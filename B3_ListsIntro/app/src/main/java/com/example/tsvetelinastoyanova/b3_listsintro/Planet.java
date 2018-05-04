@@ -1,61 +1,82 @@
 package com.example.tsvetelinastoyanova.b3_listsintro;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Planet extends RecyclerView.Adapter<Planet.ViewHolder> {
-    //private String[] pictureName;
-    private String[] mDataset;
+public class Planet implements Parcelable {
+    private String name;
+    private String description;
+    private int pictureId;
+    private String url;
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public TextView mTextView;
-        public ViewHolder(TextView v) {
-            super(v);
-            mTextView = v;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeInt(pictureId);
+        dest.writeString(url);
+    }
+
+    public static final Creator<Planet> CREATOR = new Creator<Planet>() {
+        @Override
+        public Planet createFromParcel(Parcel in) {
+            return new Planet(in);
         }
+
+        @Override
+        public Planet[] newArray(int size) {
+            return new Planet[size];
+        }
+    };
+
+    protected Planet(Parcel in) {
+        name = in.readString();
+        description = in.readString();
+        pictureId = in.readInt();
+        url = in.readString();
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public Planet(String[] myDataset) {
-        mDataset = myDataset;
+    public Planet(String name, String description, int pictureId, String url) {
+        this.name = name;
+        this.description = description;
+        this.pictureId = pictureId;
+        this.url = url;
     }
 
-    // Create new views (invoked by the layout manager)
-    @Override
-    public Planet.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
-        // create a new view
-        TextView v = (TextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.my_text_view, parent, false);
-
-      /*  R.drawable ourRID = new R.drawable();
-        Field photoNameField = ourRID.getClass().getField("aaa");
-        myImageView.setImageResource(photoNameField.getInt(ourRID));*/
-
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+    public String getName() {
+        return name;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
-        holder.mTextView.setText(mDataset[position]);
-
+    public void setName(String name) {
+        this.name = name;
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return mDataset.length;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getPictureId() {
+        return pictureId;
+    }
+
+    public void setPictureId(int pictureId) {
+        this.pictureId = pictureId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

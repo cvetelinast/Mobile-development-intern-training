@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">B3_ListsIntro</string>
+    <string name="mercury_url">https://en.wikipedia.org/wiki/Mercury_(planet)</string>
+    <string name="venus_url"> https://en.wikipedia.org/wiki/Venus</string>
+    <string name="earth_url">https://en.wikipedia.org/wiki/Earth</string>
+    <string name="mars_url">https://en.wikipedia.org/wiki/Mars</string>
+    <string name="jupiter_url">https://en.wikipedia.org/wiki/Jupiter</string>
+    <string name="saturn_url">https://en.wikipedia.org/wiki/Saturn</string>
+    <string name="uranus_url">https://en.wikipedia.org/wiki/Uranus</string>
+    <string name="neptune_url">https://en.wikipedia.org/wiki/Neptune</string>
+    <string name="planet_object">planet_object</string>
 </resources>

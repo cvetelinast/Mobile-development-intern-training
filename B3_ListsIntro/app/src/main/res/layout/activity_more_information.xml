@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:scrollbarAlwaysDrawVerticalTrack="true">
+
+    <ImageView
+        android:id="@+id/planet_picture"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/mercury" />
+
+    <TextView
+        android:id="@+id/planet_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/planet_picture"
+        android:layout_below="@id/planet_picture"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/planet_picture"
+        android:textSize="40dp"
+        tools:text="Test" />
+
+    <TextView
+        android:id="@+id/planet_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/planet_name"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/planet_picture"
+        android:autoLink="web"
+        android:textSize="15dp"
+        tools:text="www.fkdpsaof.com" />
+
+    <TextView
+        android:id="@+id/planet_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/planet_picture"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/planet_picture"
+        android:layout_marginTop="30dp"
+        tools:text="Test description anfdps fgofod kfpdpsm vcmdfsfdddccxc cxpxgfdggd gdfg dfgdgd gdfsds fdsf " />
+
+    <Button
+        android:id="@+id/webViewButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/planet_description"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Open in webview"
+        android:onClick="openLinkInWebView"/>
+
+    <WebView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/webViewButton"/>
+
+</RelativeLayout>
