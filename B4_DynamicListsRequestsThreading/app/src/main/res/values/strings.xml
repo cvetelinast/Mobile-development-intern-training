@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">B4_DynamicListsRequestsThreading</string>
+    <string name="url_input">url_input</string>
+    <string name="depth_input">depth_input</string>
+    <string name="wrong_url_prompt">You entered a wrong url. Try again.</string>
+    <string name="wrong_depth_prompt">You entered a wrong depth. Try again.</string>
+   <!-- <string name="url_pattern">^(https?:\\/\\/)?(www.)?([a&#8211;zA&#8211;Z0&#8211;9]+).[a&#8211;zA&#8211;Z0&#8211;9]*.[a&#8211;z]{3}.?([a&#8211;z]+)?$</string>-->
+</resources>
