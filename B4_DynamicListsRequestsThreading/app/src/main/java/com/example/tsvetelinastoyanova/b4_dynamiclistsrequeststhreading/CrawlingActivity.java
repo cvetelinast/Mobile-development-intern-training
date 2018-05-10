@@ -1,12 +1,15 @@
 package com.example.tsvetelinastoyanova.b4_dynamiclistsrequeststhreading;
 
 import android.content.Intent;
+import android.os.Looper;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -16,16 +19,23 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class CrawlingActivity extends AppCompatActivity implements UrlsAdapter.ItemClickListener {
+interface CrawlerEventsListener {
+    void onCrawlingStarted();
 
-    private final List<String> queueWithUrls = new LinkedList<>(); // to fix to be a queue ?
+    void onAllUrlsCrawled(List<String> crawledUrls);
+}
+
+public class CrawlingActivity extends AppCompatActivity implements UrlsAdapter.ItemClickListener, CrawlerEventsListener {
     private UrlsAdapter adapter;
-    private RecyclerView recyclerView;
-    boolean flag;
+    private Crawler crawler;
+    private String url;
+    private int depth;
+
+    private List<String> adapterItems = new ArrayList<>();
 
     @Override
     public void onItemClick(View view, int position) {
@@ -38,92 +48,73 @@ public class CrawlingActivity extends AppCompatActivity implements UrlsAdapter.I
         setContentView(R.layout.activity_crawling);
 
         Intent intent = getIntent();
-        String url = intent.getStringExtra(this.getString(R.string.url_input));
-        String depth = intent.getStringExtra(this.getString(R.string.depth_input));
+        url = intent.getStringExtra(this.getString(R.string.url_input));
+        depth = Integer.parseInt(intent.getStringExtra(this.getString(R.string.depth_input)));
 
+        crawler = new Crawler(this);
         initializeRecyclerViewAndAdapter();
-        crawling(url, Integer.parseInt(depth));
-        flag = false;
     }
 
-    public void stopCrawling(View view) {
-        Log.d("stop", "Links are " + queueWithUrls.size());
-        flag = true;
-        adapter.notifyDataSetChanged();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        crawler.startCrawling(url, depth);
+    }
 
+    /*@Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(this.getString(R.string.is_crawling_stopped), isCrawlingStopped);
+        savedInstanceState.putStringArrayList(this.getString(R.string.queue_with_urls), (ArrayList<String>) queueWithUrls); // Saving the ArrayList queueWithUrls
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        isCrawlingStopped = savedInstanceState.getBoolean(this.getString(R.string.is_crawling_stopped));
+        queueWithUrls = savedInstanceState.getStringArrayList(this.getString(R.string.queue_with_urls)); //Restoring queueWithUrls
+
+    }*/
+
+    public void stopCrawling(View view) {
+        crawler.stopCrawling();
     }
 
     private void initializeRecyclerViewAndAdapter() {
-        recyclerView = findViewById(R.id.urls);
+        RecyclerView recyclerView = findViewById(R.id.urls);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new UrlsAdapter(this, queueWithUrls);
+        initializeAdapter();
         recyclerView.setAdapter(adapter);
+    }
+
+    private void initializeAdapter() {
+        adapter = new UrlsAdapter(this, adapterItems);
         adapter.setClickListener(this);
     }
 
-    private void crawling(String enteredUrl, int length) {
-        new Thread(() -> {
-            diggingRecursive(enteredUrl, length);
-            runOnUiThread(() -> adapter.notifyDataSetChanged());
-        }).start();
+    private void makeProgressBarGone() {
+        ProgressBar progressBar = findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.GONE);
     }
 
-    private void diggingRecursive(String enteredUrl, int length) {
-        if (length == 0 || flag) {
-            return;
-        }
-        String page = getHtmlSourceFromEnteredUrl(enteredUrl);
-        if (page.equals("")) {
-            return;
-        }
-        Vector<String> grabHTMLLinks = new HTMLLinkExtractor().grabHTMLLinks(page);
-        queueWithUrls.addAll(grabHTMLLinks);
-        for (int i = 0; i < grabHTMLLinks.size(); i++) { // only the new links
-            diggingRecursive(grabHTMLLinks.get(i), length - 1);
-        }
+    private void makeProgressBarVisible() {
+        ProgressBar progressBar = findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
-    private String getHtmlSourceFromEnteredUrl(String enteredUrl) {
-        StringBuilder htmlPage = new StringBuilder();
-        InputStream in;
-        try {
-            URLConnection connection = handleUrlConnection(enteredUrl);
-
-            // Read and store the result line by line then return the entire string.
-            in = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            for (String line; (line = reader.readLine()) != null; ) {
-                htmlPage.append(line);
-            }
-            in.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return htmlPage.toString();
-        }
-        // get the whole page
-        return htmlPage.toString();
+    @Override
+    public void onCrawlingStarted() {
+        runOnUiThread(() -> makeProgressBarVisible());
     }
 
-    private URLConnection handleUrlConnection(String enteredUrl) throws IOException {
-        URLConnection connection = (createURL(enteredUrl)).openConnection();
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-        connection.connect();
-        return connection;
+    @Override
+    public void onAllUrlsCrawled(List<String> urlsCrawled) {
+        runOnUiThread(() -> {
+            adapterItems.addAll(urlsCrawled);
+            adapter.notifyDataSetChanged();
+            makeProgressBarGone();
+        });
     }
 
-    private URL createURL(String urlLink) {
-        URL url = null;
-        try {
-            url = new URL(urlLink);
-        } catch (MalformedURLException e) {
-            Log.d("Exception", "A problem with URL occured.");
-            e.printStackTrace();
-        }
-        return url;
-    }
+
 }

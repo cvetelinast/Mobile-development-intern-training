@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class UrlsAdapter extends RecyclerView.Adapter<UrlsAdapter.ViewHolder> {
@@ -17,8 +18,8 @@ public class UrlsAdapter extends RecyclerView.Adapter<UrlsAdapter.ViewHolder> {
 
     // data is passed into the constructor
     UrlsAdapter(Context context, List<String> data) {
-        this.mInflater = LayoutInflater.from(context);
-        this.mData = data;
+        mInflater = LayoutInflater.from(context);
+        mData = data;
     }
 
     // inflates the row layout from xml when needed

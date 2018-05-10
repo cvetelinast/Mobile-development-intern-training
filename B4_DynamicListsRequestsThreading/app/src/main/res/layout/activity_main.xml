@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/url_prompt"
-            android:hint="Enter URL"/>
+            android:hint="Enter URL" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -34,7 +34,7 @@
             android:id="@+id/depth_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/url_prompt"/>
+            android:layout_below="@+id/url_prompt" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -45,7 +45,7 @@
         android:layout_below="@+id/depth"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:text="Go"
-        android:onClick="startCrawling"/>
+        android:onClick="startCrawling"
+        android:text="Go" />
 
 </RelativeLayout>

@@ -1,17 +1,20 @@
 package com.example.tsvetelinastoyanova.b4_dynamiclistsrequeststhreading;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-    // here or in strings.xml is a better practice ?
     private static final String URL_PATTERN = "^(https?:\\/\\/)?(www.)?([a-zA-Z0-9]+).[a-zA-Z0-9]*.[a-z]{3}.?([a-z]+)?$";
 
     private String url;
@@ -24,21 +27,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startCrawling(View view) {
-
-        // Todo: 
-        // -case withouth internet
-        // - case rotate screen
-
-        // hard coded:
-        Intent startCrawlingIntent = new Intent(this, CrawlingActivity.class);
-        startCrawlingIntent.putExtra(this.getString(R.string.url_input), "https://github.com/kstpr");
-        startCrawlingIntent.putExtra(this.getString(R.string.depth_input), "2");
-        startActivity(startCrawlingIntent);
-
-     // execute this:
-
-     /*  initializeInputs();
-       validateInputs();*/
+       initializeInputs();
+       validateInputs();
     }
 
     private void initializeInputs() {
@@ -46,12 +36,21 @@ public class MainActivity extends AppCompatActivity {
         url = url_input.getText().toString();
         TextInputEditText depth_input = findViewById(R.id.depth_input);
         depth = depth_input.getText().toString();
+
+        // hard coded:
+       // url = "https://github.com/kstpr";
+       // depth = "2";
+
     }
 
     private void validateInputs() {
         boolean isUrlValid = validateUrl(url);
         boolean isDepthValid = validateNumber(depth);
 
+       /* if (!isOnline()) {
+            Toast.makeText(this, this.getString(R.string.no_internet_message), Toast.LENGTH_SHORT).show();
+            return;
+        }*/
         if (isUrlValid && isDepthValid) {
             startCrawlingActivity();
         } else if (!isUrlValid) {
@@ -73,10 +72,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateNumber(String number) {
-        if(number.equals("")) {
+        if (number.equals("")) {
             depth = "100"; // = forever ?
             return true;
         }
         return Pattern.matches("\\d+", number);
     }
+
+    /*public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }*/
+
+    /*
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            // is this reliable ??
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }*/
 }
