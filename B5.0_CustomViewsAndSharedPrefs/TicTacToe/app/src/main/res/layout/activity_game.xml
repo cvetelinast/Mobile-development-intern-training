@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/com.example.tsvetelinastoyanova.tic_tac_toe"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/back">
+
+    <LinearLayout
+        android:id="@+id/symbol_field"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="You: "
+        android:textSize="40dp" />
+
+    <TextView
+        android:id="@+id/symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_toRightOf="@+id/text"
+        android:textSize="40dp"
+        tools:text="X" />
+    </LinearLayout>
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="240dp" />
+
+    <Button
+        android:visibility="gone"
+        android:id="@+id/new_game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="190dp"
+        android:text="New game"
+        android:onClick="startNewGame"
+        android:background="@drawable/button_selector"/>
+
+    <LinearLayout
+        android:id="@+id/board"
+        android:visibility="visible"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_below="@+id/symbol_field"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/one"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/two"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/three"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/four"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/five"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/six"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/seven"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/eight"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+
+            <com.example.tsvetelinastoyanova.tic_tac_toe.Box
+                android:id="@+id/nine"
+                android:layout_width="wrap_content"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_background"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
