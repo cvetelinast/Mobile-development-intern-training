@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Tic-Tac-Toe</string>
+    <string name="first_player_name">first_player_name</string>
+    <string name="second_player_name">second_player_name</string>
+    <string name="wrong_names_message">Wrong input. Please, try again.</string>
+    <string name="result">result</string>
+    <string name="win">win</string>
+    <string name="lose">lose</string>
+    <string name="equal">equal</string>
+</resources>

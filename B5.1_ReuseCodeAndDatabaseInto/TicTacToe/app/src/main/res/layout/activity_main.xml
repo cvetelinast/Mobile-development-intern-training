@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@drawable/back">
+
+    <ImageView
+        android:id="@+id/pic"
+        android:layout_width="wrap_content"
+        android:layout_height="240dp"
+        android:src="@drawable/pic" />
+
+    <EditText
+        android:id="@+id/first_player_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pic"
+        android:hint="Name of the first player."
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/second_player_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/first_player_name"
+        android:hint="Name of the second player."
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/statistics_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/second_player_name"
+        android:layout_margin="60dp"
+        android:layout_alignLeft="@+id/pic"
+        android:text="Statistics"
+        android:onClick="openStatistics"
+        android:background="@drawable/button_selector"/>
+
+    <Button
+        android:id="@+id/new_game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/second_player_name"
+        android:layout_margin="60dp"
+        android:layout_alignRight="@+id/pic"
+        android:text="New game"
+        android:onClick="startNewGame"
+        android:background="@drawable/button_selector"/>
+
+
+</RelativeLayout>

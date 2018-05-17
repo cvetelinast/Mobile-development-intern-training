@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Statistics"
+    android:background="@drawable/back">
+
+    <TextView
+        android:id="@+id/heading_statistics"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:text="Statistics:"
+        android:textSize="40dp" />
+    <TextView
+        android:id="@+id/wins"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/heading_statistics"
+        android:layout_marginTop="40dp"
+        android:text="✔Wins: "
+        android:textColor="#0dc62c"
+        android:textSize="30dp" />
+    <TextView
+        android:id="@+id/loses"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/wins"
+        android:layout_marginTop="40dp"
+        android:text="✘ Loses: "
+        android:textColor="#ed0e0e"
+        android:textSize="30dp" />
+
+</RelativeLayout>
