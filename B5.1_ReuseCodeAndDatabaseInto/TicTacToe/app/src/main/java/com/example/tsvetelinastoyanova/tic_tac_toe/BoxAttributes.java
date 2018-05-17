@@ -8,7 +8,7 @@ public class BoxAttributes {
     private int margin;
     private Paint paint;
 
-    public BoxAttributes(int width, int height,int margin) {
+    public BoxAttributes(int width, int height, int margin) {
         this.width = width;
         this.height = height;
         this.margin = margin;

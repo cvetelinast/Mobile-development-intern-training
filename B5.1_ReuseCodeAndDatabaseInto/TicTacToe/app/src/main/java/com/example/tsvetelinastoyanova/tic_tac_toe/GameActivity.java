@@ -17,9 +17,6 @@ import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Database.AppDatabase;
 import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.GameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.OnePlayerGameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.TwoPlayersGameEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +26,7 @@ import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
-   // GameEngine gameEngine;
+    // GameEngine gameEngine;
 
     public boolean firstPlayerSymbol;
     public static final Map<Boolean, Character> variants = new HashMap<>();
@@ -37,9 +34,9 @@ public class GameActivity extends AppCompatActivity {
     private boolean secondPlayerSymbol;
     public static boolean currentPlayerSymbol;
 
-   private List<Box> boardViews = new ArrayList<>();
-   private Board board;
-     private String result;
+    private List<Box> boardViews = new ArrayList<>();
+    private Board board;
+    private String result;
 
     private String firstPlayerName;
     private String secondPlayerName;
@@ -108,7 +105,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void showNamesAndSymbolsForPlayers() {
         textViewFirst.setText(firstPlayerName + ": " + variants.get(firstPlayerSymbol).toString());//gameEngine.getSymbol(firstPlayerSymbol).toString());
-        textViewSecond.setText(secondPlayerName + ": " +variants.get(secondPlayerSymbol).toString());// gameEngine.getSymbol(!firstPlayerSymbol).toString());
+        textViewSecond.setText(secondPlayerName + ": " + variants.get(secondPlayerSymbol).toString());// gameEngine.getSymbol(!firstPlayerSymbol).toString());
         textViewFirst.setTypeface(null, Typeface.BOLD);
     }
 
@@ -123,7 +120,7 @@ public class GameActivity extends AppCompatActivity {
         boardViews.add(findViewById(R.id.eight));
         boardViews.add(findViewById(R.id.nine));
 
-       // gameEngine.makeBoard(boardViews);
+        // gameEngine.makeBoard(boardViews);
         board = new Board(boardViews.size());
         setOnClickListeners();
     }
@@ -152,11 +149,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void checkSituationAfterMove(Box box, int index) {
-        if(!box.isChecked()) {
+        if (!box.isChecked()) {
             box.setOnTouchEvent(currentPlayerSymbol);
             board.personMove(index);
             boolean isWinner = isThereWinner();
-            if (!isWinner && areMoreMoves()){// gameEngine.areMoreMoves()) {
+            if (!isWinner && areMoreMoves()) {// gameEngine.areMoreMoves()) {
                 board.personMove(index);
                 changePlayerTurn();
                 changeStyles();
@@ -164,10 +161,12 @@ public class GameActivity extends AppCompatActivity {
             } else if (isWinner) {
                 Line line = board.checkIfPersonWin(currentPlayerSymbol);
                 startLineCreatingIfThereIsWinner(line);
-                openResultViews(getResources().getString(R.string.win));
+
                 if (isFirstPlayerTurn) {
+                    openResultViews(/*getResources().getString(R.string.win)*/ firstPlayerName);
                     databaseManipulation(firstPlayerName, secondPlayerName);
                 } else {
+                    openResultViews(/*getResources().getString(R.string.win)*/ secondPlayerName);
                     databaseManipulation(secondPlayerName, firstPlayerName);
                 }
             }
@@ -212,9 +211,9 @@ public class GameActivity extends AppCompatActivity {
         boardViews.get(line.endIndex).setIsThereWinner(line.direction);
     }
 
-    private void openResultViews(String result) {
+    private void openResultViews(/*String result*/String winner) {
         Log.d("tag", "Execute openResultViews() in GameActivity.");
-        this.result = result;
+        //  this.result = result;
         LinearLayout board = this.findViewById(R.id.board);
 
         board.animate().alpha(0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
@@ -226,11 +225,13 @@ public class GameActivity extends AppCompatActivity {
                 textViewSecond.setVisibility(LinearLayout.GONE);
                 // initPicture();
                 initButton();
+                showWinnerText(winner);
+
             }
         });
     }
 
-    private void initPicture() {
+    /*private void initPicture() {
         ImageView imageview = findViewById(R.id.image_view);
         imageview.setVisibility(ImageView.VISIBLE);
         if (result.equals(getResources().getString(R.string.win))) {
@@ -242,7 +243,14 @@ public class GameActivity extends AppCompatActivity {
         } else {
             imageview.setImageDrawable(getResources().getDrawable(R.drawable.equal));
         }
+    }*/
+
+    private void showWinnerText(String winner) {
+        TextView textView = findViewById(R.id.winner_text);
+        textView.setText(winner + " wins!");
+        textView.setVisibility(TextView.VISIBLE);
     }
+
 
     private void initButton() {
         Button newGameButton = findViewById(R.id.new_game_button);
@@ -261,12 +269,12 @@ public class GameActivity extends AppCompatActivity {
         new Thread(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "players").build();
             if (db.userDao().getUserWithThisName(winner) == 0) {
-                db.userDao().insertPlayer(new Player(winner,0,0));
+                db.userDao().insertPlayer(new Player(winner, 0, 0));
             }
             db.userDao().incrementNumWinsOfPlayer(winner);
 
             if (db.userDao().getUserWithThisName(loser) == 0) {
-                db.userDao().insertPlayer(new Player(loser,0,0));
+                db.userDao().insertPlayer(new Player(loser, 0, 0));
             }
             db.userDao().decrementNumLosesOfPlayer(loser);
         }

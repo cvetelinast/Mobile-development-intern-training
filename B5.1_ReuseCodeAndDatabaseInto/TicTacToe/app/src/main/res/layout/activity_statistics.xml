@@ -15,7 +15,16 @@
         android:layout_centerHorizontal="true"
         android:text="Statistics:"
         android:textSize="40dp" />
-    <TextView
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/heading_statistics"
+        android:layout_marginTop="20dp"/>
+
+    <!--<TextView
         android:id="@+id/wins"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -34,6 +43,6 @@
         android:layout_marginTop="40dp"
         android:text="✘ Loses: "
         android:textColor="#ed0e0e"
-        android:textSize="30dp" />
+        android:textSize="30dp" />-->
 
 </RelativeLayout>

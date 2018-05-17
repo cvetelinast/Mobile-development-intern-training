@@ -9,7 +9,8 @@ import android.support.annotation.NonNull;
 public class Player {
 
     @PrimaryKey
-    @NonNull private String name;
+    @NonNull
+    private String name;
 
     @ColumnInfo(name = "wins")
     private int wins;
@@ -23,7 +24,8 @@ public class Player {
         this.loses = loses;
     }
 
-    public String getName() {
+    public @NonNull
+    String getName() {
         return name;
     }
 
@@ -35,7 +37,7 @@ public class Player {
         return loses;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 

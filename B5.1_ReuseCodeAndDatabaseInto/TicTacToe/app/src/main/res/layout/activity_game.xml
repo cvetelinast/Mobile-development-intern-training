@@ -22,11 +22,21 @@
         android:text="Player2: X"
         android:textSize="20sp" />
 
-    <ImageView
+    <TextView
+        android:id="@+id/winner_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second_player_name_symbol"
+        android:layout_centerHorizontal="true"
+        android:text="Player2 wins"
+        android:textSize="40sp"
+        android:visibility="gone" />
+
+    <!--<ImageView
         android:id="@+id/image_view"
         android:layout_width="wrap_content"
         android:layout_height="240dp"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
     <Button
         android:id="@+id/new_game_button"
@@ -44,7 +54,7 @@
         android:id="@+id/board"
         android:layout_width="350dp"
         android:layout_height="350dp"
-        android:layout_below="@+id/field_second"
+        android:layout_below="@+id/first_player_name_symbol"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="80dp"
         android:orientation="vertical"
