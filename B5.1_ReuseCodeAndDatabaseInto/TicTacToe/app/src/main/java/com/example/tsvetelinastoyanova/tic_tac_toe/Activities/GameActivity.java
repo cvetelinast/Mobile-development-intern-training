@@ -149,7 +149,7 @@ public class GameActivity extends AppCompatActivity {
     private void checkSituationAfterMove(Box box, int index) {
         if (tryToMakeValidMove(box, index)) {
             checkShouldWeContinue();
-            if (!isGameForTwoPlayers && isTheGameOver) {
+            if (!isGameForTwoPlayers && !isTheGameOver) {
                 simulateMove();
                 checkShouldWeContinue();
             }
