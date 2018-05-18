@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
+package com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses;
 
 public enum Direction {
     HORIZONTAL(0), VERTICAL(1), UPDOWNDIAGONAL(2), DOWNUPDIAGONAL(3);

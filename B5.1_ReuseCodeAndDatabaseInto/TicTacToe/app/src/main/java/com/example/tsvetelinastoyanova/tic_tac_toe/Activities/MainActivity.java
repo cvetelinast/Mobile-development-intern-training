@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.Activities;
+package com.example.tsvetelinastoyanova.tic_tac_toe.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     String firstPlayerName;
     String secondPlayerName;
-    private boolean twoPlayersGame;
+    private boolean isGameForTwoPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +32,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void onCheckBoxClicked(boolean isChecked) {
-        final EditText editText = findViewById(R.id.second_player_name);
-        if (isChecked) {
-            editText.setVisibility(View.VISIBLE);
-            twoPlayersGame = true;
-        } else {
-            editText.setVisibility(View.INVISIBLE);
-            twoPlayersGame = false;
-        }
-    }
-
     public void startNewGame(View view) {
-        if (validateNamesAndSetFieldsWithThem()) {
+        initFieldsWithNames();
+        if (areNamesValid()) {
             Intent startNewGameIntent = makeIntent();
             startActivity(startNewGameIntent);
         } else {
@@ -53,12 +43,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public Intent makeIntent() {
+    public void openStatistics(View view) {
+        Intent openStatisticsIntent = new Intent(this, Statistics.class);
+        startActivity(openStatisticsIntent);
+    }
+
+    private Intent makeIntent() {
         Intent startNewGameIntent = new Intent(this, GameActivity.class);
         startNewGameIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        startNewGameIntent.putExtra(getString(R.string.two_players_game), twoPlayersGame);
+        startNewGameIntent.putExtra(getString(R.string.two_players_game), isGameForTwoPlayers);
         startNewGameIntent.putExtra(getString(R.string.first_player_name), firstPlayerName);
-        if (twoPlayersGame) {
+        if (isGameForTwoPlayers) {
             startNewGameIntent.putExtra(getString(R.string.second_player_name), secondPlayerName);
         } else {
             startNewGameIntent.putExtra(getString(R.string.second_player_name), getString(R.string.computer));
@@ -66,23 +61,31 @@ public class MainActivity extends AppCompatActivity {
         return startNewGameIntent;
     }
 
-    public void openStatistics(View view) {
-        Intent openStatisticsIntent = new Intent(this, Statistics.class);
-        startActivity(openStatisticsIntent);
-    }
-
-    public boolean validateNamesAndSetFieldsWithThem() {
+    private void initFieldsWithNames() {
         TextView viewFirstPlayerName = findViewById(R.id.first_player_name);
         firstPlayerName = viewFirstPlayerName.getText().toString();
 
         TextView viewSecondPlayerName = findViewById(R.id.second_player_name);
         secondPlayerName = viewSecondPlayerName.getText().toString();
+    }
 
+    private boolean areNamesValid() {
         if (firstPlayerName.equals(secondPlayerName) || firstPlayerName.length() == 0) {
             return false;
-        } else if (secondPlayerName.length() == 0 && twoPlayersGame) {
+        } else if (secondPlayerName.length() == 0 && isGameForTwoPlayers) {
             return false;
         }
         return true;
+    }
+
+    private void onCheckBoxClicked(boolean isChecked) {
+        final EditText editText = findViewById(R.id.second_player_name);
+        if (isChecked) {
+            editText.setVisibility(View.VISIBLE);
+            isGameForTwoPlayers = true;
+        } else {
+            editText.setVisibility(View.INVISIBLE);
+            isGameForTwoPlayers = false;
+        }
     }
 }

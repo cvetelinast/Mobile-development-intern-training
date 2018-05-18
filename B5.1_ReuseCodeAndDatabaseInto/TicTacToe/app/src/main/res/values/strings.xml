@@ -6,7 +6,7 @@
     <string name="result">result</string>
     <string name="win">win</string>
     <string name="lose">lose</string>
-    <string name="equal">equal</string>
+    <string name="equal">Equal result!</string>
     <string name="two_players_game">two_players_game</string>
     <string name="computer">computer</string>
 </resources>

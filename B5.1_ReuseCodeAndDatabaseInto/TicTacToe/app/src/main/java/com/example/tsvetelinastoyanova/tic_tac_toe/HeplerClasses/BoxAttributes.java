@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
+package com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses;
 
 import android.graphics.Paint;
 

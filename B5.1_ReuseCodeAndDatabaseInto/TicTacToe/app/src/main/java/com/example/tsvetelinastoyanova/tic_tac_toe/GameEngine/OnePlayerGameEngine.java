@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine;
+package com.example.tsvetelinastoyanova.tic_tac_toe.gameengine;
 
 public class OnePlayerGameEngine extends GameEngine {
     public OnePlayerGameEngine(){}

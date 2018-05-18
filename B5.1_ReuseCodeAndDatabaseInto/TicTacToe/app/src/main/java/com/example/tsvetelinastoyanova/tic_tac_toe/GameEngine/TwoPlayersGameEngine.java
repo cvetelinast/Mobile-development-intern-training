@@ -1,9 +1,10 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine;
+package com.example.tsvetelinastoyanova.tic_tac_toe.gameengine;
 
 public class TwoPlayersGameEngine extends GameEngine {
-    public TwoPlayersGameEngine() { }
+    public TwoPlayersGameEngine() {
+    }
+
     public void simulateComputerMove() {
-        return;
     }
 
 }

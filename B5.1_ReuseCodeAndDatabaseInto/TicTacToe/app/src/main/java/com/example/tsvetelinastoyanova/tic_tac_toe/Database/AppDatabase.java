@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.Database;
+package com.example.tsvetelinastoyanova.tic_tac_toe.database;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;

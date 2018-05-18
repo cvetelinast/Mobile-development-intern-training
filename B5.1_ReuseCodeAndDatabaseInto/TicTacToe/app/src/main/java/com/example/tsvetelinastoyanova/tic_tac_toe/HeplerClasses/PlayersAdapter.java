@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
+package com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
+import com.example.tsvetelinastoyanova.tic_tac_toe.database.Player;
 import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
 import java.util.List;

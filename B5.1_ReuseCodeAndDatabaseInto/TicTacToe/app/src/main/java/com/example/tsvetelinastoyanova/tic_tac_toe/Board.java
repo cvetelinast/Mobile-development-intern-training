@@ -1,9 +1,9 @@
 package com.example.tsvetelinastoyanova.tic_tac_toe;
 
-import com.example.tsvetelinastoyanova.tic_tac_toe.Activities.GameActivity;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.GameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Direction;
-import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Line;
+import com.example.tsvetelinastoyanova.tic_tac_toe.activities.GameActivity;
+import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.GameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses.Direction;
+import com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses.Line;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +35,13 @@ public class Board {
     }
 
     public int computerMove() {
-        int i = randomGenerator.nextInt(freeCellIndexes.size());
+        int i = chooseBestMove(GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs()));
+        if (i == 9) {
+            i = chooseBestMove(GameEngine.getSymbolFromBooleanValue(!GameActivity.getWhoseTurnIs())); // counter attack
+            if (i == 9) {
+                i = randomGenerator.nextInt(freeCellIndexes.size());
+            }
+        }
         final int computerChoiceIndex = freeCellIndexes.get(i);
         final char computerSymbol = GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs());
         boardWithSymbols.put(computerChoiceIndex, computerSymbol);
@@ -43,22 +49,27 @@ public class Board {
         return computerChoiceIndex;
     }
 
-    public Line checkIfPersonWinAndGetLineWithIndices(/*boolean playerSymbol*/) {
-        if (checkIfWin(/*playerSymbol*/)) {
+    private int chooseBestMove(Character symbol) {
+        for (int i = 0; i < freeCellIndexes.size(); i++) {
+            int computerChoiceIndex = freeCellIndexes.get(i);
+            boardWithSymbols.put(computerChoiceIndex, symbol);
+            if (checkIfWin(symbol)) {
+                boardWithSymbols.put(computerChoiceIndex, 'N');
+                return i;
+            }
+            boardWithSymbols.put(computerChoiceIndex, 'N');
+        }
+        return 9;
+    }
+
+    public Line checkIfSomeoneWinAndGetLineWithIndices() {
+        if (checkIfWin(GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs()))) {
             return lineIfWinner;
         }
         return new Line();
     }
 
-    /*public Line checkIfComputerWin() {
-        if (checkIfWin(GameActivity.getWhoseTurnIs())) {
-            return lineIfWinner;
-        }
-        return new Line();
-    }*/
-
-    private boolean checkIfWin(/*boolean symbol*/) {
-        Character playerSymbol = GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs());
+    private boolean checkIfWin(Character playerSymbol) {
         if (checkIfThereIsWinnerDiagonal(playerSymbol)) {
             return true;
         }

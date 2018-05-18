@@ -1,6 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
-
-import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Direction;
+package com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses;
 
 public class Line {
     private int startIndex;

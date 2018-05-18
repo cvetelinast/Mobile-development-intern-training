@@ -1,8 +1,7 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe.Activities;
+package com.example.tsvetelinastoyanova.tic_tac_toe.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +12,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Box;
-import com.example.tsvetelinastoyanova.tic_tac_toe.Database.AppDatabase;
-import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.GameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.OnePlayerGameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.TwoPlayersGameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.GameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.OnePlayerGameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.TwoPlayersGameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses.DatabaseConnector;
 import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
 import java.util.ArrayList;
@@ -25,13 +23,14 @@ import java.util.List;
 
 public class GameActivity extends AppCompatActivity {
 
-    GameEngine gameEngine;
     public boolean firstPlayerSymbol;
+
+    private GameEngine gameEngine;
     private String firstPlayerName;
     private String secondPlayerName;
     private static boolean isFirstPlayerTurn;
-    private boolean isTheGameWon;
-    private boolean twoPlayersGame;
+    private boolean isTheGameOver;
+    private boolean isGameForTwoPlayers;
 
     private TextView textViewFirst;
     private TextView textViewSecond;
@@ -43,15 +42,15 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         initializePlayersNames(intent);
         initializeGameEngine(intent);
+
         symbolsInit();
-        showPlayersNames();
-        setPlayerOneIsFirst();
+        prepareScreen();
         gameEngine.initializeMapWithVariants();
         showNamesAndSymbolsForPlayers();
         initBoard();
     }
 
-    public static boolean getWhoseTurnIs(){
+    public static boolean getWhoseTurnIs() {
         return isFirstPlayerTurn;
     }
 
@@ -63,14 +62,19 @@ public class GameActivity extends AppCompatActivity {
         startActivity(startNewGameIntent);
     }
 
+    private void prepareScreen() {
+        showPlayersNames();
+        setPlayerOneIsFirst();
+    }
+
     private void initializePlayersNames(Intent intent) {
         firstPlayerName = intent.getStringExtra(getString(R.string.first_player_name));
         secondPlayerName = intent.getStringExtra(getString(R.string.second_player_name));
     }
 
-    private void initializeGameEngine(Intent intent){
-        twoPlayersGame = intent.getBooleanExtra(getString(R.string.two_players_game), false);
-        if(twoPlayersGame){
+    private void initializeGameEngine(Intent intent) {
+        isGameForTwoPlayers = intent.getBooleanExtra(getString(R.string.two_players_game), false);
+        if (isGameForTwoPlayers) {
             gameEngine = new TwoPlayersGameEngine();
         } else {
             gameEngine = new OnePlayerGameEngine();
@@ -92,9 +96,9 @@ public class GameActivity extends AppCompatActivity {
         textViewSecond.setTypeface(null, styleSecond);
     }
 
-   private void symbolsInit(){
-       firstPlayerSymbol = gameEngine.randomSymbolInit();
-   }
+    private void symbolsInit() {
+        firstPlayerSymbol = gameEngine.randomSymbolInit();
+    }
 
     private void showNamesAndSymbolsForPlayers() {
         textViewFirst.setText(firstPlayerName + ": " + gameEngine.getSymbolFromBooleanValue(firstPlayerSymbol));
@@ -132,8 +136,7 @@ public class GameActivity extends AppCompatActivity {
         gameEngine.changePlayerTurn();
     }
 
-
-    public void setOnClickListeners(List<Box> boardViews ) {
+    public void setOnClickListeners(List<Box> boardViews) {
         for (int i = 0; i < boardViews.size(); i++) {
             int index = i;
             boardViews.get(i).setOnClickListener(v -> {
@@ -144,40 +147,47 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void checkSituationAfterMove(Box box, int index) {
-        makeMove(box, index);
-        checkShouldWeContinue();
-        if(!twoPlayersGame && !isTheGameWon) {
-            simulateMove();
+        if (tryToMakeValidMove(box, index)) {
             checkShouldWeContinue();
-        }
-    }
-
-    private void checkShouldWeContinue() {
-        if (gameEngine.isThereWinner()) {
-            isTheGameWon = true;
-            if (isFirstPlayerTurn) {
-                openResultViews(firstPlayerName);
-                databaseManipulation(firstPlayerName, secondPlayerName);
-            } else {
-                openResultViews(secondPlayerName);
-                databaseManipulation(secondPlayerName, firstPlayerName);
+            if (!isGameForTwoPlayers && isTheGameOver) {
+                simulateMove();
+                checkShouldWeContinue();
             }
-        } else if (!gameEngine.areMoreMoves()) {
-            openResultViews(getResources().getString(R.string.equal));
         }
-        changePlayerTurn();
-        changeStyles();
     }
 
-    private void makeMove(Box box, int index) {
-        gameEngine.makeMoveIfBoxIsFree(box, index);
+    private boolean tryToMakeValidMove(Box box, int index) {
+        return gameEngine.isMoveSuccessful(box, index);
     }
 
     private void simulateMove() {
         gameEngine.simulateComputerMove();
     }
 
-    private void openResultViews(String winner) {
+    private void checkShouldWeContinue() {
+        if (gameEngine.isThereWinner()) {
+            isTheGameOver = true;
+            if (isFirstPlayerTurn) {
+                openResultViews(firstPlayerName + " wins!");
+                databaseConnection(firstPlayerName, secondPlayerName);
+            } else {
+                openResultViews(secondPlayerName + " wins!");
+                databaseConnection(secondPlayerName, firstPlayerName);
+            }
+        } else if (!gameEngine.areMoreMoves()) {
+            isTheGameOver = true;
+            openResultViews(getResources().getString(R.string.equal));
+        }
+        changePlayerTurn();
+        changeStyles();
+    }
+
+    private void databaseConnection(String winner, String loser) {
+        DatabaseConnector databaseConnector = new DatabaseConnector(winner, loser);
+        databaseConnector.databaseManipulation(getApplicationContext());
+    }
+
+    private void openResultViews(String winnerText) {
         LinearLayout board = this.findViewById(R.id.board);
 
         board.animate().alpha(0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
@@ -185,39 +195,27 @@ public class GameActivity extends AppCompatActivity {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 board.setVisibility(LinearLayout.GONE);
-                textViewFirst.setVisibility(LinearLayout.GONE);
-                textViewSecond.setVisibility(LinearLayout.GONE);
-                initButton();
-                showWinnerText(winner);
+                setNamesInvisible();
+                initAndShowButton();
+                initAndShowWinnerText(winnerText);
 
             }
         });
     }
 
-    private void showWinnerText(String winner) {
-        TextView textView = findViewById(R.id.winner_text);
-        textView.setText(winner + " wins!");
-        textView.setVisibility(TextView.VISIBLE);
+    private void setNamesInvisible() {
+        textViewFirst.setVisibility(LinearLayout.GONE);
+        textViewSecond.setVisibility(LinearLayout.GONE);
     }
 
-    private void initButton() {
+    private void initAndShowButton() {
         Button newGameButton = findViewById(R.id.new_game_button);
         newGameButton.setVisibility(Button.VISIBLE);
     }
 
-    private void databaseManipulation(String winner, String loser) {
-        new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "players").build();
-            if (db.userDao().getUserWithThisName(winner) == 0) {
-                db.userDao().insertPlayer(new Player(winner, 0, 0));
-            }
-            db.userDao().incrementNumWinsOfPlayer(winner);
-
-            if (db.userDao().getUserWithThisName(loser) == 0) {
-                db.userDao().insertPlayer(new Player(loser, 0, 0));
-            }
-            db.userDao().decrementNumLosesOfPlayer(loser);
-        }
-        ).start();
+    private void initAndShowWinnerText(String winnerText) {
+        TextView textView = findViewById(R.id.winner_text);
+        textView.setText(winnerText);
+        textView.setVisibility(TextView.VISIBLE);
     }
 }
