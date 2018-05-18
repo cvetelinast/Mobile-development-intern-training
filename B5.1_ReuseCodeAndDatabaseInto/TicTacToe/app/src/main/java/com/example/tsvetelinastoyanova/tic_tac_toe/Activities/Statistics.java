@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe;
+package com.example.tsvetelinastoyanova.tic_tac_toe.Activities;
 
 import android.arch.persistence.room.Room;
 import android.content.SharedPreferences;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Database.AppDatabase;
 import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.PlayersAdapter;
+import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
 import java.util.ArrayList;
 import java.util.List;

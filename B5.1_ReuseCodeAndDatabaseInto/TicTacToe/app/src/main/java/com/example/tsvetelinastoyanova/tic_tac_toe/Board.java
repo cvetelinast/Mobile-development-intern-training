@@ -1,5 +1,10 @@
 package com.example.tsvetelinastoyanova.tic_tac_toe;
 
+import com.example.tsvetelinastoyanova.tic_tac_toe.Activities.GameActivity;
+import com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine.GameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Direction;
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Line;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,35 +30,35 @@ public class Board {
     }
 
     public void personMove(int i) {
-        boardWithSymbols.put(i, GameActivity.variants.get(GameActivity.currentPlayerSymbol));
+        boardWithSymbols.put(i, GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs()));
         freeCellIndexes.remove(Integer.valueOf(i));
     }
 
     public int computerMove() {
         int i = randomGenerator.nextInt(freeCellIndexes.size());
         final int computerChoiceIndex = freeCellIndexes.get(i);
-        final char computerSymbol = GameActivity.variants.get(GameActivity.currentPlayerSymbol);
+        final char computerSymbol = GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs());
         boardWithSymbols.put(computerChoiceIndex, computerSymbol);
         freeCellIndexes.remove(i);
         return computerChoiceIndex;
     }
 
-    public Line checkIfPersonWin(boolean playerSymbol) {
-        if (checkIfWin(playerSymbol)) {
+    public Line checkIfPersonWinAndGetLineWithIndices(/*boolean playerSymbol*/) {
+        if (checkIfWin(/*playerSymbol*/)) {
             return lineIfWinner;
         }
         return new Line();
     }
 
-    public Line checkIfComputerWin() {
-        if (checkIfWin(GameActivity.currentPlayerSymbol)) {
+    /*public Line checkIfComputerWin() {
+        if (checkIfWin(GameActivity.getWhoseTurnIs())) {
             return lineIfWinner;
         }
         return new Line();
-    }
+    }*/
 
-    private boolean checkIfWin(boolean symbol) {
-        Character playerSymbol = GameActivity.variants.get(symbol);
+    private boolean checkIfWin(/*boolean symbol*/) {
+        Character playerSymbol = GameEngine.getSymbolFromBooleanValue(GameActivity.getWhoseTurnIs());
         if (checkIfThereIsWinnerDiagonal(playerSymbol)) {
             return true;
         }

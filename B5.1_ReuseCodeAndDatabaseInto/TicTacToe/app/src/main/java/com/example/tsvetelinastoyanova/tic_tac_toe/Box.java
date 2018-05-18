@@ -7,6 +7,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.BoxAttributes;
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Direction;
+
 public class Box extends View {
 
     BoxAttributes boxAttributes;

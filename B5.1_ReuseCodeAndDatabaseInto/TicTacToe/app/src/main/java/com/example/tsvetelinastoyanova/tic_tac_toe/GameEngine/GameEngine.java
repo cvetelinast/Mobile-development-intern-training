@@ -1,11 +1,20 @@
 package com.example.tsvetelinastoyanova.tic_tac_toe.GameEngine;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.arch.persistence.room.Room;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Board;
 import com.example.tsvetelinastoyanova.tic_tac_toe.Box;
-import com.example.tsvetelinastoyanova.tic_tac_toe.Line;
+import com.example.tsvetelinastoyanova.tic_tac_toe.Database.AppDatabase;
+import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Line;
 import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
 import java.util.ArrayList;
@@ -16,127 +25,87 @@ import java.util.Random;
 
 public abstract class GameEngine {
 
-   /* public boolean firstPlayerSymbol;
-    public static final Map<Boolean, Character> variants = new HashMap<>();
 
-    private boolean secondPlayerSymbol;
-    public static boolean currentPlayerSymbol;
-    private List<Box> boardViews = new ArrayList<>();
-    private Board board;
-    private String result;
+    public boolean firstPlayerSymbol;
+    private static final Map<Boolean, Character> variants = new HashMap<>();
 
-    private String firstPlayerName;
-    private String secondPlayerName;
+    //private boolean secondPlayerSymbol;
+    public boolean currentPlayerSymbol;
+
+    protected List<Box> boardViews = new ArrayList<>();
+    protected Board board;
     private boolean isFirstPlayerTurn;
 
-    GameEngine(String firstPlayerName, String secondPlayerName, boolean firstPlayerSymbol){
-        this.firstPlayerName = firstPlayerName;
-        this.secondPlayerName = secondPlayerName;
-        this.firstPlayerSymbol = firstPlayerSymbol;
-        initializeMapWithVariants();
-        secondPlayerSymbolInit();
+    public GameEngine(){}
 
-       // setNamesAndSymbolsForPlayers();
-      //  initBoard();
+    public static Character getSymbolFromBooleanValue(boolean booleanValueOfSymbol){
+        return variants.get(booleanValueOfSymbol);
     }
 
-    public Character getSymbol(boolean symbol){
-        return variants.get(symbol);
-    }
-
-   *//* public void makeBoard(List<Box> views){
-        boardViews = views;
-        board = new Board(boardViews.size());
-        setOnClickListeners();
-    }*//*
-
-    private void initializeMapWithVariants() {
+    public void initializeMapWithVariants() {
         variants.put(true, 'O');
         variants.put(false, 'X');
     }
 
-    private void secondPlayerSymbolInit() {
-       // Random random = new Random();
-       // firstPlayerSymbol = random.nextBoolean();
-        secondPlayerSymbol = !firstPlayerSymbol;
+    public boolean randomSymbolInit() {
+        Random random = new Random();
+        firstPlayerSymbol = random.nextBoolean();
+        //secondPlayerSymbol = !firstPlayerSymbol;
         currentPlayerSymbol = firstPlayerSymbol;
+        return firstPlayerSymbol;
     }
 
-    *//*private void setNamesAndSymbolsForPlayers() {
-        textViewFirst.setText(firstPlayerName + ": " + variants.get(firstPlayerSymbol).toString());
-        textViewSecond.setText(secondPlayerName + ": " + variants.get(secondPlayerSymbol).toString());
-        textViewFirst.setTypeface(null, Typeface.BOLD);
-    }*//*
-
-    *//*private void initBoard() {
-        boardViews.add(findViewById(R.id.one));
-        boardViews.add(findViewById(R.id.two));
-        boardViews.add(findViewById(R.id.three));
-        boardViews.add(findViewById(R.id.four));
-        boardViews.add(findViewById(R.id.five));
-        boardViews.add(findViewById(R.id.six));
-        boardViews.add(findViewById(R.id.seven));
-        boardViews.add(findViewById(R.id.eight));
-        boardViews.add(findViewById(R.id.nine));
-
-        board = new Board(boardViews.size());
-        setOnClickListeners();
-    }*//*
-
-   *//* private void setOnClickListeners() {
-        for (int i = 0; i < boardViews.size(); i++) {
-            int index = i;
-            boardViews.get(i).setOnClickListener(v -> {
-                Box box = (Box) v;
-                personOnActionClick(box, index);
-            });
-        }
-    }*//*
-
-    public boolean personOnActionClick(Box box, int index) {
-        if (!box.isChecked()) {
-            box.setOnTouchEvent(currentPlayerSymbol);
-            board.personMove(index);
-            return true;
-        }
-        return false;
+    public void addBoardViews(List<Box> boardViews) {
+        this.boardViews.addAll(boardViews);
     }
 
-    *//*public void checkIfGameShouldContinue(Box box, int index){
-           // boolean isWinner = isThereWinner();
-            if (!isWinner && areMoreMoves()) {
-                //board.personMove(index);
-                changePlayerTurn();
-                changeStyles();
-                // simulateComputerMove();
-            } else if (isWinner) {
-                if (isFirstPlayerTurn) {
-                    databaseManipulation(firstPlayerName, secondPlayerName);
-                } else {
-                    databaseManipulation(secondPlayerName, firstPlayerName);
-                }
-            }
-        }
-    }*//*
+    public void initNewBoard(){
+        this.board = new Board(boardViews.size());
+    }
 
-   *//* public boolean isThereWinner() {
-        Line line = board.checkIfPersonWin(currentPlayerSymbol);
+    public void changePlayerTurn() {
+        isFirstPlayerTurn = !isFirstPlayerTurn;
+        currentPlayerSymbol = !currentPlayerSymbol;
+    }
+
+    public boolean isThereWinner() {
+        Line line = board.checkIfPersonWinAndGetLineWithIndices(/*currentPlayerSymbol*/);
         if (line.isThereWinner()) {
-            Log.d("tag", "person win");
-            *//**//*startLineCreatingIfThereIsWinner(line);
-            openResultViews(getResources().getString(R.string.win));*//**//*
+            startLineCreatingIfThereIsWinner(line);
             return true;
         }
         return false;
-    }*//*
+    }
 
-    *//*public boolean areMoreMoves() {
+    public boolean areMoreMoves() {
         if (!board.areMoreMoves()) {
-            Log.d("tag", "equal");
-            openResultViews(getResources().getString(R.string.equal));
             return false;
         }
         return true;
-    }*/
+    }
+
+    private void startLineCreatingIfThereIsWinner(Line line) {
+        Log.d("tag", "Execute startLineCreatingIfThereIsWinner() in GameActivity.");
+        boardViews.get(line.getStartIndex()).setIsThereWinner(line.getDirection());
+        boardViews.get(line.getMiddleIndex()).setIsThereWinner(line.getDirection());
+        boardViews.get(line.getEndIndex()).setIsThereWinner(line.getDirection());
+    }
+
+    public void makeMoveIfBoxIsFree(Box box, int index) {
+        if (!isBoxChecked(box)) {
+            box.setOnTouchEvent(currentPlayerSymbol);
+            personMoveAtIndex(index);
+        }
+    }
+
+    private boolean isBoxChecked(Box box){
+        return box.isChecked();
+    }
+
+    private void personMoveAtIndex(int index){
+        board.personMove(index);
+    }
+
+    public abstract void simulateComputerMove();
 
 }

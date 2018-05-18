@@ -1,10 +1,12 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe;
+package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
+
+import com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses.Direction;
 
 public class Line {
-    int startIndex;
-    int middleIndex;
-    int endIndex;
-    Direction direction;
+    private int startIndex;
+    private int middleIndex;
+    private int endIndex;
+    private Direction direction;
     private boolean isThereWinner;
 
     public Line() {
@@ -21,6 +23,22 @@ public class Line {
         this.endIndex = endIndex;
         this.direction = direction;
         this.isThereWinner = true;
+    }
+
+    public int getStartIndex() {
+        return startIndex;
+    }
+
+    public int getMiddleIndex() {
+        return middleIndex;
+    }
+
+    public int getEndIndex() {
+        return endIndex;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 
     public boolean isThereWinner() {

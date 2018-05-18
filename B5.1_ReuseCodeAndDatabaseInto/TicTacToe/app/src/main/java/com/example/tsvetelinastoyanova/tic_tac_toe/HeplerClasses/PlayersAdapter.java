@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.tic_tac_toe;
+package com.example.tsvetelinastoyanova.tic_tac_toe.HeplerClasses;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Database.Player;
+import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.MyViewHo
         }
     }
 
-    PlayersAdapter(List<Player> playersList) {
+    public PlayersAdapter(List<Player> playersList) {
         this.playersList = playersList;
     }
 
