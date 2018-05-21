@@ -1,5 +1,33 @@
 <resources>
     <string name="app_name">Registration and Login App</string>
+    <string name="too_short_username">This username is too short.</string>
+    <string name="too_long_username">This username is too long.</string>
+    <string name="not_valid_username">This username contains not allowed symbols.</string>
+    <string name="too_short_password">This password is too short.</string>
+    <string name="too_long_password">This password is too long.</string>
+    <string name="not_valid_password">This password contains not allowed symbols.</string>
+    <string name="not_correctly_repeated_password">This password is not correctly repeated. Try again.</string>
+    <string name="not_valid_email">This email is not valid. Enter another one.</string>
+    <string name="not_valid_firstname">Your first name is not entered correctly. Try again.</string>
+    <string name="not_capital_letter_firstname">Your first name does not start with capital letter.</string>
+    <string name="not_valid_lastname">Your last name is not entered correctly. Try again.</string>
+    <string name="too_young_age">Your are too young to use this app.</string>
+    <string name="too_old_age">Your are too old to use this app.</string>
+    <string name="existing_user">This user already exists.</string>
+    <string name="successful_registration">You registered successfully.</string>
+    <string name="not_existing_user">This user does not exist.</string>
+    <string name="wrong_password">You entered a wrong password. Try again.</string>
+    <string name="fill_all_fields_prompt">Please, fill all the fields.</string>
+
+    <string name="email">Email: </string>
+    <string name="first_name">First name: </string>
+    <string name="last_name">Last name: </string>
+    <string name="age">Age: </string>
+    <string name="action_search">Search</string>
+
+
+
+
     <string name="title_activity_login2">Sign in</string>
 
     <!-- Strings related to login -->
