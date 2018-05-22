@@ -10,31 +10,31 @@ public interface UserValidator {
 
     final String LASTNAME_REGEX = "^[a-zA-Z\\s]*$";
 
-    public boolean isUsernameTooShort();
+    public boolean isUsernameTooShort(String username);
 
-    public boolean isUsernameTooLong();
+    public boolean isUsernameTooLong(String username);
 
-    public boolean isUsernameValid();
+    public boolean isUsernameValid(String username);
 
-   // public boolean doesWordMatchesRegex(String word, String regex);
+    public boolean doesWordMatchesRegex(String word, String regex);
 
-    public boolean isPasswordTooShort();
+    public boolean isPasswordTooShort(String password);
 
-    public boolean isPasswordTooLong();
+    public boolean isPasswordTooLong(String password);
 
-    public boolean isPasswordValid();
+    public boolean isPasswordValid(String password);
 
-    public boolean isPasswordCorrectlyRepeated(String repeatedPassword);
+    public boolean isPasswordCorrectlyRepeated(String password, String repeatedPassword);
 
-    public boolean isEmailValid();
+    public boolean isEmailValid(String email);
 
-    public boolean isFirstNameValid();
+    public boolean isFirstNameValid(String firstName);
 
-    public boolean doesFirstNameStartWithCapitalLetter();
+    public boolean doesFirstNameStartWithCapitalLetter(String firstName);
 
-    public boolean isLastNameValid();
+    public boolean isLastNameValid(String lastName);
 
-    public boolean isTooYoung();
+    public boolean isTooYoung(int age);
 
-    public boolean isTooOld();
+    public boolean isTooOld(int age);
 }
