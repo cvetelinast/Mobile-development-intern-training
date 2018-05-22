@@ -5,27 +5,34 @@ import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tsvetelinastoyanova.registrationloginapp.R;
 import com.example.tsvetelinastoyanova.registrationloginapp.database.AppDatabase;
 import com.example.tsvetelinastoyanova.registrationloginapp.database.User;
+import com.example.tsvetelinastoyanova.registrationloginapp.validation.CustomWatcher;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserPropertiesValidator;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserValidator;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RegistrationActivity extends AppCompatActivity {
 
     UserValidator userValidator = new UserPropertiesValidator();
     User user = new User();
+    ExecutorService notMainThread = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
         initButtonRegister();
+        addEditTextChangeListeners();
     }
 
     private void initButtonRegister() {
@@ -34,105 +41,175 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void register() {
-        if (isValidUsername() && isValidPassword() && isValidRepeatedPassword() && isValidEmail() && isValidFirstName() && isValidLastName() && isValidAge()) {
+        if (getMistakeFromUsername().isEmpty() && getMistakeFromPassword().isEmpty() && getMistakeFromValidatedPassword().isEmpty()
+                && getMistakeFromEmail().isEmpty() && getMistakeFromFirstName().isEmpty() && getMistakeFromLastName().isEmpty() && getMistakeFromAge().isEmpty()) {
             registerIfUsernameIsAvailable();
         }
     }
 
-    private boolean isValidUsername() {
+    private void addEditTextChangeListeners() {
+       /* final EditText username = findViewById(R.id.username_input);
+        username.addTextChangedListener(new CustomWatcher(username, getMistakeFromUsername()));
+
+        final EditText password = findViewById(R.id.password_input);
+        password.addTextChangedListener(new CustomWatcher(password, getMistakeFromPassword()));*/
+
+        final EditText username = findViewById(R.id.username_input);
+        username.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromUsername();
+                if (!result.isEmpty()) {
+                    username.setError(result);
+                }
+            }
+        });
+
+        final EditText password = findViewById(R.id.password_input);
+        password.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromPassword();
+                if (!result.isEmpty()) {
+                    password.setError(result);
+                }
+            }
+        });
+
+        final EditText verifyPassword = findViewById(R.id.verify_password_input);
+        verifyPassword.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromValidatedPassword();
+                if (!result.isEmpty()) {
+                    verifyPassword.setError(result);
+                }
+            }
+        });
+
+        final EditText email = findViewById(R.id.email_input);
+        email.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromEmail();
+                if (!result.isEmpty()) {
+                    email.setError(result);
+                }
+            }
+        });
+        final EditText firstName = findViewById(R.id.first_name_input);
+        firstName.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromFirstName();
+                if (!result.isEmpty()) {
+                    firstName.setError(result);
+                }
+            }
+        });
+        final EditText lastName = findViewById(R.id.last_name_input);
+        lastName.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromLastName();
+                if (!result.isEmpty()) {
+                    lastName.setError(result);
+                }
+            }
+        });
+        final EditText age = findViewById(R.id.age_input);
+        age.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromAge();
+                if (!result.isEmpty()) {
+                    age.setError(result);
+                }
+            }
+        });
+    }
+
+    private String getMistakeFromUsername() {
         String username = getTextFromContainer(R.id.username_container);
         if (userValidator.isUsernameTooShort(username)) {
-            printToast(getResources().getString(R.string.too_short_username));
-            return false;
+            return getResources().getString(R.string.too_short_username);
         } else if (userValidator.isUsernameTooLong(username)) {
-            printToast(getResources().getString(R.string.too_long_username));
-            return false;
+            return getResources().getString(R.string.too_long_username);
         } else if (!userValidator.isUsernameValid(username)) {
-            printToast(getResources().getString(R.string.not_valid_username));
-            return false;
+            return getResources().getString(R.string.not_valid_username);
         }
         user.setUsername(username);
-        return true;
+        return "";
     }
 
-    private boolean isValidPassword() {
+    private String getMistakeFromPassword() {
         String password = getTextFromContainer(R.id.password_container);
         if (userValidator.isPasswordTooShort(password)) {
-            printToast(getResources().getString(R.string.too_short_password));
-            return false;
+            return getResources().getString(R.string.too_short_password);
         } else if (userValidator.isPasswordTooLong(password)) {
-            printToast(getResources().getString(R.string.too_long_password));
-            return false;
+            return getResources().getString(R.string.too_long_password);
         } else if (!userValidator.isPasswordValid(password)) {
-            printToast(getResources().getString(R.string.not_valid_password));
-            return false;
+            return getResources().getString(R.string.not_valid_password);
         }
         user.setPassword(password);
-        return true;
+        return "";
     }
 
-    private boolean isValidRepeatedPassword() {
+    private String getMistakeFromValidatedPassword() {
         String password = getTextFromContainer(R.id.password_container);
         String repeatPassword = getTextFromContainer(R.id.verify_password_container);
         if (!userValidator.isPasswordCorrectlyRepeated(password, repeatPassword)) {
-            printToast(getResources().getString(R.string.not_correctly_repeated_password));
-            return false;
+            return getResources().getString(R.string.not_correctly_repeated_password);
         }
-        return true;
+        return "";
     }
 
-    private boolean isValidEmail() {
+    private String getMistakeFromEmail() {
         String email = getTextFromContainer(R.id.email_container);
         if (!userValidator.isEmailValid(email)) {
-            printToast(getResources().getString(R.string.not_valid_email));
-            return false;
+            return getResources().getString(R.string.not_valid_email);
         }
         user.setEmail(email);
-        return true;
+        return "";
     }
 
-    private boolean isValidFirstName() {
+    private String getMistakeFromFirstName() {
         String firstName = getTextFromContainer(R.id.first_name_container);
         if (!userValidator.isFirstNameValid(firstName)) {
-            printToast(getResources().getString(R.string.not_valid_firstname));
-            return false;
+            return getResources().getString(R.string.not_valid_firstname);
         } else if (!userValidator.doesFirstNameStartWithCapitalLetter(firstName)) {
-            printToast(getResources().getString(R.string.not_capital_letter_firstname));
-            return false;
+            return getResources().getString(R.string.not_capital_letter_firstname);
         }
         user.setFirstName(firstName);
-        return true;
+        return "";
     }
 
-    private boolean isValidLastName() {
+    private String getMistakeFromLastName() {
         String lastName = getTextFromContainer(R.id.last_name_container);
         if (!userValidator.isLastNameValid(lastName)) {
-            printToast(getResources().getString(R.string.not_valid_lastname));
-            return false;
+            return getResources().getString(R.string.not_valid_lastname);
         }
         user.setLastName(lastName);
-        return true;
+        return "";
     }
 
-    private boolean isValidAge() {
+    private String getMistakeFromAge() {
         String ageText = getTextFromContainer(R.id.age_container);
         int age = 0;
         if (!ageText.isEmpty()) {
             age = Integer.parseInt(ageText);
         }
         if (userValidator.isTooYoung(age)) {
-            printToast(getResources().getString(R.string.too_young_age));
-            return false;
+            return getResources().getString(R.string.too_young_age);
         } else if (userValidator.isTooOld(age)) {
-            printToast(getResources().getString(R.string.too_old_age));
-            return false;
+            return getResources().getString(R.string.too_old_age);
         }
         user.setAge(age);
-        return true;
+        return "";
     }
 
     private void registerIfUsernameIsAvailable() {
-        new Thread(() -> {
+        notMainThread.execute(() -> {
             AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "users").build();
             List<User> userWithThisUsername = db.userDao().getUserWithThisName(user.getUsername());
 
@@ -141,16 +218,15 @@ public class RegistrationActivity extends AppCompatActivity {
                     printToast(getResources().getString(R.string.existing_user));
                 } else {
                     printToast(getResources().getString(R.string.successful_registration));
-                    saveUserInDatabase(db);
                     startIntentLoginScreen();
-
+                    saveUserInDatabase(db);
                 }
             });
-        }).start();
+        });
     }
 
     private void saveUserInDatabase(AppDatabase db) {
-        new Thread(() -> db.userDao().insertUser(user)).start();
+        notMainThread.execute(() -> db.userDao().insertUser(user));
     }
 
     private void startIntentLoginScreen() {
@@ -164,6 +240,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void printToast(CharSequence text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
+
 }

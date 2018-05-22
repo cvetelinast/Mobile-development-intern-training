@@ -5,22 +5,27 @@ import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.text.Editable;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tsvetelinastoyanova.registrationloginapp.R;
 import com.example.tsvetelinastoyanova.registrationloginapp.database.AppDatabase;
 import com.example.tsvetelinastoyanova.registrationloginapp.database.User;
+import com.example.tsvetelinastoyanova.registrationloginapp.validation.CustomWatcher;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserPropertiesValidator;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserValidator;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginActivity extends AppCompatActivity {
 
     UserValidator userValidator = new UserPropertiesValidator();
     User user = new User();
+    ExecutorService notMainThread = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         initButtons();
+        addEditTextChangeListeners();
     }
 
     private void initButtons() {
@@ -44,45 +50,67 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void openLoginScreen() {
-        if (setUsernameIfValid() && setPasswordIfValid()) {
-            loginIfUsernameExists();
+        if (getMistakeFromUsername().isEmpty() && getMistakeFromPassword().isEmpty()) {
+            loginIfUserExists();
         }
     }
 
-    private boolean setUsernameIfValid() {
+    private void addEditTextChangeListeners() {
+        final EditText username = findViewById(R.id.username_input);
+        username.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromUsername();
+                if (!result.isEmpty()) {
+                    username.setError(result);
+                } /*else {
+                        user.setUsername(getTextFromContainer(R.id.username_container));
+                    }*/
+            }
+        });
+
+        final EditText password = findViewById(R.id.password_input);
+        password.addTextChangedListener(new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = getMistakeFromPassword();
+                if (!result.isEmpty()) {
+                    password.setError(result);
+                }/* else {
+                    user.setPassword(getTextFromContainer(R.id.password_container));
+                }*/
+            }
+        });
+    }
+
+    private String getMistakeFromUsername() {
         String username = getTextFromContainer(R.id.username_container);
         if (userValidator.isUsernameTooShort(username)) {
-            printToast(getResources().getString(R.string.too_short_username));
-            return false;
+            return getResources().getString(R.string.too_short_username);
         } else if (userValidator.isUsernameTooLong(username)) {
-            printToast(getResources().getString(R.string.too_long_username));
-            return false;
+            return getResources().getString(R.string.too_long_username);
         } else if (!userValidator.isUsernameValid(username)) {
-            printToast(getResources().getString(R.string.not_valid_username));
-            return false;
+            return getResources().getString(R.string.not_valid_username);
         }
         user.setUsername(username);
-        return true;
+        return "";
     }
 
-    private boolean setPasswordIfValid() {
+    private String getMistakeFromPassword() {
         String password = getTextFromContainer(R.id.password_container);
         if (userValidator.isPasswordTooShort(password)) {
-            printToast(getResources().getString(R.string.too_short_password));
-            return false;
+            return getResources().getString(R.string.too_short_password);
         } else if (userValidator.isPasswordTooLong(password)) {
-            printToast(getResources().getString(R.string.too_long_password));
-            return false;
+            return getResources().getString(R.string.too_long_password);
         } else if (!userValidator.isPasswordValid(password)) {
-            printToast(getResources().getString(R.string.not_valid_password));
-            return false;
+            return getResources().getString(R.string.not_valid_password);
         }
         user.setPassword(password);
-        return true;
+        return "";
     }
 
-    public void loginIfUsernameExists() {
-        new Thread(() -> {
+    public void loginIfUserExists() {
+        notMainThread.execute(() -> {
             AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "users").build();
             List<User> userWithThisUsername = db.userDao().getUserWithThisName(user.getUsername());
 
@@ -95,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
                     startIntentUsersListScreen();
                 }
             });
-        }).start();
+        });
     }
 
     private void startIntentUsersListScreen() {

@@ -22,12 +22,15 @@ import com.example.tsvetelinastoyanova.registrationloginapp.visualization.UsersA
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class UsersListActivity extends AppCompatActivity implements UsersAdapterListener {
     private List<User> usersList = new ArrayList<>();
     private RecyclerView recyclerView;
     private UsersAdapter adapter;
     private SearchView searchView;
+    ExecutorService notMainThread = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +53,11 @@ public class UsersListActivity extends AppCompatActivity implements UsersAdapter
     }
 
     private void loadUsersFromDatabase() {
-        new Thread(() -> {
+        notMainThread.execute(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "users").build();
             usersList.addAll(db.userDao().getAll());
-            runOnUiThread(() -> {
-                adapter.notifyDataSetChanged();
-            });
-        }).start();
+            runOnUiThread(() -> adapter.notifyDataSetChanged());
+        });
     }
 
     @Override
