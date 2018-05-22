@@ -8,13 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.tic_tac_toe.Box;
 import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.GameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.OnePlayerGameEngine;
-import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.TwoPlayersGameEngine;
+import com.example.tsvetelinastoyanova.tic_tac_toe.gameengine.SinglePlayerGameEngine;
 import com.example.tsvetelinastoyanova.tic_tac_toe.heplerclasses.DatabaseConnector;
 import com.example.tsvetelinastoyanova.tic_tac_toe.R;
 
@@ -57,6 +57,7 @@ public class GameActivity extends AppCompatActivity {
     public void startNewGame(View view) {
         Intent startNewGameIntent = new Intent(this, GameActivity.class);
         startNewGameIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startNewGameIntent.putExtra(getString(R.string.two_players_game), isGameForTwoPlayers);
         startNewGameIntent.putExtra(getString(R.string.first_player_name), firstPlayerName);
         startNewGameIntent.putExtra(getString(R.string.second_player_name), secondPlayerName);
         startActivity(startNewGameIntent);
@@ -75,9 +76,9 @@ public class GameActivity extends AppCompatActivity {
     private void initializeGameEngine(Intent intent) {
         isGameForTwoPlayers = intent.getBooleanExtra(getString(R.string.two_players_game), false);
         if (isGameForTwoPlayers) {
-            gameEngine = new TwoPlayersGameEngine();
+            gameEngine = new GameEngine();
         } else {
-            gameEngine = new OnePlayerGameEngine();
+            gameEngine = new SinglePlayerGameEngine();
         }
     }
 
@@ -168,15 +169,19 @@ public class GameActivity extends AppCompatActivity {
         if (gameEngine.isThereWinner()) {
             isTheGameOver = true;
             if (isFirstPlayerTurn) {
-                openResultViews(firstPlayerName + " wins!");
+                openResultViews(firstPlayerName);
+                showPictureAsResult(R.drawable.winner);
                 databaseConnection(firstPlayerName, secondPlayerName);
             } else {
-                openResultViews(secondPlayerName + " wins!");
+                openResultViews(secondPlayerName);
+                showPictureAsResult(R.drawable.winner);
                 databaseConnection(secondPlayerName, firstPlayerName);
             }
         } else if (!gameEngine.areMoreMoves()) {
             isTheGameOver = true;
             openResultViews(getResources().getString(R.string.equal));
+            showPictureAsResult(R.drawable.equal);
+
         }
         changePlayerTurn();
         changeStyles();
@@ -217,5 +222,11 @@ public class GameActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.winner_text);
         textView.setText(winnerText);
         textView.setVisibility(TextView.VISIBLE);
+    }
+
+    private void showPictureAsResult(int id){
+        ImageView imageview = findViewById(R.id.image_view);
+        imageview.setVisibility(ImageView.VISIBLE);
+        imageview.setImageDrawable(getResources().getDrawable(id));
     }
 }

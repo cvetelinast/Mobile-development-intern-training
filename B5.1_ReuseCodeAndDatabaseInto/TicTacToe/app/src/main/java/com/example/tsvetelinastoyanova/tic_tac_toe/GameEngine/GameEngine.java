@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public abstract class GameEngine {
+public class GameEngine {
 
     public boolean firstPlayerSymbol;
     private static final Map<Boolean, Character> variants = new HashMap<>();
@@ -20,9 +20,6 @@ public abstract class GameEngine {
     protected List<Box> boardViews = new ArrayList<>();
     protected Board board;
     private boolean isFirstPlayerTurn;
-
-    public GameEngine() {
-    }
 
     public static Character getSymbolFromBooleanValue(boolean booleanValueOfSymbol) {
         return variants.get(booleanValueOfSymbol);
@@ -92,6 +89,6 @@ public abstract class GameEngine {
         board.personMove(index);
     }
 
-    public abstract void simulateComputerMove();
+    public void simulateComputerMove(){}
 
 }
