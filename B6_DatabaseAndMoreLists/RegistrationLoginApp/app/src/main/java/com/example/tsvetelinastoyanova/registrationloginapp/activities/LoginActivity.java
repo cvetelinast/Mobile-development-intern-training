@@ -63,9 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                 String result = getMistakeFromUsername();
                 if (!result.isEmpty()) {
                     username.setError(result);
-                } /*else {
-                        user.setUsername(getTextFromContainer(R.id.username_container));
-                    }*/
+                }
             }
         });
 
@@ -76,9 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                 String result = getMistakeFromPassword();
                 if (!result.isEmpty()) {
                     password.setError(result);
-                }/* else {
-                    user.setPassword(getTextFromContainer(R.id.password_container));
-                }*/
+                }
             }
         });
     }

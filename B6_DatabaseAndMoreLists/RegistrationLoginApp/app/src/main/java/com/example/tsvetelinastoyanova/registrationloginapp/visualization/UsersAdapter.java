@@ -1,6 +1,8 @@
 package com.example.tsvetelinastoyanova.registrationloginapp.visualization;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.MyViewHolder
     private Context context;
     private List<User> usersListFiltered;
     private UsersAdapterListener listener;
+
+    private Filter filter = null;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView username, email, firstName, lastName, age;
@@ -75,22 +79,23 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.MyViewHolder
 
     @Override
     public Filter getFilter() {
+        if (filter == null) {
+            filter = createFilter();
+        }
+
+        return filter;
+    }
+
+    @NonNull
+    private Filter createFilter() {
         return new Filter() {
             @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString().toLowerCase();
-                if (charString.isEmpty()) {
+            protected FilterResults performFiltering(CharSequence query) {
+                String queryLowerCase = query.toString().toLowerCase();
+                if (queryLowerCase.isEmpty()) {
                     usersListFiltered = usersList;
                 } else {
-                    List<User> filteredList = new ArrayList<>();
-                    for (User row : usersList) {
-                        if (row.getUsername().toLowerCase().contains(charString) || row.getEmail().toLowerCase().contains(charSequence) ||
-                                row.getFirstName().toLowerCase().contains(charString) || row.getLastName().toLowerCase().contains(charSequence) ||
-                                String.valueOf(row.getAge()).contains(charSequence)) {
-                            filteredList.add(row);
-                        }
-                    }
-                    usersListFiltered = filteredList;
+                    usersListFiltered = findFilteredUsers(queryLowerCase);
                 }
 
                 FilterResults filterResults = new FilterResults();
@@ -104,6 +109,25 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.MyViewHolder
                 notifyDataSetChanged();
             }
         };
+    }
+
+    @NonNull
+    private List<User> findFilteredUsers(String queryLowerCase) {
+        List<User> filteredList = new ArrayList<>();
+        for (User user : usersList) {
+            if (userContainsQuery(queryLowerCase, user)) {
+                filteredList.add(user);
+            }
+        }
+        return filteredList;
+    }
+
+    private boolean userContainsQuery(String queryLowerCase, User row) {
+        return row.getUsername().toLowerCase().contains(queryLowerCase) ||
+                row.getEmail().toLowerCase().contains(queryLowerCase) ||
+                row.getFirstName().toLowerCase().contains(queryLowerCase) ||
+                row.getLastName().toLowerCase().contains(queryLowerCase) ||
+                String.valueOf(row.getAge()).contains(queryLowerCase);
     }
 }
 

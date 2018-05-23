@@ -48,5 +48,6 @@ dependencies {
     testImplementation "android.arch.persistence.room:testing:$room_version"
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation "com.android.support:support-core-utils:27.1.1"
+    implementation 'com.github.dmstocking:support-optional:1.1'
 
 }

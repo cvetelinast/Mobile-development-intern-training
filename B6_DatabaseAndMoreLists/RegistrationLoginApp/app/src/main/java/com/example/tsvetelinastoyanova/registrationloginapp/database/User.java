@@ -7,11 +7,6 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "users")
 public class User {
 
-    // How to make entity
-    // are more methods allowed?
-    // primary key - username
-    // constructor
-
     @PrimaryKey(autoGenerate = true)
     private int uid;
 
@@ -32,21 +27,6 @@ public class User {
 
     @ColumnInfo(name = "age")
     private int age;
-
-   /* @Ignore
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User(@NonNull String username, String password, String email, String firstName, String lastName, int age) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.age = age;
-    }*/
 
     public int getUid() {
         return uid;

@@ -16,6 +16,7 @@ import com.example.tsvetelinastoyanova.registrationloginapp.database.User;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.CustomWatcher;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserPropertiesValidator;
 import com.example.tsvetelinastoyanova.registrationloginapp.validation.UserValidator;
+import com.github.dmstocking.optional.java.util.function.Supplier;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -47,86 +48,39 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
+    private static CustomWatcher createWatcher(EditText editText, Supplier<String> supplier) {
+        return new CustomWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String result = supplier.get();
+                if (!result.isEmpty()) {
+                    editText.setError(result);
+                }
+            }
+        };
+    }
+
     private void addEditTextChangeListeners() {
-       /* final EditText username = findViewById(R.id.username_input);
-        username.addTextChangedListener(new CustomWatcher(username, getMistakeFromUsername()));
-
-        final EditText password = findViewById(R.id.password_input);
-        password.addTextChangedListener(new CustomWatcher(password, getMistakeFromPassword()));*/
-
         final EditText username = findViewById(R.id.username_input);
-        username.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromUsername();
-                if (!result.isEmpty()) {
-                    username.setError(result);
-                }
-            }
-        });
+        username.addTextChangedListener(createWatcher(username, this::getMistakeFromUsername));
 
         final EditText password = findViewById(R.id.password_input);
-        password.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromPassword();
-                if (!result.isEmpty()) {
-                    password.setError(result);
-                }
-            }
-        });
+        password.addTextChangedListener(createWatcher(password, this::getMistakeFromPassword));
 
         final EditText verifyPassword = findViewById(R.id.verify_password_input);
-        verifyPassword.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromValidatedPassword();
-                if (!result.isEmpty()) {
-                    verifyPassword.setError(result);
-                }
-            }
-        });
+        verifyPassword.addTextChangedListener(createWatcher(verifyPassword, this::getMistakeFromValidatedPassword));
 
         final EditText email = findViewById(R.id.email_input);
-        email.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromEmail();
-                if (!result.isEmpty()) {
-                    email.setError(result);
-                }
-            }
-        });
+        email.addTextChangedListener(createWatcher(email, this::getMistakeFromEmail));
+
         final EditText firstName = findViewById(R.id.first_name_input);
-        firstName.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromFirstName();
-                if (!result.isEmpty()) {
-                    firstName.setError(result);
-                }
-            }
-        });
+        firstName.addTextChangedListener(createWatcher(email, this::getMistakeFromFirstName));
+
         final EditText lastName = findViewById(R.id.last_name_input);
-        lastName.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromLastName();
-                if (!result.isEmpty()) {
-                    lastName.setError(result);
-                }
-            }
-        });
+        lastName.addTextChangedListener(createWatcher(email, this::getMistakeFromLastName));
+
         final EditText age = findViewById(R.id.age_input);
-        age.addTextChangedListener(new CustomWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String result = getMistakeFromAge();
-                if (!result.isEmpty()) {
-                    age.setError(result);
-                }
-            }
-        });
+        age.addTextChangedListener(createWatcher(email, this::getMistakeFromAge));
     }
 
     private String getMistakeFromUsername() {
