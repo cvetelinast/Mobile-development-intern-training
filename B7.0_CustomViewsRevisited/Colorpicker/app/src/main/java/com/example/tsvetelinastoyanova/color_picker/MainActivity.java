@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 dialog = new Dialog(context);
                 dialog.setContentView(R.layout.dialog);
 
-                TextView headingDialog = (TextView) dialog.findViewById(R.id.headingDialog);
+                TextView headingDialog = dialog.findViewById(R.id.headingDialog);
                 headingDialog.setText(getResources().getString(R.string.headingDialog));
 
                 buttonOkToCloseDialog = dialog.findViewById(R.id.dialogButtonOk);

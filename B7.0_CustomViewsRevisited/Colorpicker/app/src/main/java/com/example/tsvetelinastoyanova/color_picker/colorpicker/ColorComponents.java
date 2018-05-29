@@ -8,7 +8,7 @@ public class ColorComponents {
     private int green;
     private int blue;
 
-    public ColorComponents(int alpha, int red, int green, int blue) {
+    ColorComponents(int alpha, int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;

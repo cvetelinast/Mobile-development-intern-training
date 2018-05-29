@@ -77,24 +77,21 @@ public class ColorPickerDialog {
 
         float values[] = colorComponents.getHSV();
         if (values.length == 3) {
-            hueCode.setText("H: " + values[0]);
-            saturationCode.setText("S: " + values[1]);
-            brightnessCode.setText("V: " + values[2]);
+            hueCode.setText("H: " + String.format("%.2f", values[0]));
+            saturationCode.setText("S: " + String.format("%.2f", values[1]));
+            brightnessCode.setText("V: " + String.format("%.2f", values[2]));
         }
     }
 
     private ColorComponents getColorsOnTouch(View v, MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY();
-
-        // v.getBackground();
         v.buildDrawingCache();
         Bitmap bitmap = v.getDrawingCache();
         x = validateCoordinates(x, bitmap.getWidth());
         y = validateCoordinates(y, bitmap.getHeight());
         int pixel = bitmap.getPixel(x, y);
         v.destroyDrawingCache();
-
         return new ColorComponents(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel));
     }
 

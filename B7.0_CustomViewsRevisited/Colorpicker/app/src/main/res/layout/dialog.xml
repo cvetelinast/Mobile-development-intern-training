@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="3dp">
 
     <TextView
         android:id="@+id/headingDialog"
@@ -36,7 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Red:"
             android:textAlignment="center" />
 
         <TextView
@@ -44,7 +44,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Green:"
             android:textAlignment="center" />
 
         <TextView
@@ -52,7 +51,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Blue:"
             android:textAlignment="center" />
     </LinearLayout>
 
@@ -68,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hue:"
             android:textAlignment="center" />
 
         <TextView
@@ -76,7 +73,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Saturation:"
             android:textAlignment="center" />
 
         <TextView
@@ -84,7 +80,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Brightness:"
             android:textAlignment="center" />
     </LinearLayout>
 
@@ -101,7 +96,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="#2f5g6"
             android:textAlignment="center"
             android:textStyle="bold" />
 
@@ -119,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text=" Ok " />
+            android:text="Ok" />
     </LinearLayout>
 
 
