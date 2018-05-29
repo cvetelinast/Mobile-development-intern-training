@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Color-picker</string>
+    <string name="red">Red: %d</string>
+    <string name="green">Green: %d</string>
+    <string name="blue">Blue: %d</string>
+    <string name="headingDialog">Choose a color!</string>
+</resources>
