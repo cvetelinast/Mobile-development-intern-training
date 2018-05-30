@@ -1,6 +1,5 @@
 package com.example.tsvetelinastoyanova.color_picker.colorpicker;
 
-
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,90 +8,128 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.color_picker.R;
+import com.example.tsvetelinastoyanova.color_picker.colorcontainers.GradientLine;
+import com.example.tsvetelinastoyanova.color_picker.colorcontainers.Palette;
 
 public class ColorPickerDialog {
-    private GradientLine gradientLine;
-    private Palette palette;
+
     private Dialog dialog;
-    private TextView chosenColor;
+
+    private TextView boxShowingChosenColor;
+
+    private View paletteView;
+
+    private int lastLocationX;
+
+    private int lastLocationY;
+
+    private int lastColor;
 
     public ColorPickerDialog(Dialog dialog) {
         this.dialog = dialog;
-        gradientLine = dialog.findViewById(R.id.gradient);
-        palette = dialog.findViewById(R.id.palette);
-        chosenColor = dialog.findViewById(R.id.color);
+        boxShowingChosenColor = dialog.findViewById(R.id.color);
         initSmallComponents();
-        setClickListeners();
+        setClickListeners(dialog.findViewById(R.id.gradient), dialog.findViewById(R.id.palette));
     }
 
     private void initSmallComponents() {
-        chosenColor.setBackgroundColor(Color.RED);
-        updateTextViews(new ColorComponents(255, 255, 0, 0));
+        boxShowingChosenColor.setBackgroundColor(Color.RED);
+        updateTextViews(new PixelComponents(255, 255, 0, 0, 0, 0));
     }
 
-    private void setClickListeners() {
-        gradientLine.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                ColorComponents colorComponents = getColorsOnTouch(v, event);
-                palette.mainColorChange(colorComponents);
-                chosenColor.setBackgroundColor(Color.argb(colorComponents.getAlpha(), colorComponents.getRed(), colorComponents.getGreen(), colorComponents.getBlue()));
-                updateTextViews(colorComponents);
-                return true;
-            }
+    private void setClickListeners(GradientLine gradientLine, Palette palette) {
+        gradientLine.setOnTouchListener((v, event) -> {
+            PixelComponents pixelComponents = getColorComponentsOnTouch(v, event);
+            modificationsOnGradientLineClicked(gradientLine, palette, pixelComponents);
+            return true;
         });
 
-        palette.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                ColorComponents colorComponents = getColorsOnTouch(v, event);
-                chosenColor.setBackgroundColor(Color.argb(colorComponents.getAlpha(), colorComponents.getRed(), colorComponents.getGreen(), colorComponents.getBlue()));
-                updateTextViews(colorComponents);
-                return true;
-            }
+        palette.setOnTouchListener((v, event) -> {
+            PixelComponents pixelComponents = getColorComponentsOnTouch(v, event);
+            modificationsOnPaletteClicked(v, palette, pixelComponents);
+            return true;
         });
     }
 
-    private void updateTextViews(ColorComponents colorComponents) {
+    private PixelComponents getColorComponentsOnTouch(View v, MotionEvent event) {
+        v.buildDrawingCache();
+        Bitmap bitmap = v.getDrawingCache();
+        int x = validateCoordinates((int) event.getX(), bitmap.getWidth());
+        int y = validateCoordinates((int) event.getY(), bitmap.getHeight());
+        int pixel = bitmap.getPixel(x, y);
+        v.destroyDrawingCache();
+        return new PixelComponents(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel), x, y);
+    }
+
+    private void modificationsOnGradientLineClicked(GradientLine gradientLine, Palette palette, PixelComponents pixelComponents) {
+        palette.mainColorChange(pixelComponents);
+        gradientLine.changeLocationForIndicator(pixelComponents.getX());
+        if(paletteView == null){
+            updateSmallComponents(pixelComponents);
+        } else {
+            PixelComponents newPixelComponents = getColorFromPreviousMarkLocation();
+            updateSmallComponents(newPixelComponents);
+        }
+    }
+
+    private void modificationsOnPaletteClicked(View v, Palette palette, PixelComponents pixelComponents) {
+        palette.updateMark(pixelComponents.getX(), pixelComponents.getY());
+        savePaletteComponents(v, pixelComponents.getX(), pixelComponents.getY());
+        updateSmallComponents(pixelComponents);
+    }
+
+    private PixelComponents getColorFromPreviousMarkLocation() {
+        paletteView.buildDrawingCache();
+        Bitmap bitmap = paletteView.getDrawingCache();
+        int pixel = bitmap.getPixel(this.lastLocationX, this.lastLocationY);
+        paletteView.destroyDrawingCache();
+        return new PixelComponents(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel), this.lastLocationX, this.lastLocationY);
+    }
+
+    private void updateSmallComponents(PixelComponents pixelComponents) {
+        updateBoxWithChosenColor(pixelComponents);
+        updateTextViews(pixelComponents);
+    }
+
+    private void updateBoxWithChosenColor(PixelComponents pixelComponents) {
+        lastColor = Color.argb(pixelComponents.getAlpha(), pixelComponents.getRed(), pixelComponents.getGreen(), pixelComponents.getBlue());
+        boxShowingChosenColor.setBackgroundColor(lastColor);
+    }
+
+    private void savePaletteComponents(View v, int x, int y) {
+        this.paletteView = v;
+        this.lastLocationX = x;
+        this.lastLocationY = y;
+    }
+
+    private void updateTextViews(PixelComponents pixelComponents) {
         TextView colorCode = dialog.findViewById(R.id.colorCode);
-        colorCode.setText(colorComponents.getCode());
-        updateRBG(colorComponents);
-        updateHSV(colorComponents);
+        colorCode.setText(pixelComponents.getCode());
+        updateRBG(pixelComponents);
+        updateHSV(pixelComponents);
     }
 
-    private void updateRBG(ColorComponents colorComponents) {
+    private void updateRBG(PixelComponents pixelComponents) {
         TextView redCode = dialog.findViewById(R.id.red);
         TextView greenCode = dialog.findViewById(R.id.green);
         TextView blueCode = dialog.findViewById(R.id.blue);
 
-        redCode.setText("R: " + colorComponents.getRed());
-        greenCode.setText("G: " + colorComponents.getGreen());
-        blueCode.setText("B: " + colorComponents.getBlue());
+        redCode.setText("R: " + pixelComponents.getRed());
+        greenCode.setText("G: " + pixelComponents.getGreen());
+        blueCode.setText("B: " + pixelComponents.getBlue());
     }
 
-    private void updateHSV(ColorComponents colorComponents) {
+    private void updateHSV(PixelComponents pixelComponents) {
         TextView hueCode = dialog.findViewById(R.id.hue);
         TextView saturationCode = dialog.findViewById(R.id.saturation);
         TextView brightnessCode = dialog.findViewById(R.id.brightness);
 
-        float values[] = colorComponents.getHSV();
+        float values[] = pixelComponents.getHSV();
         if (values.length == 3) {
             hueCode.setText("H: " + String.format("%.2f", values[0]));
             saturationCode.setText("S: " + String.format("%.2f", values[1]));
             brightnessCode.setText("V: " + String.format("%.2f", values[2]));
         }
-    }
-
-    private ColorComponents getColorsOnTouch(View v, MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        v.buildDrawingCache();
-        Bitmap bitmap = v.getDrawingCache();
-        x = validateCoordinates(x, bitmap.getWidth());
-        y = validateCoordinates(y, bitmap.getHeight());
-        int pixel = bitmap.getPixel(x, y);
-        v.destroyDrawingCache();
-        return new ColorComponents(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel));
     }
 
     private int validateCoordinates(int c, int max) {

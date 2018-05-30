@@ -3,5 +3,6 @@
     <string name="red">Red: %d</string>
     <string name="green">Green: %d</string>
     <string name="blue">Blue: %d</string>
-    <string name="headingDialog">Choose a color!</string>
+    <string name="dialogTitle">Choose a color!</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -5,18 +5,14 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.view.View.OnClickListener;
 
 import com.example.tsvetelinastoyanova.color_picker.colorpicker.ColorPickerDialog;
 
 public class MainActivity extends AppCompatActivity {
     final Context context = this;
     private Button buttonOpenDialog;
-    private Button buttonOkToCloseDialog;
-    private Dialog dialog;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -27,35 +23,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setOnClickListenerWhenOpenDialog() {
-        buttonOpenDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                dialog = new Dialog(context);
-                dialog.setContentView(R.layout.dialog);
+        buttonOpenDialog.setOnClickListener((v) -> {
+            Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.dialog);
+            setTitleToDialog(dialog);
 
-                TextView headingDialog = dialog.findViewById(R.id.headingDialog);
-                headingDialog.setText(getResources().getString(R.string.headingDialog));
-
-                buttonOkToCloseDialog = dialog.findViewById(R.id.dialogButtonOk);
-                /*ColorPickerDialog colorPickerDialog = */
-                new ColorPickerDialog(dialog);
-                setOnClickListenerForClose();
-                dialog.show();
-            }
+            /*ColorPickerDialog colorPickerDialog = */
+            new ColorPickerDialog(dialog);
+            Button buttonOkToCloseDialog = dialog.findViewById(R.id.dialogButtonOk);
+            setOnClickListenerForClose(dialog, buttonOkToCloseDialog);
+            dialog.show();
         });
     }
 
-    private void setOnClickListenerForClose() {
-        buttonOkToCloseDialog.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                colorButtonOpenDialog();
-            }
+    private void setTitleToDialog(Dialog dialog) {
+        TextView dialogTitle = dialog.findViewById(R.id.dialogTitle);
+        dialogTitle.setText(getResources().getString(R.string.dialogTitle));
+    }
+
+    private void setOnClickListenerForClose(Dialog dialog, Button buttonOkToCloseDialog) {
+        buttonOkToCloseDialog.setOnClickListener((v) -> {
+            dialog.dismiss();
+            colorButtonOpenDialog(dialog);
         });
     }
 
-    private void colorButtonOpenDialog() {
+    private void colorButtonOpenDialog(Dialog dialog) {
         TextView chosenColor = dialog.findViewById(R.id.color);
         if (chosenColor.getBackground() instanceof ColorDrawable) {
             ColorDrawable cd = (ColorDrawable) chosenColor.getBackground();

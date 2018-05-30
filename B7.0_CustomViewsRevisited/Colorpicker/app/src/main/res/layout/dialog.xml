@@ -6,20 +6,20 @@
     android:padding="3dp">
 
     <TextView
-        android:id="@+id/headingDialog"
+        android:id="@+id/dialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:padding="10dp"
         android:textStyle="bold" />
 
-    <com.example.tsvetelinastoyanova.color_picker.colorpicker.Palette
+    <com.example.tsvetelinastoyanova.color_picker.colorcontainers.Palette
         android:id="@+id/palette"
         android:layout_width="wrap_content"
         android:layout_height="210dp"
-        android:layout_below="@+id/headingDialog" />
+        android:layout_below="@+id/dialogTitle" />
 
-    <com.example.tsvetelinastoyanova.color_picker.colorpicker.GradientLine
+    <com.example.tsvetelinastoyanova.color_picker.colorcontainers.GradientLine
         android:id="@+id/gradient"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -104,8 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:padding="10dp"
+            android:padding="8dp"
             android:textAlignment="center" />
 
         <Button
@@ -113,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ok" />
+            android:text="@string/ok" />
     </LinearLayout>
 
 
