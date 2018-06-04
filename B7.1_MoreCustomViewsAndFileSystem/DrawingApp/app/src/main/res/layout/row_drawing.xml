@@ -29,5 +29,15 @@
         android:layout_toRightOf="@id/drawing"
         android:text="Last modified: 16.05.2018" />
 
+    <TextView
+        android:id="@+id/view_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="10dp"
+        android:text="&#8942;"
+        android:textAppearance="?android:textAppearanceLarge" />
+
 
 </RelativeLayout>
