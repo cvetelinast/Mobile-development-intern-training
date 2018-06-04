@@ -1,5 +1,7 @@
 package com.example.tsvetelinastoyanova.drawingapp;
 
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -8,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.support.design.widget.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,7 @@ public class DrawingList extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        setOnClickListenerToFloatingButton();
         initComponentsOfRecyclerView();
     }
 
@@ -119,5 +124,16 @@ public class DrawingList extends AppCompatActivity {
         } else {
             drawingsRecyclerView.setLayoutManager(gridLayoutManager);
         }
+    }
+
+    private void setOnClickListenerToFloatingButton(){
+        FloatingActionButton fab = findViewById(R.id.floating_action_button);
+        final Intent intent = new Intent(this, DrawingScreen.class);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(intent);
+            }
+        });
     }
 }

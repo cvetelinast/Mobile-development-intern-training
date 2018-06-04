@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private List<Picture> pictures;
-   // private boolean isListMode;
+    // private boolean isListMode;
 
     public RecyclerViewAdapter(List<Picture> pictures/*, boolean isListMode*/) {
         this.pictures = pictures;
@@ -23,14 +23,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         View pictureLayoutView;
-        if(DrawingList.isListMode) {
+        if (DrawingList.isListMode) {
             pictureLayoutView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_drawing, null);
         } else {
             pictureLayoutView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.grid_drawing, null);
         }
-       // isListMode = !isListMode;
+        // isListMode = !isListMode;
         ViewHolder viewHolder = new ViewHolder(pictureLayoutView);
         return viewHolder;
     }
