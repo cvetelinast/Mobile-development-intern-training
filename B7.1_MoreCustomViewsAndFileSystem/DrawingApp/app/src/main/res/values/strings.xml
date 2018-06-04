@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Drawing app</string>
+    <string name="grid_list_switch">grid_list_switch</string>
+</resources>
