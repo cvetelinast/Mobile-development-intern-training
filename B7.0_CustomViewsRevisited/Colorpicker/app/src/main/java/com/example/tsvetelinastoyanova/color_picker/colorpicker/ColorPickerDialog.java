@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.color_picker.colorpicker;
 
 import android.app.Dialog;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.view.MotionEvent;
@@ -14,19 +15,15 @@ import com.example.tsvetelinastoyanova.color_picker.colorcontainers.Palette;
 public class ColorPickerDialog {
 
     private Dialog dialog;
-
     private TextView boxShowingChosenColor;
-
     private View paletteView;
-
     private int lastLocationX;
-
     private int lastLocationY;
+    private Resources resources;
 
-    private int lastColor;
-
-    public ColorPickerDialog(Dialog dialog) {
+    public ColorPickerDialog(Dialog dialog, Resources resources) {
         this.dialog = dialog;
+        this.resources = resources;
         boxShowingChosenColor = dialog.findViewById(R.id.color);
         initSmallComponents();
         setClickListeners(dialog.findViewById(R.id.gradient), dialog.findViewById(R.id.palette));
@@ -64,7 +61,7 @@ public class ColorPickerDialog {
     private void modificationsOnGradientLineClicked(GradientLine gradientLine, Palette palette, PixelComponents pixelComponents) {
         palette.mainColorChange(pixelComponents);
         gradientLine.changeLocationForIndicator(pixelComponents.getX());
-        if(paletteView == null){
+        if (paletteView == null) {
             updateSmallComponents(pixelComponents);
         } else {
             PixelComponents newPixelComponents = getColorFromPreviousMarkLocation();
@@ -92,7 +89,7 @@ public class ColorPickerDialog {
     }
 
     private void updateBoxWithChosenColor(PixelComponents pixelComponents) {
-        lastColor = Color.argb(pixelComponents.getAlpha(), pixelComponents.getRed(), pixelComponents.getGreen(), pixelComponents.getBlue());
+        int lastColor = Color.argb(pixelComponents.getAlpha(), pixelComponents.getRed(), pixelComponents.getGreen(), pixelComponents.getBlue());
         boxShowingChosenColor.setBackgroundColor(lastColor);
     }
 
@@ -114,9 +111,9 @@ public class ColorPickerDialog {
         TextView greenCode = dialog.findViewById(R.id.green);
         TextView blueCode = dialog.findViewById(R.id.blue);
 
-        redCode.setText("R: " + pixelComponents.getRed());
-        greenCode.setText("G: " + pixelComponents.getGreen());
-        blueCode.setText("B: " + pixelComponents.getBlue());
+        redCode.setText(resources.getString(R.string.r, pixelComponents.getRed()));
+        greenCode.setText(resources.getString(R.string.g, pixelComponents.getGreen()));
+        blueCode.setText(resources.getString(R.string.b, pixelComponents.getBlue()));
     }
 
     private void updateHSV(PixelComponents pixelComponents) {
@@ -126,17 +123,17 @@ public class ColorPickerDialog {
 
         float values[] = pixelComponents.getHSV();
         if (values.length == 3) {
-            hueCode.setText("H: " + String.format("%.2f", values[0]));
-            saturationCode.setText("S: " + String.format("%.2f", values[1]));
-            brightnessCode.setText("V: " + String.format("%.2f", values[2]));
+            hueCode.setText(resources.getString(R.string.h, values[0]));
+            saturationCode.setText(resources.getString(R.string.s, values[1]));
+            brightnessCode.setText(resources.getString(R.string.v, values[2]));
         }
     }
 
     private int validateCoordinates(int c, int max) {
         if (c >= max) {
             c = max - 1;
-        } else if (c < 0) {
-            c = 0;
+        } else if (c <= 0) {
+            c = 1;
         }
         return c;
     }

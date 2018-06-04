@@ -1,11 +1,13 @@
 package com.example.tsvetelinastoyanova.color_picker.colorcontainers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.support.v4.graphics.ColorUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -13,62 +15,41 @@ import com.example.tsvetelinastoyanova.color_picker.colorpicker.PixelComponents;
 
 public class Palette extends View {
 
-    Paint paint = new Paint();
+    private Bitmap bitmap;
+    private int red;
+    private int green;
+    private int blue;
+    private int x;
+    private int y;
+    private boolean shouldRedrawBitmap = true;
+    private Paint paint = new Paint();
 
-    int red;
-
-    int green;
-
-    int blue;
-
-    int x;
-
-    int y;
-
-    Palette(Context context, AttributeSet attrs) {
+    public Palette(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.red = 255;
-        this.green = 0;
-        this.blue = 0;
+        this.setDrawingCacheEnabled(true);
+        initDefaultColor();
     }
 
-    public int getRed() {
-        return red;
-    }
-
-    public int getGreen() {
-        return green;
-    }
-
-    public int getBlue() {
-        return blue;
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        int repeat = this.getWidth() / 255;
-        int saveLocation = 0;
-        int[] colors = new int[2];
-
-        for (int x = 0; x < 256; x++) {
-            colors[0] = Color.argb(255 - x, red, green, blue);
-            colors[1] = Color.BLACK;
-            for (int i = 0; i < repeat; i++) {
-                Shader shader = new LinearGradient(0, saveLocation + i, this.getWidth(), saveLocation + i, colors, null, Shader.TileMode.CLAMP);
-                paint.setShader(shader);
-                canvas.drawLine(0, saveLocation + i, this.getWidth(), saveLocation + i, paint);
-            }
-            saveLocation = saveLocation + repeat;
+        if (shouldRedrawBitmap) {
+            redrawCanvas();
         }
-        paint.setShader(null); // clear any previous shader
-        drawMark(canvas);
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+        drawCircle(canvas);
     }
 
     public void mainColorChange(PixelComponents c) {
         this.red = c.getRed();
         this.green = c.getGreen();
         this.blue = c.getBlue();
+        shouldRedrawBitmap = true;
         invalidate();
     }
 
@@ -78,7 +59,13 @@ public class Palette extends View {
         invalidate();
     }
 
-    private void drawMark(Canvas canvas) {
+    private void initDefaultColor() {
+        this.red = 255;
+        this.green = 0;
+        this.blue = 0;
+    }
+
+    private void drawCircle(Canvas canvas) {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
@@ -87,4 +74,22 @@ public class Palette extends View {
         canvas.drawCircle(this.x, this.y, 20, paint);
     }
 
+    private void redrawCanvas() {
+        Canvas testCanvas = new Canvas(bitmap);
+        for (int x = 0; x < 256; x++) {
+            final int input = Color.argb(255 - x, red, green, blue);
+            int firstColor = ColorUtils.compositeColors(input, Color.BLACK);
+            int secondColor = Color.WHITE;
+            Shader shader = new LinearGradient(0, x, this.getWidth(), x, new int[]{firstColor, secondColor}, null, Shader.TileMode.CLAMP);
+            paint.setShader(shader);
+            testCanvas.drawLine(0, x, this.getWidth(), x, paint);
+        }
+        shouldRedrawBitmap = false;
+    }
+
+    @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(this.getMeasuredWidth(), 255);
+    }
 }

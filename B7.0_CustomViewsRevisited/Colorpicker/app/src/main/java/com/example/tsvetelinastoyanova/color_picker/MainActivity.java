@@ -1,35 +1,36 @@
 package com.example.tsvetelinastoyanova.color_picker;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.color_picker.colorpicker.ColorPickerDialog;
 
 public class MainActivity extends AppCompatActivity {
-    final Context context = this;
     private Button buttonOpenDialog;
 
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         buttonOpenDialog = findViewById(R.id.buttonShowCustomDialog);
         setOnClickListenerWhenOpenDialog();
     }
 
     private void setOnClickListenerWhenOpenDialog() {
         buttonOpenDialog.setOnClickListener((v) -> {
-            Dialog dialog = new Dialog(context);
+            Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.dialog);
             setTitleToDialog(dialog);
 
-            /*ColorPickerDialog colorPickerDialog = */
-            new ColorPickerDialog(dialog);
+            new ColorPickerDialog(dialog, getResources());
             Button buttonOkToCloseDialog = dialog.findViewById(R.id.dialogButtonOk);
             setOnClickListenerForClose(dialog, buttonOkToCloseDialog);
             dialog.show();

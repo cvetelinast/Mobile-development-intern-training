@@ -16,6 +16,8 @@ public class PixelComponents {
 
     private int y;
 
+    private String CODE_COLOR = "#%02x%02x%02x";
+
     PixelComponents(int alpha, int red, int green, int blue, int x, int y) {
         this.red = red;
         this.green = green;
@@ -50,7 +52,7 @@ public class PixelComponents {
     }
 
     public String getCode() {
-        return String.format("#%02x%02x%02x", red, green, blue);
+        return String.format(CODE_COLOR, red, green, blue);
     }
 
     public float[] getHSV() {

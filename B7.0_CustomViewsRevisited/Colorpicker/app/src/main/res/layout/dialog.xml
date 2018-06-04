@@ -16,7 +16,7 @@
     <com.example.tsvetelinastoyanova.color_picker.colorcontainers.Palette
         android:id="@+id/palette"
         android:layout_width="wrap_content"
-        android:layout_height="210dp"
+        android:layout_height="255dp"
         android:layout_below="@+id/dialogTitle" />
 
     <com.example.tsvetelinastoyanova.color_picker.colorcontainers.GradientLine
@@ -83,7 +83,6 @@
             android:textAlignment="center" />
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/codeColorButtonRow"
         android:layout_width="match_parent"
@@ -114,6 +113,5 @@
             android:layout_weight="1"
             android:text="@string/ok" />
     </LinearLayout>
-
 
 </RelativeLayout>
