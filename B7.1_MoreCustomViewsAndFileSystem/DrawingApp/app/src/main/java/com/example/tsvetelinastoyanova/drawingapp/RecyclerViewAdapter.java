@@ -4,22 +4,30 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private List<Picture> pictures;
     private Context context; // we want to show popup menu for single row
+    private final int imageWidthPixels = 500;
+    private final int imageHeightPixels = 500;
+    List<File> files;
 
-    public RecyclerViewAdapter(List<Picture> pictures, Context context) {
-        this.pictures = pictures;
+    public RecyclerViewAdapter(Context context) {
         this.context = context;
+
+        File directoryFiles = context.getFilesDir();
+        files = new ArrayList<>();
+        for (File file : directoryFiles.listFiles()) {
+            files.add(file);
+        }
     }
 
     @Override
@@ -38,38 +46,39 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        Picture pic = pictures.get(position);
-        viewHolder.name.setText(pic.getName());
-        viewHolder.lastModified.setText(pic.getLastModified());
-        viewHolder.imgViewIcon.setImageResource(pic.getImageUrl());
-        viewHolder.buttonViewOption.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        File file = files.get(position);
+        GlideApp.with(context)
+                .load(file)
+                .override(imageWidthPixels, imageHeightPixels)
+                .into(viewHolder.imgViewIcon);
+
+        viewHolder.name.setText(context.getResources().getString(R.string.name, file.getName()));
+        viewHolder.lastModified.setText(context.getResources().getString(R.string.last_modified, file.lastModified()));
+        viewHolder.buttonViewOption.setOnClickListener((v) -> {
+            {
                 Log.d("tag", "show menu");
                 createMenuForView(viewHolder);
             }
         });
     }
 
+
     private void createMenuForView(ViewHolder viewHolder) {
         PopupMenu popup = new PopupMenu(context, viewHolder.buttonViewOption);
         popup.inflate(R.menu.options_menu_drawings);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.delete:
-                        Log.d("tag", "delete");
-                        break;
-                    case R.id.rename:
-                        Log.d("tag", "rename");
-                        break;
-                    case R.id.share:
-                        Log.d("tag", "share");
-                        break;
-                }
-                return false;
+        popup.setOnMenuItemClickListener((item) -> {
+            switch (item.getItemId()) {
+                case R.id.delete:
+                    Log.d("tag", "delete");
+                    break;
+                case R.id.rename:
+                    Log.d("tag", "rename");
+                    break;
+                case R.id.share:
+                    Log.d("tag", "share");
+                    break;
             }
+            return false;
         });
         popup.show();
     }
@@ -92,7 +101,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return pictures.size();
+        return files.size();
     }
 }
 

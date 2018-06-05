@@ -32,7 +32,6 @@ public class DrawingList extends AppCompatActivity {
     private Menu menu;
     private LinearLayoutManager gridLayoutManager;
     private LinearLayoutManager horizontalLayoutManager;
-    private List<Picture> pictures;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,46 +88,6 @@ public class DrawingList extends AppCompatActivity {
         isListMode = savedInstanceState.getBoolean("isListMode");
     }
 
-    public List<Picture> fill_with_data() {
-
-        List<Picture> data = new ArrayList<>();
-
-        data.add(new Picture("Name 1", "Date 1", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 2", "Date 2", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 3", "Date 3", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 4", "Date 4", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 5", "Date 5", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 6", "Date 6", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 7", "Date 7", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 8", "Date 8", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 9", "Date 9", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 10", "Date 10", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 11", "Date 11", R.drawable.ic_launcher_background));
-        data.add(new Picture("Name 12", "Date 12", R.drawable.ic_launcher_background));
-        return data;
-    }
-
-   /* private void loadDrawingsFromStorage(String path){
-        List<Picture> data = new ArrayList<>();
-
-        File directoryFiles = getFilesDir();
-        for (String strFile : directoryFiles.list())
-        {
-            try {
-                File f=new File(strFile);
-                Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-              //  ImageView img=(ImageView)findViewById(R.id.imgPicker);
-                // img.setImageBitmap(b);
-            }
-            catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-
-    }*/
-
     private void initView() {
         setContentView(R.layout.activity_drawing_list);
         Toolbar toolbar = findViewById(R.id.my_toolbar);
@@ -137,8 +96,7 @@ public class DrawingList extends AppCompatActivity {
 
     private void initComponentsOfRecyclerView() {
         drawingsRecyclerView = findViewById(R.id.drawings_recycler_view);
-        pictures = fill_with_data();
-        adapter = new RecyclerViewAdapter(pictures, this);
+        adapter = new RecyclerViewAdapter(this);
 
         gridLayoutManager = new GridLayoutManager(DrawingList.this, 2);
         horizontalLayoutManager = new LinearLayoutManager(DrawingList.this, LinearLayoutManager.VERTICAL, false);
@@ -155,14 +113,11 @@ public class DrawingList extends AppCompatActivity {
         }
     }
 
-    private void setOnClickListenerToFloatingButton(){
+    private void setOnClickListenerToFloatingButton() {
         FloatingActionButton fab = findViewById(R.id.floating_action_button);
         final Intent intent = new Intent(this, DrawingScreen.class);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(intent);
-            }
+        fab.setOnClickListener((view) -> {
+            startActivity(intent);
         });
     }
 }

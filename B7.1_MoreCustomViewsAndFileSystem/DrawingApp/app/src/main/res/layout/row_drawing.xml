@@ -1,43 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/drawing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/ic_launcher_background" />
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/card_margin"
+        android:elevation="3dp">
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_toRightOf="@id/drawing"
-        android:text="Name: nsofmd" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/last_modified"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/name"
-        android:layout_margin="10dp"
-        android:layout_toRightOf="@id/drawing"
-        android:text="Last modified: 16.05.2018" />
+            <ImageView
+                android:id="@+id/drawing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:adjustViewBounds="true" />
 
-    <TextView
-        android:id="@+id/view_options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:paddingLeft="10dp"
-        android:text="&#8942;"
-        android:textAppearance="?android:textAppearanceLarge" />
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_toRightOf="@id/drawing"
+                android:text="Name: nsofmd" />
+
+            <TextView
+                android:id="@+id/last_modified"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name"
+                android:layout_margin="10dp"
+                android:layout_toRightOf="@id/drawing"
+                android:text="Last modified: 16.05.2018" />
+
+            <TextView
+                android:id="@+id/view_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="10dp"
+                android:text="&#8942;"
+                android:textAppearance="?android:textAppearanceLarge" />
 
 
-</RelativeLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

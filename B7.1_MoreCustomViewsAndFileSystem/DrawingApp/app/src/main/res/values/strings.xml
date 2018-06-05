@@ -16,6 +16,8 @@
     <string name="save_dialog_prompt">Enter name of the drawing.</string>
 
     <string name="jpg_format">%s.jpg</string>
+    <string name="name">Name: %s</string>
+    <string name="last_modified">Last modified: %d</string>
 
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>

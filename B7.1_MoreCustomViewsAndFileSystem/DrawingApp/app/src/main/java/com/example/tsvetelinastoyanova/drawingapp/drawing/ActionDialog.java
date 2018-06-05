@@ -53,11 +53,11 @@ public class ActionDialog {
         dialog.show();
     }
 
-    public ActionDialog setPreviousSizeOfEraser(int seekbarId, int sizeEraser){
+    public ActionDialog setPreviousSizeOfEraser(int seekbarId, int sizeEraser) {
         return this;
     }
 
-    public ActionDialog initNameInput(int drawingInputDest, String nameOfDrawing){
+    public ActionDialog initNameInput(int drawingInputDest, String nameOfDrawing) {
         return this;
     }
 }
