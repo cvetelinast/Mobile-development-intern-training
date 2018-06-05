@@ -1,9 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DrawingScreen">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/action_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/brush"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/brush"
+            app:srcCompat="@drawable/ic_brush_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/eraser"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/erase"
+            app:srcCompat="@drawable/ic_temp_24dp" />
+
+        <ImageButton
+            android:id="@+id/fill"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/fill"
+            app:srcCompat="@drawable/ic_temp_24dp" />
+
+        <ImageButton
+            android:id="@+id/pipette"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/pipette"
+            app:srcCompat="@drawable/ic_colorize_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/rectangle"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/rectangle"
+            app:srcCompat="@drawable/ic_rectangle_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/oval"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/oval"
+            app:srcCompat="@drawable/ic_circle_24dp" />
+
+        <ImageButton
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/save"
+            app:srcCompat="@drawable/ic_save_black_24dp" />
+    </LinearLayout>
+
+    <com.example.tsvetelinastoyanova.drawingapp.drawing.DrawingView
+        android:id="@+id/drawing"
+        android:layout_width="fill_parent"
+        android:layout_height="450sp"
+        android:layout_below="@+id/action_bar"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:background="@color/grey" />
+
+</RelativeLayout>

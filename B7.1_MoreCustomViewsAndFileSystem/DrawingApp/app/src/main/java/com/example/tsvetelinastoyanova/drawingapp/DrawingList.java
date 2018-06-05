@@ -1,7 +1,8 @@
 package com.example.tsvetelinastoyanova.drawingapp;
 
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,9 +13,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.design.widget.FloatingActionButton;
+import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class DrawingList extends AppCompatActivity {
 
@@ -101,6 +108,27 @@ public class DrawingList extends AppCompatActivity {
         return data;
     }
 
+   /* private void loadDrawingsFromStorage(String path){
+        List<Picture> data = new ArrayList<>();
+
+        File directoryFiles = getFilesDir();
+        for (String strFile : directoryFiles.list())
+        {
+            try {
+                File f=new File(strFile);
+                Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+              //  ImageView img=(ImageView)findViewById(R.id.imgPicker);
+                // img.setImageBitmap(b);
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+
+    }*/
+
     private void initView() {
         setContentView(R.layout.activity_drawing_list);
         Toolbar toolbar = findViewById(R.id.my_toolbar);
@@ -119,6 +147,7 @@ public class DrawingList extends AppCompatActivity {
     }
 
     private void setLayoutManager() {
+        //todo: reuse this method
         if (isListMode) {
             drawingsRecyclerView.setLayoutManager(horizontalLayoutManager);
         } else {
