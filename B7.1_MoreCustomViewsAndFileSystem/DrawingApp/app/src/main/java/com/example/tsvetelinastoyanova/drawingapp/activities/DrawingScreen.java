@@ -1,24 +1,27 @@
-package com.example.tsvetelinastoyanova.drawingapp;
+package com.example.tsvetelinastoyanova.drawingapp.activities;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.tsvetelinastoyanova.drawingapp.drawing.DrawingTool;
+import com.example.tsvetelinastoyanova.drawingapp.handlers.FilesHandler;
+import com.example.tsvetelinastoyanova.drawingapp.R;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.ColorPickerDialogBuilder;
+import com.example.tsvetelinastoyanova.drawingapp.enums.DrawingTool;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.DrawingView;
-import com.example.tsvetelinastoyanova.drawingapp.drawing.Eraser;
-import com.example.tsvetelinastoyanova.drawingapp.drawing.Saver;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.Eraser;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.Saver;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class DrawingScreen extends AppCompatActivity {
     private int sizeEraser = 30;
@@ -35,26 +38,62 @@ public class DrawingScreen extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         initDrawingView();
+        setOnBrushButtonClickListener(findViewById(R.id.brush));
         setOnEraseButtonClickListener(findViewById(R.id.eraser));
+        setOnPipetteButtonClickListener(findViewById(R.id.pipette));
         setOnSaveButtonClickListener(findViewById(R.id.save));
     }
 
     /*  private void initDialog(ImageButton openDialogButton){
           setOnEraseButtonClickListener(openDialogButton);
       }
-  */
+    */
 
     private void initDrawingView() {
         drawingView = findViewById(R.id.drawing);
         drawingView.setSizeEraser(sizeEraser);
     }
 
-    private void setOnEraseButtonClickListener(ImageButton openEraserDialog) {
-        openEraserDialog.setOnClickListener((v) -> {
+    private void setOnBrushButtonClickListener(ImageButton openBrushButton) {
+        openBrushButton.setOnClickListener((v) -> {
+            drawingView.setDrawingTool(DrawingTool.BRUSH);
+        });
+        openBrushButton.setOnLongClickListener((v) -> {
+            ColorPickerDialogBuilder colorPickerDialogBuilder = new ColorPickerDialogBuilder(this);
+            colorPickerDialogBuilder.setContentView(R.layout.color_picker_dialog)
+                    .setTitleToDialog(R.id.dialogTitle, getResources().getString(R.string.color_picker_dialog_title))
+                    .initButtonOk(R.id.dialogButtonOk)
+                    .createInstance()
+                    .showDialog();
+            setOnClickListenerForBrushOk(colorPickerDialogBuilder.getDialog(), colorPickerDialogBuilder.getButtonOk());
+            return true;
+        });
+    }
+
+    private void setOnClickListenerForBrushOk(Dialog dialog, Button buttonOk) {
+        buttonOk.setOnClickListener((v) -> {
+            dialog.dismiss();
+            colorButtonOpenDialog(dialog);
+        });
+    }
+
+    private void colorButtonOpenDialog(Dialog dialog) {
+        TextView chosenColor = dialog.findViewById(R.id.color);
+        if (chosenColor.getBackground() instanceof ColorDrawable) {
+            ColorDrawable cd = (ColorDrawable) chosenColor.getBackground();
+            ImageButton buttonOpenColorpickerDialog = findViewById(R.id.brush);
+            buttonOpenColorpickerDialog.setBackgroundColor(cd.getColor());
+            drawingView.setDrawingTool(DrawingTool.BRUSH);
+            drawingView.setPaintColor(cd.getColor());
+        }
+    }
+
+    private void setOnEraseButtonClickListener(ImageButton openEraserButton) {
+        openEraserButton.setOnClickListener((v) -> {
             drawingView.setDrawingTool(DrawingTool.ERASER);
         });
 
-        openEraserDialog.setOnLongClickListener((v) -> {
+        openEraserButton.setOnLongClickListener((v) -> {
             Eraser eraser = new Eraser(this);
             eraser.setContentView(R.layout.erase_dialog)
                     .setTitleToDialog(R.id.title, getResources().getString(R.string.size_eraser_prompt))
@@ -75,6 +114,12 @@ public class DrawingScreen extends AppCompatActivity {
             sizeEraser = seekErase.getProgress();
             drawingView.setSizeEraser(sizeEraser);
             dialog.dismiss();
+        });
+    }
+
+    private void setOnPipetteButtonClickListener(ImageButton openPipetteButton) {
+        openPipetteButton.setOnClickListener((v) -> {
+            drawingView.setDrawingTool(DrawingTool.PIPETTE);
         });
     }
 
@@ -103,18 +148,24 @@ public class DrawingScreen extends AppCompatActivity {
             TextInputLayout textInputLayout = dialog.findViewById(R.id.drawing_name_input);
             EditText editText = textInputLayout.getEditText();
             nameOfDrawing = getResources().getString(R.string.jpg_format, editText.getText().toString());
+            String nameOfDirectory = getResources().getString(R.string.directory);
+            String fullPathToNewFile = getFilesDir().getAbsolutePath() + File.separator + nameOfDirectory;
 
-            FileOutputStream fileOutputStream = null;
-            try {
-                fileOutputStream = openFileOutput(nameOfDrawing, Context.MODE_PRIVATE);
-                drawingView.getCanvasBitmap().compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-            } catch (Exception e) {
-                Log.d("Exception", "An exception with the stream while saving the drawing occured.");
-                e.printStackTrace();
+            FilesHandler filesHandler = new FilesHandler();
+            boolean isSavingFileSuccessful = filesHandler.saveDrawing(drawingView.getCanvasBitmap(), nameOfDrawing, fullPathToNewFile);
+            if (isSavingFileSuccessful) {
+                Toast.makeText(this, getResources().getString(R.string.success_saved_drawing), Toast.LENGTH_LONG);
+                returnToDrawingListActivity();
             }
-            Log.d("tag", "SAVING");
+
             dialog.dismiss();
         });
+    }
+
+   
+    private void returnToDrawingListActivity() {
+        Intent intent = new Intent(this, DrawingList.class);
+        startActivity(intent);
     }
 
 

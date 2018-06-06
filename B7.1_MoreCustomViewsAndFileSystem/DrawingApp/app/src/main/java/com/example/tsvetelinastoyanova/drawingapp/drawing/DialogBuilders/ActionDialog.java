@@ -1,16 +1,19 @@
-package com.example.tsvetelinastoyanova.drawingapp.drawing;
+package com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.support.design.widget.TextInputLayout;
+import android.view.View;
 import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.example.tsvetelinastoyanova.drawingapp.enums.ActionDrawing;
 
 public class ActionDialog {
 
-    Dialog dialog;
-    Button buttonOk;
-    Button buttonCancel;
+    public Dialog dialog;
+    public Button buttonOk;
+    public Button buttonCancel;
 
     public Dialog getDialog() {
         return dialog;
@@ -30,6 +33,14 @@ public class ActionDialog {
 
     public ActionDialog setContentView(int view) {
         dialog.setContentView(view);
+        return this;
+    }
+
+    public ActionDialog hideTextInputField(int idDestination, boolean shouldHideField) {
+        if (shouldHideField) {
+            TextInputLayout textInputLayout = dialog.findViewById(idDestination);
+            textInputLayout.setVisibility(View.GONE);
+        }
         return this;
     }
 
@@ -58,6 +69,10 @@ public class ActionDialog {
     }
 
     public ActionDialog initNameInput(int drawingInputDest, String nameOfDrawing) {
+        return this;
+    }
+
+    public ActionDialog createInstance() {
         return this;
     }
 }

@@ -10,7 +10,11 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.example.tsvetelinastoyanova.drawingapp.activities.DrawingList;
+import com.example.tsvetelinastoyanova.drawingapp.handlers.PopupMenuHandler;
+
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +22,30 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private Context context; // we want to show popup menu for single row
     private final int imageWidthPixels = 500;
     private final int imageHeightPixels = 500;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     List<File> files;
 
     public RecyclerViewAdapter(Context context) {
         this.context = context;
-
-        File directoryFiles = context.getFilesDir();
+        String nameOfDirectory = context.getResources().getString(R.string.directory);
+        String folder = context.getFilesDir().getAbsolutePath() + File.separator + nameOfDirectory;
+        createDirectoryOfDrawingsIfNotExist(folder);
+        File directoryFiles = new File(folder);
         files = new ArrayList<>();
         for (File file : directoryFiles.listFiles()) {
             files.add(file);
         }
     }
 
+    void createDirectoryOfDrawingsIfNotExist(String folder){
+        File subFolder = new File(folder);
+        if (!subFolder.exists()) {
+            subFolder.mkdirs();
+        }
+    }
+
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                             int viewType) {
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View pictureLayoutView;
         if (DrawingList.isListMode) {
             pictureLayoutView = LayoutInflater.from(parent.getContext())
@@ -52,34 +65,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 .override(imageWidthPixels, imageHeightPixels)
                 .into(viewHolder.imgViewIcon);
 
-        viewHolder.name.setText(context.getResources().getString(R.string.name, file.getName()));
-        viewHolder.lastModified.setText(context.getResources().getString(R.string.last_modified, file.lastModified()));
+        String name = context.getResources().getString(R.string.name, file.getName());
+        viewHolder.name.setText(name);
+        viewHolder.lastModified.setText(context.getResources().getString(R.string.last_modified, dateFormat.format(file.lastModified()).toString()));
         viewHolder.buttonViewOption.setOnClickListener((v) -> {
             {
                 Log.d("tag", "show menu");
-                createMenuForView(viewHolder);
+                createMenuForView(position, viewHolder);
             }
         });
     }
 
-
-    private void createMenuForView(ViewHolder viewHolder) {
+    private void createMenuForView(int position, ViewHolder viewHolder) {
         PopupMenu popup = new PopupMenu(context, viewHolder.buttonViewOption);
         popup.inflate(R.menu.options_menu_drawings);
-        popup.setOnMenuItemClickListener((item) -> {
-            switch (item.getItemId()) {
-                case R.id.delete:
-                    Log.d("tag", "delete");
-                    break;
-                case R.id.rename:
-                    Log.d("tag", "rename");
-                    break;
-                case R.id.share:
-                    Log.d("tag", "share");
-                    break;
-            }
-            return false;
-        });
+        PopupMenuHandler popupMenuHandler = new PopupMenuHandler(context, popup, position, files, this);
+        popupMenuHandler.setClickListenersOnPopupMenu();
         popup.show();
     }
 

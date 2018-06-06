@@ -1,7 +1,6 @@
-package com.example.tsvetelinastoyanova.drawingapp.drawing;
+package com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.SeekBar;
 
 public class Eraser extends ActionDialog {

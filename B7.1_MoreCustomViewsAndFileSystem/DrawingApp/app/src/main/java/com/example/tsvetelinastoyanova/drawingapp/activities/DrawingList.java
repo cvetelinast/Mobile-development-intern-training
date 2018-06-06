@@ -1,8 +1,6 @@
-package com.example.tsvetelinastoyanova.drawingapp;
+package com.example.tsvetelinastoyanova.drawingapp.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,21 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.support.design.widget.FloatingActionButton;
-import android.widget.ImageView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import com.example.tsvetelinastoyanova.drawingapp.R;
+import com.example.tsvetelinastoyanova.drawingapp.RecyclerViewAdapter;
 
 public class DrawingList extends AppCompatActivity {
 
-    static boolean isListMode = true;
+    public static boolean isListMode = true;
 
     private RecyclerView drawingsRecyclerView;
     private RecyclerViewAdapter adapter;

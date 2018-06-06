@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.ActionDialog;
+import com.example.tsvetelinastoyanova.drawingapp.enums.ActionDrawing;
+import com.example.tsvetelinastoyanova.drawingapp.enums.DrawingTool;
+
 
 public class DrawingView extends View {
     //drawing path
@@ -38,6 +42,11 @@ public class DrawingView extends View {
 
     public void setDrawingTool(DrawingTool drawingTool) {
         this.drawingTool = drawingTool;
+    }
+
+    public void setPaintColor(int paintColor) {
+        this.paintColor = paintColor;
+        drawPaint.setColor(this.paintColor);
     }
 
     public DrawingView(Context context, AttributeSet attrs) {
@@ -71,17 +80,25 @@ public class DrawingView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(drawingTool.name().equals("BRUSH")) {
+        if (drawingTool.name().equals(DrawingTool.BRUSH.name())) {
             Log.d("tag", "brush");
             drawPaint.setXfermode(null);
             canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
             canvas.drawPath(drawPath, drawPaint);
-        } else if(drawingTool.name().equals("ERASER")){
+        } else if (drawingTool.name().equals(DrawingTool.ERASER.name())) {
             Log.d("tag", "eraser");
             drawPaint.setStrokeWidth(sizeEraser);
             drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
             canvas.drawPath(drawPath, drawPaint);
+        } else if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
+            Log.d("tag", "pipette");
+        } else if (drawingTool.name().equals(DrawingTool.FILL.name())) {
+            Log.d("tag", "fill");
+        } else if (drawingTool.name().equals(DrawingTool.RECTANGLE.name())) {
+            Log.d("tag", "rectangle");
+        } else if (drawingTool.name().equals(DrawingTool.OVAL.name())) {
+            Log.d("tag", "oval");
         }
     }
 

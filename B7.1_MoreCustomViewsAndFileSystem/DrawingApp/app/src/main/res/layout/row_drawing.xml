@@ -47,6 +47,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="&#8942;"
                 android:textAppearance="?android:textAppearanceLarge" />
 
