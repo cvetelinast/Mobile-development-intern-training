@@ -86,7 +86,7 @@ public class DrawingList extends AppCompatActivity {
 
     private void initComponentsOfRecyclerView() {
         drawingsRecyclerView = findViewById(R.id.drawings_recycler_view);
-        adapter = new RecyclerViewAdapter(this/*, initRecyclerViewClickListener()*/);
+        adapter = new RecyclerViewAdapter(this);
 
         gridLayoutManager = new GridLayoutManager(DrawingList.this, 2);
         horizontalLayoutManager = new LinearLayoutManager(DrawingList.this, LinearLayoutManager.VERTICAL, false);

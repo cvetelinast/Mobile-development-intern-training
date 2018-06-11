@@ -25,11 +25,6 @@ public class FilesHandler {
                 String fullPathToFile = new File(subFolder, nameOfDrawing).toString();
                 outputStream = new FileOutputStream(fullPathToFile);
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                /*try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
             } catch (FileNotFoundException e) {
                 Log.e("ERROR", "An exception with the stream while saving the drawing occured." + e.toString());
             } finally {
@@ -53,20 +48,20 @@ public class FilesHandler {
         return subFolder;
     }
 
-    public boolean deleteDrawing(File fileToDelete, File fullPathDirectory,/* Activity activity,*/ Runnable afterDeleteAction, Runnable notSuccessfulDeleteAction) {
+    public boolean deleteDrawing(File fileToDelete, File fullPathDirectory, Activity activity, Runnable afterDeleteAction, Runnable notSuccessfulDeleteAction) {
         new Thread(() -> {
             for (File file : fullPathDirectory.listFiles()) {
                 if (file.equals(fileToDelete)) {
                     file.delete();
-                    //   activity.runOnUiThread(afterDeleteAction);
+                    activity.runOnUiThread(afterDeleteAction);
                 }
             }
-            //  activity.runOnUiThread(notSuccessfulDeleteAction);
+            activity.runOnUiThread(notSuccessfulDeleteAction);
         }).start();
         return true;
     }
 
-    public boolean renameDrawing(int position, File fullPathDirectory, List<File> files, String newName, /*Activity activity, */Runnable afterRenameAction, Runnable notSuccessfulRenameAction) {
+    public boolean renameDrawing(int position, File fullPathDirectory, List<File> files, String newName, Activity activity, Runnable afterRenameAction, Runnable notSuccessfulRenameAction) {
         File fileToRename = files.get(position);
         new Thread(() -> {
             for (File file : fullPathDirectory.listFiles()) {
@@ -75,10 +70,10 @@ public class FilesHandler {
                     file.renameTo(newFile);
                     files.remove(position);
                     files.add(position, newFile);
-                    //      activity.runOnUiThread(afterRenameAction);
+                    activity.runOnUiThread(afterRenameAction);
                 }
             }
-            //    activity.runOnUiThread(notSuccessfulRenameAction);
+            activity.runOnUiThread(notSuccessfulRenameAction);
         }).start();
         return true;
     }

@@ -27,7 +27,7 @@ import com.example.tsvetelinastoyanova.drawingapp.enums.DrawingTool;
 public class DrawingView extends View {
     private Path drawPath;
     private Paint drawPaint, canvasPaint;
-    private int paintColor = 0xFF660000;
+    private int paintColor = 0xFF00ffab;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
 
