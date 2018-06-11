@@ -12,7 +12,7 @@ import com.example.tsvetelinastoyanova.drawingapp.R;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.colorpicker.colorcontainers.GradientLine;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.colorpicker.colorcontainers.Palette;
 
-public class ColorPickerDialog {
+public class ColorPicker {
 
     private Dialog dialog;
     private TextView boxShowingChosenColor;
@@ -21,7 +21,7 @@ public class ColorPickerDialog {
     private int lastLocationY;
     private Resources resources;
 
-    public ColorPickerDialog(Dialog dialog, Resources resources) {
+    public ColorPicker(Dialog dialog, Resources resources) {
         this.dialog = dialog;
         this.resources = resources;
         boxShowingChosenColor = dialog.findViewById(R.id.color);

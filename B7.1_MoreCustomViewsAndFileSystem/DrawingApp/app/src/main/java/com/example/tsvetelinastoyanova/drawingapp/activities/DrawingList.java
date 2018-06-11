@@ -61,11 +61,10 @@ public class DrawingList extends AppCompatActivity {
                     drawingsRecyclerView.setLayoutManager(horizontalLayoutManager);
                 }
                 drawingsRecyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
                 isListMode = !isListMode;
-                return (true);
+                return true;
         }
-        return (super.onOptionsItemSelected(item));
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class DrawingList extends AppCompatActivity {
 
     private void initComponentsOfRecyclerView() {
         drawingsRecyclerView = findViewById(R.id.drawings_recycler_view);
-        adapter = new RecyclerViewAdapter(this);
+        adapter = new RecyclerViewAdapter(this/*, initRecyclerViewClickListener()*/);
 
         gridLayoutManager = new GridLayoutManager(DrawingList.this, 2);
         horizontalLayoutManager = new LinearLayoutManager(DrawingList.this, LinearLayoutManager.VERTICAL, false);
@@ -96,7 +95,6 @@ public class DrawingList extends AppCompatActivity {
     }
 
     private void setLayoutManager() {
-        //todo: reuse this method
         if (isListMode) {
             drawingsRecyclerView.setLayoutManager(horizontalLayoutManager);
         } else {
@@ -106,8 +104,8 @@ public class DrawingList extends AppCompatActivity {
 
     private void setOnClickListenerToFloatingButton() {
         FloatingActionButton fab = findViewById(R.id.floating_action_button);
-        final Intent intent = new Intent(this, DrawingScreen.class);
         fab.setOnClickListener((view) -> {
+            final Intent intent = new Intent(this, DrawingScreen.class);
             startActivity(intent);
         });
     }

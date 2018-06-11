@@ -36,14 +36,6 @@ public class ActionDialog {
         return this;
     }
 
-    public ActionDialog hideTextInputField(int idDestination, boolean shouldHideField) {
-        if (shouldHideField) {
-            TextInputLayout textInputLayout = dialog.findViewById(idDestination);
-            textInputLayout.setVisibility(View.GONE);
-        }
-        return this;
-    }
-
     public ActionDialog setTitleToDialog(int idDestination, String title) {
         TextView destination = dialog.findViewById(idDestination);
         destination.setText(title);
@@ -64,7 +56,7 @@ public class ActionDialog {
         dialog.show();
     }
 
-    public ActionDialog setPreviousSizeOfEraser(int seekbarId, int sizeEraser) {
+    public ActionDialog setPreviousSizeOfTool(int seekbarId, int sizeEraser) {
         return this;
     }
 

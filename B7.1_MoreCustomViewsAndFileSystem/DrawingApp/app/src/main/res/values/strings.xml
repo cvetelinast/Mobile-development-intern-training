@@ -2,6 +2,9 @@
     <string name="app_name">Drawing app</string>
     <string name="grid_list_switch">grid_list_switch</string>
     <string name="directory">drawings</string>
+    <string name="your_drawings">Your drawings:</string>
+    <string name="edit_drawing">drawing</string>
+    <string name="position_of_item">position_of_item</string>
 
     <!--actions-->
     <string name="brush">Brush</string>
@@ -13,8 +16,10 @@
     <string name="save">Save</string>
 
     <string name="size_eraser_prompt">Choose size of eraser.</string>
+    <string name="size_brush_prompt">Choose size of brush.</string>
     <string name="save_dialog_title">Saving drawing</string>
     <string name="save_dialog_prompt">Enter name of the drawing.</string>
+    <string name="before_save_dialog">Saving...</string>
 
     <string name="jpg_format">%s.jpg</string>
     <string name="name">Name: %s</string>
@@ -27,6 +32,10 @@
     <string name="cancel">Cancel</string>
 
     <string name="success_saved_drawing">The drawing was saved successfully.</string>
+    <string name="success_delete_drawing">The drawing was deleted successfully.</string>
+    <string name="not_success_delete_drawing">The drawing was not deleted successfully.</string>
+    <string name="success_rename_drawing">The drawing was renamed successfully.</string>
+    <string name="not_success_rename_drawing">The drawing was not renamed successfully.</string>
 
     <!--color picker-->
     <string name="r">R: %d</string>

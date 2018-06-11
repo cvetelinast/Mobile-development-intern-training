@@ -3,34 +3,43 @@ package com.example.tsvetelinastoyanova.drawingapp.drawing;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.graphics.Path;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.ActionDialog;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.ElipseTool;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.RectangleTool;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.Tool;
 import com.example.tsvetelinastoyanova.drawingapp.enums.ActionDrawing;
 import com.example.tsvetelinastoyanova.drawingapp.enums.DrawingTool;
 
 
 public class DrawingView extends View {
-    //drawing path
     private Path drawPath;
-    //drawing and canvas paint
     private Paint drawPaint, canvasPaint;
-    //initial color
     private int paintColor = 0xFF660000;
-    //canvas
     private Canvas drawCanvas;
-    //canvas bitmap
     private Bitmap canvasBitmap;
 
     private DrawingTool drawingTool;
     private int sizeEraser;
+    private int sizeBrush;
+    private ImageButton currentColorField;
+
+    float beginX;
+    float beginY;
+    float endX;
+    float endY;
 
     public Bitmap getCanvasBitmap() {
         return canvasBitmap;
@@ -38,6 +47,14 @@ public class DrawingView extends View {
 
     public void setSizeEraser(int sizeEraser) {
         this.sizeEraser = sizeEraser;
+    }
+
+    public void setSizeBrush(int sizeBrush) {
+        this.sizeBrush = sizeBrush;
+    }
+
+    public void setCurrentColorFieldId(ImageButton currentColorField) {
+        this.currentColorField = currentColorField;
     }
 
     public void setDrawingTool(DrawingTool drawingTool) {
@@ -49,9 +66,22 @@ public class DrawingView extends View {
         drawPaint.setColor(this.paintColor);
     }
 
+    public void setCanvasBitmap(Bitmap canvasBitmap) {
+        this.canvasBitmap = canvasBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        drawCanvas = new Canvas(this.canvasBitmap);
+    }
+
+    public boolean isFigureCreated() {
+        return drawingTool.name().equals(DrawingTool.RECTANGLE.name()) || drawingTool.name().equals(DrawingTool.OVAL.name());
+    }
+
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setupDrawing();
+    }
+
+    public int getPaintColor() {
+        return paintColor;
     }
 
     private void setupDrawing() {
@@ -74,31 +104,33 @@ public class DrawingView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        drawCanvas = new Canvas(canvasBitmap);
+        if (canvasBitmap == null) {
+            canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            drawCanvas = new Canvas(canvasBitmap);
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         if (drawingTool.name().equals(DrawingTool.BRUSH.name())) {
-            Log.d("tag", "brush");
+            drawPaint.setStrokeWidth(sizeBrush);
             drawPaint.setXfermode(null);
             canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
             canvas.drawPath(drawPath, drawPaint);
         } else if (drawingTool.name().equals(DrawingTool.ERASER.name())) {
-            Log.d("tag", "eraser");
             drawPaint.setStrokeWidth(sizeEraser);
             drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
             canvas.drawPath(drawPath, drawPaint);
         } else if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
-            Log.d("tag", "pipette");
-        } else if (drawingTool.name().equals(DrawingTool.FILL.name())) {
-            Log.d("tag", "fill");
+            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         } else if (drawingTool.name().equals(DrawingTool.RECTANGLE.name())) {
-            Log.d("tag", "rectangle");
+            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+            canvas.drawRect(beginX, beginY, endX, endY, drawPaint);
         } else if (drawingTool.name().equals(DrawingTool.OVAL.name())) {
-            Log.d("tag", "oval");
+            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+            RectF oval = new RectF(beginX, beginY, endX, endY);
+            canvas.drawOval(oval, drawPaint);
         }
     }
 
@@ -106,22 +138,83 @@ public class DrawingView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
+        if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    paintColor = getColorOfPixelOnTouch(event);
+                    drawPaint.setColor(paintColor);
+                    currentColorField.setBackgroundColor(paintColor);
+                    break;
+                default:
+                    return false;
+            }
+        } else if (isFigureCreated()) {
+            onTouchEventWhenDrawingFigures(event, touchX, touchY);
+        } else {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    drawPath.moveTo(touchX, touchY);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    drawPath.lineTo(touchX, touchY);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    drawCanvas.drawPath(drawPath, drawPaint);
+                    drawPath.reset();
+                    break;
+                default:
+                    return false;
+            }
+            invalidate();
+            return true;
+        }
+        return true;
+    }
+
+    private void onTouchEventWhenDrawingFigures(MotionEvent event, float touchX, float touchY) {
+        Tool tool = new Tool();
+        if (drawingTool.name().equals(DrawingTool.RECTANGLE.name())) {
+            tool = new RectangleTool();
+        } else if (drawingTool.name().equals(DrawingTool.OVAL.name())) {
+            tool = new ElipseTool();
+        }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                drawPath.moveTo(touchX, touchY);
+                beginX = touchX;
+                beginY = touchY;
                 break;
             case MotionEvent.ACTION_MOVE:
-                drawPath.lineTo(touchX, touchY);
+                endX = touchX;
+                endY = touchY;
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                drawCanvas.drawPath(drawPath, drawPaint);
+                endX = touchX;
+                endY = touchY;
+                tool.executeAction(drawCanvas, beginX, beginY, endX, endY, drawPaint);
                 drawPath.reset();
+                invalidate();
                 break;
-            default:
-                return false;
         }
-        invalidate();
-        return true;
+    }
+
+    private int validateCoordinates(int c, int max) {
+        if (c >= max) {
+            c = max - 1;
+        } else if (c <= 0) {
+            c = 1;
+        }
+        return c;
+    }
+
+    private int getColorOfPixelOnTouch(MotionEvent event) {
+        buildDrawingCache();
+        Bitmap bitmap = getDrawingCache();
+        int x = validateCoordinates((int) event.getX(), bitmap.getWidth());
+        int y = validateCoordinates((int) event.getY(), bitmap.getHeight());
+        int pixel = bitmap.getPixel(x, y);
+        destroyDrawingCache();
+        return Color.argb(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel));
     }
 
 }

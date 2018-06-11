@@ -83,11 +83,26 @@
             android:textAlignment="center" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hsv"
+        android:text="@string/size_brush_prompt"/>
+
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:max="100"
+        android:progress="30" />
+
     <LinearLayout
         android:id="@+id/codeColorButtonRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/hsv"
+        android:layout_below="@+id/seekbar"
         android:layout_marginTop="5dp">
 
         <TextView

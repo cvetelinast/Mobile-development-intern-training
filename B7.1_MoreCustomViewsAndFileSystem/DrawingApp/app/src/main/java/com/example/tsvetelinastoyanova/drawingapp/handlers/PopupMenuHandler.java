@@ -1,28 +1,33 @@
 package com.example.tsvetelinastoyanova.drawingapp.handlers;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
+import com.example.tsvetelinastoyanova.drawingapp.BuildConfig;
 import com.example.tsvetelinastoyanova.drawingapp.R;
 import com.example.tsvetelinastoyanova.drawingapp.RecyclerViewAdapter;
-import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.Saver;
-import com.example.tsvetelinastoyanova.drawingapp.enums.ActionDrawing;
-import com.example.tsvetelinastoyanova.drawingapp.handlers.FilesHandler;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.DeleteDialog;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.SaveDialog;
 
 import java.io.File;
 import java.util.List;
 
 public class PopupMenuHandler {
-    Context context;
-    PopupMenu popup;
-    int position;
-    List<File> files;
-    RecyclerViewAdapter adapter;
+    private Context context;
+    private PopupMenu popup;
+    private int position;
+    private List<File> files;
+    private RecyclerViewAdapter adapter;
 
     public PopupMenuHandler(Context context, PopupMenu popup, int position, List<File> files, RecyclerViewAdapter adapter) {
         this.context = context;
@@ -32,18 +37,18 @@ public class PopupMenuHandler {
         this.adapter = adapter;
     }
 
-    public void setClickListenersOnPopupMenu() {
+    public void setClickListenersOnPopupMenu(/*Activity activity*/) {
         popup.setOnMenuItemClickListener((item) -> {
             switch (item.getItemId()) {
                 case R.id.delete:
-                    showDialogToModify(position, ActionDrawing.DELETE);
+                    showDialogToDelete(position/*, activity*/);
                     break;
                 case R.id.rename:
-                    showDialogToModify(position, ActionDrawing.RENAME);
-                    Log.d("tag", "rename");
+                    showDialogToRename(position/*, activity*/);
                     break;
                 case R.id.share:
                     Log.d("tag", "share");
+                    showDialogToSendEmail(position);
                     break;
             }
             return false;
@@ -51,64 +56,59 @@ public class PopupMenuHandler {
         });
     }
 
-    private void showDialogToModify(int position, Enum actionDialog) {
-        String title = "";
-        boolean isDeleteDialog = true;
-        if (actionDialog.equals(ActionDrawing.DELETE)) {
-            title = context.getResources().getString(R.string.delete_question);
-            isDeleteDialog = true;
-        } else if (actionDialog.equals(ActionDrawing.RENAME)) {
-            title = context.getResources().getString(R.string.rename_question);
-            isDeleteDialog = false;
-        }
-
-        Saver saver = new Saver(context);
-        saver.setContentView(R.layout.save_drawing_dialog)
+    private void showDialogToDelete(int position/*, Activity activity*/) {
+        String title = context.getResources().getString(R.string.delete_question);
+        DeleteDialog deleteDialog = new DeleteDialog(context);
+        deleteDialog.setContentView(R.layout.delete_drawing_dialog)
                 .setTitleToDialog(R.id.title, title)
-                .initNameInput(R.id.drawing_name_input, files.get(position).getName()) // done in order to be reused for delete and rename
-                .hideTextInputField(R.id.drawing_name_input, isDeleteDialog)
                 .initButtonOk(R.id.button_ok)
                 .initButtonCancel(R.id.button_cancel)
                 .showDialog();
-        setOnClickListenerToConfirmAction(actionDialog, position, saver);
+        setOnClickListenerToConfirmDelete(/*activity, */position, deleteDialog.getDialog(), deleteDialog.getButtonOk());
+        setOnClickListenerForCancel(deleteDialog.getDialog(), deleteDialog.getButtonCancel());
     }
 
-    private void setOnClickListenerToConfirmAction(Enum actionDialog, int position, Saver saver) {
-        if (actionDialog.equals(ActionDrawing.DELETE)) {
-            setOnClickListenerToConfirmDelete(position, saver.getDialog(), saver.getButtonOk());
-        } else if (actionDialog.equals(ActionDrawing.RENAME)) {
-            setOnClickListenerToConfirmRename(position, saver.getDialog(), saver.getButtonOk());
-        }
-        setOnClickListenerForCancel(saver.getDialog(), saver.getButtonCancel());
-    }
-
-    private void setOnClickListenerToConfirmDelete(int positionToDelete, Dialog dialog, Button buttonOk) {
+    private void setOnClickListenerToConfirmDelete(/*Activity activity, */int positionToDelete, Dialog dialog, Button buttonOk) {
         buttonOk.setOnClickListener((v) -> {
             FilesHandler filesHandler = new FilesHandler();
             String nameOfDirectory = context.getResources().getString(R.string.directory);
             File directoryToTraverse = new File(context.getFilesDir().getAbsolutePath(), nameOfDirectory);
-            boolean isDrawingDeletedSuccessfully = filesHandler.deleteDrawing(files.get(positionToDelete), directoryToTraverse);
+            boolean isDrawingDeletedSuccessfully = filesHandler.deleteDrawing(files.get(positionToDelete), directoryToTraverse,/* activity,*/
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_delete_drawing), Toast.LENGTH_LONG).show(),
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_delete_drawing), Toast.LENGTH_LONG).show());
             if (isDrawingDeletedSuccessfully) {
                 files.remove(positionToDelete);
-                adapter.notifyItemChanged(positionToDelete);
+                adapter.notifyDataSetChanged();
             }
             dialog.dismiss();
         });
     }
 
-    private void setOnClickListenerToConfirmRename(int positionToRename, Dialog dialog, Button buttonOk) {
+    private void showDialogToRename(int position/*, Activity activity*/) {
+        String title = context.getResources().getString(R.string.rename_question);
+        SaveDialog saveDialog = new SaveDialog(context);
+        saveDialog.setContentView(R.layout.save_drawing_dialog)
+                .setTitleToDialog(R.id.title, title)
+                .initNameInput(R.id.drawing_name_input, files.get(position).getName())
+                .initButtonOk(R.id.button_ok)
+                .initButtonCancel(R.id.button_cancel)
+                .showDialog();
+        setOnClickListenerToConfirmRename(/*activity, */position, saveDialog.getDialog(), saveDialog.getButtonOk());
+        setOnClickListenerForCancel(saveDialog.getDialog(), saveDialog.getButtonCancel());
+    }
+
+    private void setOnClickListenerToConfirmRename(/*Activity activity, */int positionToRename, Dialog dialog, Button buttonOk) {
         buttonOk.setOnClickListener((v) -> {
             TextInputLayout textInputLayout = dialog.findViewById(R.id.drawing_name_input);
             EditText editText = textInputLayout.getEditText();
-            String newName = editText.getText().toString();
-           /* if (newName == null) {
-                Log.d("tag", "wrong name");
-                return;
-            }*/
+            String newName = context.getResources().getString(R.string.jpg_format, editText.getText().toString());
             String nameOfDirectory = context.getResources().getString(R.string.directory);
             File directoryToTraverse = new File(context.getFilesDir().getAbsolutePath(), nameOfDirectory);
             FilesHandler filesHandler = new FilesHandler();
-            boolean isDrawingRenamedSuccessfully = filesHandler.renameDrawing(positionToRename, files.get(positionToRename), directoryToTraverse, files, newName);
+            // todo: too many arguments
+            boolean isDrawingRenamedSuccessfully = filesHandler.renameDrawing(positionToRename, directoryToTraverse, files, newName, /*activity,*/
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_rename_drawing), Toast.LENGTH_LONG).show(),
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_rename_drawing), Toast.LENGTH_LONG).show());
             if (isDrawingRenamedSuccessfully) {
                 adapter.notifyItemChanged(positionToRename);
             }
@@ -116,9 +116,20 @@ public class PopupMenuHandler {
         });
     }
 
+    private void showDialogToSendEmail(int position) {
+        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+        File fileWithinMyDir = files.get(position);
+        if (fileWithinMyDir.exists()) {
+            intentShareFile.setType("image/jpg");
+            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", fileWithinMyDir);
+            intentShareFile.putExtra(Intent.EXTRA_STREAM, uri);
+            intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Sharing File");
+            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File " + fileWithinMyDir.getName());
+            context.startActivity(Intent.createChooser(intentShareFile, "Share File"));
+        }
+    }
+
     private void setOnClickListenerForCancel(Dialog dialog, Button buttonCancel) {
-        buttonCancel.setOnClickListener((v) -> {
-            dialog.dismiss();
-        });
+        buttonCancel.setOnClickListener((v) ->dialog.dismiss());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.drawingapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,37 +12,42 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.drawingapp.activities.DrawingList;
+import com.example.tsvetelinastoyanova.drawingapp.activities.DrawingScreen;
+import com.example.tsvetelinastoyanova.drawingapp.handlers.FilesHandler;
 import com.example.tsvetelinastoyanova.drawingapp.handlers.PopupMenuHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private Context context; // we want to show popup menu for single row
-    private final int imageWidthPixels = 500;
-    private final int imageHeightPixels = 500;
+    private final int IMAGE_WIDTH_PIXELS = 500;
+    private final int IMAGE_HEIGHT_PIXELS = 500;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-    List<File> files;
+    private static RecyclerViewClickListener recyclerViewClickListener;
+    private Context context; // we want to show popup menu for single row
+    private List<File> files;
 
-    public RecyclerViewAdapter(Context context) {
+    public RecyclerViewAdapter(Context context/*, RecyclerViewClickListener listener*/) {
         this.context = context;
+        recyclerViewClickListener = initRecyclerViewClickListener();
         String nameOfDirectory = context.getResources().getString(R.string.directory);
         String folder = context.getFilesDir().getAbsolutePath() + File.separator + nameOfDirectory;
-        createDirectoryOfDrawingsIfNotExist(folder);
-        File directoryFiles = new File(folder);
+        FilesHandler filesHandler = new FilesHandler();
+        File directoryFiles = filesHandler.prepareDirectory(folder);
         files = new ArrayList<>();
-        for (File file : directoryFiles.listFiles()) {
-            files.add(file);
-        }
+        files.addAll(Arrays.asList(directoryFiles.listFiles()));
     }
 
-    void createDirectoryOfDrawingsIfNotExist(String folder){
-        File subFolder = new File(folder);
-        if (!subFolder.exists()) {
-            subFolder.mkdirs();
-        }
+    private RecyclerViewClickListener initRecyclerViewClickListener() {
+        RecyclerViewClickListener listenerEditDrawing = (view, position) -> {
+            final Intent intent = new Intent(context, DrawingScreen.class);
+            intent.putExtra(context.getResources().getString(R.string.edit_drawing), files.get(position).getAbsolutePath());
+            context.startActivity(intent);
+        };
+        return listenerEditDrawing;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             pictureLayoutView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.grid_drawing, null);
         }
-        return new ViewHolder(pictureLayoutView);
+        return new ViewHolder(pictureLayoutView, recyclerViewClickListener);
     }
 
     @Override
@@ -62,7 +68,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         File file = files.get(position);
         GlideApp.with(context)
                 .load(file)
-                .override(imageWidthPixels, imageHeightPixels)
+                .override(IMAGE_WIDTH_PIXELS, IMAGE_HEIGHT_PIXELS)
                 .into(viewHolder.imgViewIcon);
 
         String name = context.getResources().getString(R.string.name, file.getName());
@@ -80,23 +86,30 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         PopupMenu popup = new PopupMenu(context, viewHolder.buttonViewOption);
         popup.inflate(R.menu.options_menu_drawings);
         PopupMenuHandler popupMenuHandler = new PopupMenuHandler(context, popup, position, files, this);
-        popupMenuHandler.setClickListenersOnPopupMenu();
+        popupMenuHandler.setClickListenersOnPopupMenu(/*this*/);
         popup.show();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView name;
-        public TextView lastModified;
-        public ImageView imgViewIcon;
-        public TextView buttonViewOption;
+        TextView lastModified;
+        ImageView imgViewIcon;
+        TextView buttonViewOption;
 
-        public ViewHolder(View itemLayoutView) {
+        @Override
+        public void onClick(View view) {
+            recyclerViewClickListener.onClick(view, getAdapterPosition());
+        }
+
+        ViewHolder(View itemLayoutView, RecyclerViewClickListener listener) {
             super(itemLayoutView);
             name = itemLayoutView.findViewById(R.id.name);
             lastModified = itemLayoutView.findViewById(R.id.last_modified);
             imgViewIcon = itemLayoutView.findViewById(R.id.drawing);
             buttonViewOption = itemView.findViewById(R.id.view_options);
+            recyclerViewClickListener = listener;
+            itemLayoutView.setOnClickListener(this);
         }
     }
 
