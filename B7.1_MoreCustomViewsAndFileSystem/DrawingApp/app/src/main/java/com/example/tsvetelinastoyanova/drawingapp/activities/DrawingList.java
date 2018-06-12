@@ -69,13 +69,13 @@ public class DrawingList extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean("isListMode", isListMode);
+        savedInstanceState.putBoolean(getResources().getString(R.string.is_list_mode), isListMode);
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        isListMode = savedInstanceState.getBoolean("isListMode");
+        isListMode = savedInstanceState.getBoolean(getResources().getString(R.string.is_list_mode));
     }
 
     private void initView() {

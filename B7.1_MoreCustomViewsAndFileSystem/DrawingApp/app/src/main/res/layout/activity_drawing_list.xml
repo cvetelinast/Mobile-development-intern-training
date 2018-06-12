@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.DrawingList">
+    tools:context=".activities.DrawingList"
+    android:background = "@drawable/fon">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
@@ -22,8 +22,9 @@
         android:layout_below="@id/my_toolbar"
         android:layout_centerHorizontal="true"
         android:text="@string/your_drawings"
-        android:textSize="26dp"
-        android:textStyle="bold" />
+        android:textSize="@dimen/large_size"
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawings_recycler_view"

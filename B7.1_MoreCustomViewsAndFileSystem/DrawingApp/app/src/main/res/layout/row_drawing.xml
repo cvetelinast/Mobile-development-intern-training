@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/card_margin"
-        android:elevation="3dp">
+        android:layout_margin="@dimen/card_margin">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,7 +20,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10sp"
-                android:adjustViewBounds="true" />
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/your_drawing" />
+
+            <TextView
+                android:id="@+id/view_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="@dimen/small_padding"
+                android:paddingRight="@dimen/small_padding"
+                android:text="@string/code_menu"
+                android:textStyle="bold"
+                android:textAppearance="?android:textAppearanceLarge" />
 
             <TextView
                 android:id="@+id/name"
@@ -29,7 +41,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_toRightOf="@id/drawing"
-                android:text="Name: nsofmd" />
+                android:layout_below="@+id/view_options"
+                android:text="Name: nsofmd"
+                android:textSize="@dimen/big_size"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/last_modified"
@@ -38,19 +53,9 @@
                 android:layout_below="@id/name"
                 android:layout_margin="10dp"
                 android:layout_toRightOf="@id/drawing"
-                android:text="Last modified: 16.05.2018" />
-
-            <TextView
-                android:id="@+id/view_options"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="&#8942;"
-                android:textAppearance="?android:textAppearanceLarge" />
-
+                android:text="Last modified: 16.05.2018"
+                android:textSize="@dimen/big_size"
+                android:textStyle="bold" />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

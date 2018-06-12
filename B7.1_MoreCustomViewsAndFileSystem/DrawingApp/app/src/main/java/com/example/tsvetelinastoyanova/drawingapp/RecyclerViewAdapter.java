@@ -91,12 +91,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String name = context.getResources().getString(R.string.name, file.getName());
         viewHolder.name.setText(name);
         viewHolder.lastModified.setText(context.getResources().getString(R.string.last_modified, dateFormat.format(file.lastModified()).toString()));
-        viewHolder.buttonViewOption.setOnClickListener((v) -> {
-            {
-                Log.d("tag", "show menu");
-                createMenuForView(position, viewHolder);
-            }
-        });
+        viewHolder.buttonViewOption.setOnClickListener((v) -> createMenuForView(position, viewHolder));
     }
 
     private void createMenuForView(int position, ViewHolder viewHolder) {
@@ -125,6 +120,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             lastModified = itemLayoutView.findViewById(R.id.last_modified);
             imgViewIcon = itemLayoutView.findViewById(R.id.drawing);
             buttonViewOption = itemView.findViewById(R.id.view_options);
+            initClickListener(itemLayoutView, listener);
+        }
+
+        private void initClickListener(View itemLayoutView, RecyclerViewClickListener listener) {
             recyclerViewClickListener = listener;
             itemLayoutView.setOnClickListener(this);
         }

@@ -70,11 +70,16 @@ public class DrawingScreen extends AppCompatActivity {
         drawingView.setSizeBrush(sizeBrush);
         drawingView.setCurrentColorFieldId(findViewById(R.id.currentColor));
         currentColorChange(drawingView.getPaintColor());
+        setBackgroundColorToButton(findViewById(R.id.brush));
     }
 
     private void setOnBrushButtonClickListener(ImageButton openBrushButton) {
-        openBrushButton.setOnClickListener((v) -> drawingView.setDrawingTool(DrawingTool.BRUSH));
+        openBrushButton.setOnClickListener((v) -> {
+            changeButtonBackground(openBrushButton);
+            drawingView.setDrawingTool(DrawingTool.BRUSH);
+        });
         openBrushButton.setOnLongClickListener((v) -> {
+            changeButtonBackground(openBrushButton);
             drawingView.setDrawingTool(DrawingTool.BRUSH);
             ColorPickerDialog colorPickerDialog = new ColorPickerDialog(this);
             colorPickerDialog.setContentView(R.layout.color_picker_dialog)
@@ -89,9 +94,13 @@ public class DrawingScreen extends AppCompatActivity {
     }
 
     private void setOnEraseButtonClickListener(ImageButton openEraserButton) {
-        openEraserButton.setOnClickListener((v) -> drawingView.setDrawingTool(DrawingTool.ERASER));
+        openEraserButton.setOnClickListener((v) -> {
+            changeButtonBackground(openEraserButton);
+            drawingView.setDrawingTool(DrawingTool.ERASER);
+        });
 
         openEraserButton.setOnLongClickListener((v) -> {
+            changeButtonBackground(openEraserButton);
             drawingView.setDrawingTool(DrawingTool.ERASER);
             EraserDialog eraserDialog = new EraserDialog(this);
             eraserDialog.setContentView(R.layout.erase_dialog)
@@ -109,6 +118,7 @@ public class DrawingScreen extends AppCompatActivity {
 
     private void setOnPipetteButtonClickListener(ImageButton selectPipetteButton) {
         selectPipetteButton.setOnTouchListener((v, event) -> {
+            changeButtonBackground(selectPipetteButton);
             drawingView.setDrawingTool(DrawingTool.PIPETTE);
             return true;
         });
@@ -116,6 +126,7 @@ public class DrawingScreen extends AppCompatActivity {
 
     private void setOnRectangleButtonClickListener(ImageButton selectRectangleButton) {
         selectRectangleButton.setOnTouchListener((v, event) -> {
+            changeButtonBackground(selectRectangleButton);
             drawingView.setDrawingTool(DrawingTool.RECTANGLE);
             return true;
         });
@@ -123,6 +134,7 @@ public class DrawingScreen extends AppCompatActivity {
 
     private void setOnOvalButtonClickListener(ImageButton selectOvalButton) {
         selectOvalButton.setOnTouchListener((v, event) -> {
+            changeButtonBackground(selectOvalButton);
             drawingView.setDrawingTool(DrawingTool.OVAL);
             return true;
         });
@@ -130,6 +142,7 @@ public class DrawingScreen extends AppCompatActivity {
 
     private void setOnSaveButtonClickListener(ImageButton openSaveDialog) {
         openSaveDialog.setOnClickListener((v) -> {
+            changeButtonBackground(openSaveDialog);
             SaveDialog saveDialog = new SaveDialog(this);
             saveDialog.setContentView(R.layout.save_drawing_dialog)
                     .setTitleToDialog(R.id.title, getResources().getString(R.string.save_dialog_title))
@@ -193,9 +206,9 @@ public class DrawingScreen extends AppCompatActivity {
             FilesHandler filesHandler = new FilesHandler();
             filesHandler.saveDrawing(drawingView.getCanvasBitmap(), nameOfDrawing,
                     fullPathToNewFile, this,
-                    () -> Toast.makeText(this, getResources().getString(R.string.before_save_dialog), Toast.LENGTH_LONG).show(),
+                    () -> Toast.makeText(this, getResources().getString(R.string.before_save_dialog), Toast.LENGTH_SHORT).show(),
                     () -> {
-                        Toast.makeText(this, getResources().getString(R.string.success_saved_drawing), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getResources().getString(R.string.success_saved_drawing), Toast.LENGTH_SHORT).show();
                         returnToDrawingListActivity();
                     });
             dialog.dismiss();
@@ -205,6 +218,24 @@ public class DrawingScreen extends AppCompatActivity {
     private void returnToDrawingListActivity() {
         Intent intent = new Intent(this, DrawingList.class);
         startActivity(intent);
+    }
+
+    private void removeAllBackgroundTints() {
+        findViewById(R.id.brush).setBackgroundColor(getResources().getColor(R.color.grey));
+        findViewById(R.id.eraser).setBackgroundColor(getResources().getColor(R.color.grey));
+        findViewById(R.id.pipette).setBackgroundColor(getResources().getColor(R.color.grey));
+        findViewById(R.id.rectangle).setBackgroundColor(getResources().getColor(R.color.grey));
+        findViewById(R.id.oval).setBackgroundColor(getResources().getColor(R.color.grey));
+        findViewById(R.id.save).setBackgroundColor(getResources().getColor(R.color.grey));
+    }
+
+    private void setBackgroundColorToButton(ImageButton imageButton) {
+        imageButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
+    }
+
+    private void changeButtonBackground(ImageButton imageButton) {
+        removeAllBackgroundTints();
+        setBackgroundColorToButton(imageButton);
     }
 
 }

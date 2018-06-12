@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fon"
     tools:context=".activities.DrawingScreen">
 
     <LinearLayout
@@ -17,48 +18,67 @@
             android:id="@+id/brush"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/brush"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_brush_black_24dp" />
 
         <ImageButton
             android:id="@+id/eraser"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/erase"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_temp_24dp" />
 
         <ImageButton
             android:id="@+id/pipette"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/pipette"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_colorize_black_24dp" />
 
         <ImageButton
             android:id="@+id/rectangle"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/rectangle"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_rectangle_black_24dp" />
 
         <ImageButton
             android:id="@+id/oval"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/oval"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_circle_24dp" />
 
         <ImageButton
             android:id="@+id/save"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:background="@color/grey"
             android:contentDescription="@string/save"
+            android:paddingLeft="@dimen/small_size"
+            android:paddingRight="@dimen/small_size"
             app:srcCompat="@drawable/ic_save_black_24dp" />
 
         <ImageButton
             android:id="@+id/currentColor"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/color" />
 
     </LinearLayout>
 
@@ -70,9 +90,7 @@
         android:layout_marginBottom="3dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1"
-        android:background="@color/grey" />
-
+        android:layout_marginTop="15dp"
+        android:background="@color/white" />
 
 </RelativeLayout>

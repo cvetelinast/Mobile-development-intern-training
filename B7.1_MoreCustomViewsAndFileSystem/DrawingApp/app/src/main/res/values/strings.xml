@@ -3,8 +3,12 @@
     <string name="grid_list_switch">grid_list_switch</string>
     <string name="directory">drawings</string>
     <string name="your_drawings">Your drawings:</string>
+    <string name="your_drawing">One of your drawings</string>
     <string name="edit_drawing">drawing</string>
     <string name="position_of_item">position_of_item</string>
+
+    <!--code menu indicator-->
+    <string name="code_menu">&#8942;</string>
 
     <!--actions-->
     <string name="brush">Brush</string>
@@ -14,7 +18,13 @@
     <string name="rectangle">Rectangle</string>
     <string name="oval">Oval</string>
     <string name="save">Save</string>
+    <string name="color">Current color</string>
 
+    <!--on save instance states-->
+    <string name="is_list_mode">is_list_mode</string>
+    <string name="save_drawing_view">save_drawing_view</string>
+
+    <!--messages-->
     <string name="size_eraser_prompt">Choose size of eraser.</string>
     <string name="size_brush_prompt">Choose size of brush.</string>
     <string name="save_dialog_title">Saving drawing</string>

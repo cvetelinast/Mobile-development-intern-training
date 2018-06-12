@@ -72,8 +72,8 @@ public class PopupMenuHandler {
             String nameOfDirectory = context.getResources().getString(R.string.directory);
             File directoryToTraverse = new File(context.getFilesDir().getAbsolutePath(), nameOfDirectory);
             boolean isDrawingDeletedSuccessfully = filesHandler.deleteDrawing(files.get(positionToDelete), directoryToTraverse, activity,
-                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_delete_drawing), Toast.LENGTH_LONG).show(),
-                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_delete_drawing), Toast.LENGTH_LONG).show());
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_delete_drawing), Toast.LENGTH_SHORT).show(),
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_delete_drawing), Toast.LENGTH_SHORT).show());
             if (isDrawingDeletedSuccessfully) {
                 files.remove(positionToDelete);
                 adapter.notifyDataSetChanged();
@@ -105,8 +105,8 @@ public class PopupMenuHandler {
             FilesHandler filesHandler = new FilesHandler();
             // todo: too many arguments
             boolean isDrawingRenamedSuccessfully = filesHandler.renameDrawing(positionToRename, directoryToTraverse, files, newName, activity,
-                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_rename_drawing), Toast.LENGTH_LONG).show(),
-                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_rename_drawing), Toast.LENGTH_LONG).show());
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.success_rename_drawing), Toast.LENGTH_SHORT).show(),
+                    () -> Toast.makeText(context, context.getResources().getString(R.string.not_success_rename_drawing), Toast.LENGTH_SHORT).show());
             if (isDrawingRenamedSuccessfully) {
                 adapter.notifyItemChanged(positionToRename);
             }

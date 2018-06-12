@@ -31,6 +31,7 @@ public class DrawingView extends View {
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
 
+    private PorterDuffXfermode modeEraser = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     private DrawingTool drawingTool;
     private int sizeEraser;
     private int sizeBrush;
@@ -40,6 +41,11 @@ public class DrawingView extends View {
     float beginY;
     float endX;
     float endY;
+
+    public DrawingView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        setupDrawing();
+    }
 
     public Bitmap getCanvasBitmap() {
         return canvasBitmap;
@@ -75,17 +81,11 @@ public class DrawingView extends View {
         return drawingTool.name().equals(DrawingTool.RECTANGLE.name()) || drawingTool.name().equals(DrawingTool.OVAL.name());
     }
 
-    public DrawingView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setupDrawing();
-    }
-
     public int getPaintColor() {
         return paintColor;
     }
 
     private void setupDrawing() {
-        //get drawing area setup for interaction
         drawPath = new Path();
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
@@ -98,7 +98,7 @@ public class DrawingView extends View {
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
         canvasPaint = new Paint(Paint.DITHER_FLAG);
 
-        drawingTool = DrawingTool.BRUSH;
+        setDrawingTool(DrawingTool.BRUSH);
     }
 
     @Override
@@ -112,23 +112,20 @@ public class DrawingView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         if (drawingTool.name().equals(DrawingTool.BRUSH.name())) {
             drawPaint.setStrokeWidth(sizeBrush);
             drawPaint.setXfermode(null);
-            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
             canvas.drawPath(drawPath, drawPaint);
         } else if (drawingTool.name().equals(DrawingTool.ERASER.name())) {
             drawPaint.setStrokeWidth(sizeEraser);
-            drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+            drawPaint.setXfermode(modeEraser);
             canvas.drawPath(drawPath, drawPaint);
-        } else if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
-            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         } else if (drawingTool.name().equals(DrawingTool.RECTANGLE.name())) {
-            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+            drawPaint.setXfermode(null);
             canvas.drawRect(beginX, beginY, endX, endY, drawPaint);
         } else if (drawingTool.name().equals(DrawingTool.OVAL.name())) {
-            canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+            drawPaint.setXfermode(null);
             RectF oval = new RectF(beginX, beginY, endX, endY);
             canvas.drawOval(oval, drawPaint);
         }
@@ -139,15 +136,7 @@ public class DrawingView extends View {
         float touchX = event.getX();
         float touchY = event.getY();
         if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    paintColor = getColorOfPixelOnTouch(event);
-                    drawPaint.setColor(paintColor);
-                    currentColorField.setBackgroundColor(paintColor);
-                    break;
-                default:
-                    return false;
-            }
+            onTouchEventPipetteToolSelected(event);
         } else if (isFigureCreated()) {
             onTouchEventWhenDrawingFigures(event, touchX, touchY);
         } else {
@@ -198,13 +187,14 @@ public class DrawingView extends View {
         }
     }
 
-    private int validateCoordinates(int c, int max) {
-        if (c >= max) {
-            c = max - 1;
-        } else if (c <= 0) {
-            c = 1;
+    private void onTouchEventPipetteToolSelected(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                paintColor = getColorOfPixelOnTouch(event);
+                drawPaint.setColor(paintColor);
+                currentColorField.setBackgroundColor(paintColor);
+                break;
         }
-        return c;
     }
 
     private int getColorOfPixelOnTouch(MotionEvent event) {
@@ -215,6 +205,15 @@ public class DrawingView extends View {
         int pixel = bitmap.getPixel(x, y);
         destroyDrawingCache();
         return Color.argb(Color.alpha(pixel), Color.red(pixel), Color.green(pixel), Color.blue(pixel));
+    }
+
+    private int validateCoordinates(int c, int max) {
+        if (c >= max) {
+            c = max - 1;
+        } else if (c <= 0) {
+            c = 1;
+        }
+        return c;
     }
 
 }
