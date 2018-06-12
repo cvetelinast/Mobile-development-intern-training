@@ -8,7 +8,7 @@ import com.example.tsvetelinastoyanova.drawingapp.drawing.colorpicker.colorpicke
 
 public class ColorPickerDialog extends ActionDialog {
 
-    Resources resources;
+    private Resources resources;
 
     public ColorPickerDialog(Context context) {
         super(context);
@@ -16,7 +16,7 @@ public class ColorPickerDialog extends ActionDialog {
     }
 
     @Override
-    public ColorPickerDialog createInstance() {
+    public ColorPickerDialog initializeView() {
         new ColorPicker(dialog, resources);
         return this;
     }
@@ -27,6 +27,5 @@ public class ColorPickerDialog extends ActionDialog {
         seekErase.setProgress(sizeEraser);
         return this;
     }
-
 
 }

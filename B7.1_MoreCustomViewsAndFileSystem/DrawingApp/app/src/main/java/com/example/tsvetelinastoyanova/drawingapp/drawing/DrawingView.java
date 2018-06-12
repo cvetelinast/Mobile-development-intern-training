@@ -2,45 +2,44 @@ package com.example.tsvetelinastoyanova.drawingapp.drawing;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.graphics.Path;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
-import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.ActionDialog;
-import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.ElipseTool;
+import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.EllipseTool;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.RectangleTool;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.shapes.Tool;
-import com.example.tsvetelinastoyanova.drawingapp.enums.ActionDrawing;
 import com.example.tsvetelinastoyanova.drawingapp.enums.DrawingTool;
 
 
 public class DrawingView extends View {
+    private final PorterDuffXfermode modeEraser = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+
     private Path drawPath;
     private Paint drawPaint, canvasPaint;
     private int paintColor = 0xFF00ffab;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
 
-    private PorterDuffXfermode modeEraser = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     private DrawingTool drawingTool;
     private int sizeEraser;
     private int sizeBrush;
     private ImageButton currentColorField;
 
-    float beginX;
-    float beginY;
-    float endX;
-    float endY;
+    private float beginX;
+    private float beginY;
+    private float endX;
+    private float endY;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -77,12 +76,20 @@ public class DrawingView extends View {
         drawCanvas = new Canvas(this.canvasBitmap);
     }
 
-    public boolean isFigureCreated() {
-        return drawingTool.name().equals(DrawingTool.RECTANGLE.name()) || drawingTool.name().equals(DrawingTool.OVAL.name());
-    }
-
     public int getPaintColor() {
         return paintColor;
+    }
+
+    public void initialize(String path) {
+        if (path != null) {
+            setCanvasBitmap(BitmapFactory.decodeFile(path));
+        }
+        setSizeEraser(30);
+        setSizeBrush(30);
+    }
+
+    private boolean isCurrentToolFigureTool() {
+        return drawingTool.name().equals(DrawingTool.RECTANGLE.name()) || drawingTool.name().equals(DrawingTool.OVAL.name());
     }
 
     private void setupDrawing() {
@@ -137,7 +144,7 @@ public class DrawingView extends View {
         float touchY = event.getY();
         if (drawingTool.name().equals(DrawingTool.PIPETTE.name())) {
             onTouchEventPipetteToolSelected(event);
-        } else if (isFigureCreated()) {
+        } else if (isCurrentToolFigureTool()) {
             onTouchEventWhenDrawingFigures(event, touchX, touchY);
         } else {
             switch (event.getAction()) {
@@ -161,12 +168,7 @@ public class DrawingView extends View {
     }
 
     private void onTouchEventWhenDrawingFigures(MotionEvent event, float touchX, float touchY) {
-        Tool tool = new Tool();
-        if (drawingTool.name().equals(DrawingTool.RECTANGLE.name())) {
-            tool = new RectangleTool();
-        } else if (drawingTool.name().equals(DrawingTool.OVAL.name())) {
-            tool = new ElipseTool();
-        }
+        Tool tool = createTool(drawingTool.name());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 beginX = touchX;
@@ -180,20 +182,32 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_UP:
                 endX = touchX;
                 endY = touchY;
-                tool.executeAction(drawCanvas, beginX, beginY, endX, endY, drawPaint);
-                drawPath.reset();
+                tool.drawOnCanvas(drawCanvas, beginX, beginY, endX, endY, drawPaint);
+            //    drawPath.reset();
                 invalidate();
                 break;
         }
     }
 
+    @NonNull
+    private static Tool createTool(String toolName) {
+        Tool tool = null;
+        if (toolName.equals(DrawingTool.RECTANGLE.name())) {
+            tool = new RectangleTool();
+        } else if (toolName.equals(DrawingTool.OVAL.name())) {
+            tool = new EllipseTool();
+        } else {
+            throw new IllegalStateException("Unexpected tool name: " + toolName);
+        }
+
+        return tool;
+    }
+
     private void onTouchEventPipetteToolSelected(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                paintColor = getColorOfPixelOnTouch(event);
-                drawPaint.setColor(paintColor);
-                currentColorField.setBackgroundColor(paintColor);
-                break;
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            paintColor = getColorOfPixelOnTouch(event);
+            drawPaint.setColor(paintColor);
+            currentColorField.setBackgroundColor(paintColor);
         }
     }
 
@@ -217,4 +231,3 @@ public class DrawingView extends View {
     }
 
 }
-

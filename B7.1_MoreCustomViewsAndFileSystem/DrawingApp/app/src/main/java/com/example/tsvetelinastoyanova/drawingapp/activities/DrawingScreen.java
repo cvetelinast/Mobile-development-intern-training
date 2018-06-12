@@ -2,9 +2,8 @@ package com.example.tsvetelinastoyanova.drawingapp.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,13 +23,10 @@ import com.example.tsvetelinastoyanova.drawingapp.drawing.DrawingView;
 import com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders.SaveDialog;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DrawingScreen extends AppCompatActivity {
     private int sizeEraser = 30;
     private int sizeBrush = 30;
-    private Bitmap bitmap;
     private DrawingView drawingView;
     private String nameOfDrawing = "";
     String path;
@@ -47,30 +43,26 @@ public class DrawingScreen extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         setDefaultComponentsOfDrawingView();
-        initDialog();
+        initClickListeners();
     }
 
-    private void initDialog() {
+    private void setDefaultComponentsOfDrawingView() {
+        drawingView = findViewById(R.id.drawing);
+        drawingView.initialize(path);
+        drawingView.setCurrentColorFieldId(findViewById(R.id.currentColor));
+        if (path != null) nameOfDrawing = path.substring(path.lastIndexOf("/") + 1);
+        currentColorChange(drawingView.getPaintColor());
+
+        markButtonAsSelected(findViewById(R.id.brush));
+    }
+
+    private void initClickListeners() {
         setOnBrushButtonClickListener(findViewById(R.id.brush));
         setOnEraseButtonClickListener(findViewById(R.id.eraser));
         setOnPipetteButtonClickListener(findViewById(R.id.pipette));
         setOnRectangleButtonClickListener(findViewById(R.id.rectangle));
         setOnOvalButtonClickListener(findViewById(R.id.oval));
         setOnSaveButtonClickListener(findViewById(R.id.save));
-    }
-
-    private void setDefaultComponentsOfDrawingView() {
-        drawingView = findViewById(R.id.drawing);
-        if (path != null) {
-            bitmap = BitmapFactory.decodeFile(path);
-            drawingView.setCanvasBitmap(bitmap);
-            nameOfDrawing = path.substring(path.lastIndexOf("/") + 1);
-        }
-        drawingView.setSizeEraser(sizeEraser);
-        drawingView.setSizeBrush(sizeBrush);
-        drawingView.setCurrentColorFieldId(findViewById(R.id.currentColor));
-        currentColorChange(drawingView.getPaintColor());
-        setBackgroundColorToButton(findViewById(R.id.brush));
     }
 
     private void setOnBrushButtonClickListener(ImageButton openBrushButton) {
@@ -86,7 +78,7 @@ public class DrawingScreen extends AppCompatActivity {
                     .setTitleToDialog(R.id.dialogTitle, getResources().getString(R.string.color_picker_dialog_title))
                     .setPreviousSizeOfTool(R.id.seekbar, sizeBrush)
                     .initButtonOk(R.id.dialogButtonOk)
-                    .createInstance()
+                    .initializeView()
                     .showDialog();
             setOnClickListenerForBrushOk(colorPickerDialog.getDialog(), colorPickerDialog.getButtonOk());
             return true;
@@ -197,11 +189,8 @@ public class DrawingScreen extends AppCompatActivity {
 
     private void setOnClickListenerForSaverOk(Dialog dialog, Button buttonOk) {
         buttonOk.setOnClickListener((v) -> {
-            TextInputLayout textInputLayout = dialog.findViewById(R.id.drawing_name_input);
-            EditText editText = textInputLayout.getEditText();
-            nameOfDrawing = getResources().getString(R.string.jpg_format, editText.getText().toString());
-            String nameOfDirectory = getResources().getString(R.string.directory);
-            String fullPathToNewFile = getFilesDir().getAbsolutePath() + File.separator + nameOfDirectory;
+            nameOfDrawing = composeDrawingName(dialog);
+            final String fullPathToNewFile = composeNewFilePath();
 
             FilesHandler filesHandler = new FilesHandler();
             filesHandler.saveDrawing(drawingView.getCanvasBitmap(), nameOfDrawing,
@@ -213,6 +202,18 @@ public class DrawingScreen extends AppCompatActivity {
                     });
             dialog.dismiss();
         });
+    }
+
+    @NonNull
+    private String composeNewFilePath() {
+        String nameOfDirectory = getResources().getString(R.string.directory);
+        return getFilesDir().getAbsolutePath() + File.separator + nameOfDirectory;
+    }
+
+    private String composeDrawingName(Dialog dialog) {
+        TextInputLayout textInputLayout = dialog.findViewById(R.id.drawing_name_input);
+        EditText editText = textInputLayout.getEditText();
+        return getResources().getString(R.string.jpg_format, editText.getText().toString());
     }
 
     private void returnToDrawingListActivity() {
@@ -229,13 +230,13 @@ public class DrawingScreen extends AppCompatActivity {
         findViewById(R.id.save).setBackgroundColor(getResources().getColor(R.color.grey));
     }
 
-    private void setBackgroundColorToButton(ImageButton imageButton) {
+    private void markButtonAsSelected(ImageButton imageButton) {
         imageButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
     }
 
     private void changeButtonBackground(ImageButton imageButton) {
         removeAllBackgroundTints();
-        setBackgroundColorToButton(imageButton);
+        markButtonAsSelected(imageButton);
     }
 
 }

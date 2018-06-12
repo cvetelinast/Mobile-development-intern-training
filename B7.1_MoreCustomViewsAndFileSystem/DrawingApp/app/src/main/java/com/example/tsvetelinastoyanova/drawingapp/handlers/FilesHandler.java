@@ -1,9 +1,7 @@
 package com.example.tsvetelinastoyanova.drawingapp.handlers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.File;
@@ -54,6 +52,7 @@ public class FilesHandler {
                 if (file.equals(fileToDelete)) {
                     file.delete();
                     activity.runOnUiThread(afterDeleteAction);
+                    return;
                 }
             }
             activity.runOnUiThread(notSuccessfulDeleteAction);
@@ -71,6 +70,7 @@ public class FilesHandler {
                     files.remove(position);
                     files.add(position, newFile);
                     activity.runOnUiThread(afterRenameAction);
+                    return;
                 }
             }
             activity.runOnUiThread(notSuccessfulRenameAction);

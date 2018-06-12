@@ -2,8 +2,6 @@ package com.example.tsvetelinastoyanova.drawingapp.drawing.DialogBuilders;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.design.widget.TextInputLayout;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -27,7 +25,7 @@ public class ActionDialog {
         return buttonCancel;
     }
 
-    public ActionDialog(Context context) {
+    ActionDialog(Context context) {
         dialog = new Dialog(context);
     }
 
@@ -64,7 +62,7 @@ public class ActionDialog {
         return this;
     }
 
-    public ActionDialog createInstance() {
+    public ActionDialog initializeView() {
         return this;
     }
 }
