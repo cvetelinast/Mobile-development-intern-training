@@ -1,5 +1,5 @@
 
-package com.example.tsvetelinastoyanova.weatherreportapp.models;
+package com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -23,7 +23,7 @@ public class Main {
     private double tempMax;
 
     public double getTemp() {
-        return temp;
+        return convertTemperatureToCelsius(temp);
     }
 
     public void setTemp(double temp) {
@@ -47,7 +47,7 @@ public class Main {
     }
 
     public double getTempMin() {
-        return tempMin;
+        return convertTemperatureToCelsius(tempMin);
     }
 
     public void setTempMin(double tempMin) {
@@ -55,11 +55,15 @@ public class Main {
     }
 
     public double getTempMax() {
-        return tempMax;
+        return convertTemperatureToCelsius(tempMax);
     }
 
     public void setTempMax(double tempMax) {
         this.tempMax = tempMax;
+    }
+
+    public double convertTemperatureToCelsius(double temp) {
+        return Math.round((temp - 273.15) * 10) / 10.0;
     }
 
 }

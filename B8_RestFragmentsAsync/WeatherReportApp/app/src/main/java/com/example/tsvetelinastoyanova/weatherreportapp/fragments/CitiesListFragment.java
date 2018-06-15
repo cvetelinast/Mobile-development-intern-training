@@ -1,6 +1,5 @@
 package com.example.tsvetelinastoyanova.weatherreportapp.fragments;
 
-import android.arch.persistence.room.Room;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -16,30 +15,73 @@ import android.widget.Button;
 
 import com.example.tsvetelinastoyanova.weatherreportapp.CitiesAdapter;
 import com.example.tsvetelinastoyanova.weatherreportapp.City;
-import com.example.tsvetelinastoyanova.weatherreportapp.Constants;
+import com.example.tsvetelinastoyanova.weatherreportapp.ImageOperator;
 import com.example.tsvetelinastoyanova.weatherreportapp.R;
-import com.example.tsvetelinastoyanova.weatherreportapp.database.AppDatabase;
-import com.example.tsvetelinastoyanova.weatherreportapp.database.CityEntity;
-import com.example.tsvetelinastoyanova.weatherreportapp.models.WeatherReportObject;
-import com.google.gson.Gson;
+import com.example.tsvetelinastoyanova.weatherreportapp.async.tasks.AddNewCity;
+import com.example.tsvetelinastoyanova.weatherreportapp.async.tasks.LoadCities;
+import com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model.WeatherObject;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class CitiesListFragment extends Fragment {
+public class CitiesListFragment extends Fragment implements LoadCities.LoadCitiesDelegate, AddNewCity.AddNewCityDelegate {
+
     private List<City> citiesList = new ArrayList<>();
-    private List<WeatherReportObject> weatherReportObjects = new ArrayList<>();
+    private List<WeatherObject> weatherObjects = new ArrayList<>();
     private RecyclerView recyclerView;
     private CitiesAdapter adapter;
     private TextInputLayout cityNameContainer;
+
+    void callTask() {
+        LoadCities task = new LoadCities();
+        task.setLoadCitiesDelegate(this);
+        task.execute(getActivity().getApplicationContext());
+    }
+
+    @Override
+    public void onLoadingCitiesEndWithResult(boolean success) {
+        if (success == false) {
+            Log.d("Tag", "NOT !!!!!!!! SUCCESS!");
+        } else if (success == true) {
+            Log.d("Tag", "SUCCESS!");
+        }
+    }
+
+    @Override
+    public void onAddingNewCityEndWithResult(boolean success) {
+
+    }
+
+    @Override
+    public void onAddingNewCityFinishGettingData(WeatherObject result) {
+        if (result != null) {
+            int id = ImageOperator.getImageIdFromString(result.getWeather().get(0).getIcon());
+            this.citiesList.add(new City(result.getName(), result.getMain().getTemp(), id));
+            adapter.notifyDataSetChanged();
+            weatherObjects.add(result);
+            Log.d("Tag", "RESULT ADDING CITY!");
+        }
+    }
+
+    void addNewCity(String city) {
+        AddNewCity task = new AddNewCity();
+        task.setTaskDelegate(this);
+        task.setContext(getActivity().getApplicationContext());
+        task.execute(city);
+    }
+
+    @Override
+    public void onLoadingCitiesFinishGettingData(List<WeatherObject> weatherObjects) {
+        if (weatherObjects.size() != 0) {
+            this.weatherObjects.addAll(weatherObjects);
+            for (WeatherObject w : weatherObjects) {
+                int id = ImageOperator.getImageIdFromString(w.getWeather().get(0).getIcon());
+                this.citiesList.add(new City(w.getName(), w.getMain().getTemp(), id));
+            }
+            adapter.notifyDataSetChanged();
+            Log.d("Tag", "YRAA!");
+        }
+    }
 
     public CitiesListFragment() {
     }
@@ -70,120 +112,6 @@ public class CitiesListFragment extends Fragment {
         });
     }
 
-    private URL getUrlConnection(String enteredCity) {
-        try {
-            return new URL(String.format(Constants.WEATHER_URL, enteredCity));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private HttpURLConnection getConnection(URL url) {
-        try {
-            return (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private WeatherReportObject getWeatherReportObjectFromInputStream(HttpURLConnection urlConnection) {
-        try {
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            String json = convertStreamToString(in);
-            Gson gson = new Gson();
-            return gson.fromJson(json, WeatherReportObject.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                urlConnection.disconnect();
-            } catch (Exception e) {
-            }
-        }
-        return null;
-    }
-
-    private void saveToDatabase(WeatherReportObject weatherReportObject) {
-        new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(getActivity(), AppDatabase.class, "cities").build();
-            CityEntity city = new CityEntity();
-            city.setName(weatherReportObject.getName());
-            db.cityDao().insertCity(city);
-        });
-    }
-
-    private void addWeatherReportObjectToRecyclerView(WeatherReportObject weatherReportObject) {
-        if (citiesList.isEmpty()) {
-            citiesList.add(new City(weatherReportObject.getName(), weatherReportObject.getMain().getTemp(), R.drawable.ic_launcher_background));
-        } else {
-            boolean isCityInDatabase = false;
-            for (City c : citiesList) {
-                if (c.getName().equals(weatherReportObject.getName())) {
-                    c.setTemperature(weatherReportObject.getMain().getTemp());
-                    isCityInDatabase = true;
-                }
-            }
-            if (!isCityInDatabase) {
-                citiesList.add(new City(weatherReportObject.getName(), weatherReportObject.getMain().getTemp(), R.drawable.ic_launcher_background));
-            }
-        }
-    }
-
-
-    private void loadFromApi(String enteredCity) {
-        // todo: fix this
-        new Thread(() -> {
-            URL url = getUrlConnection(enteredCity);
-            HttpURLConnection urlConnection = getConnection(url);
-            WeatherReportObject weatherReportObject = getWeatherReportObjectFromInputStream(urlConnection);
-            if(weatherReportObject !=  null) {
-                weatherReportObjects.add(weatherReportObject);
-                saveToDatabase(weatherReportObject);
-                addWeatherReportObjectToRecyclerView(weatherReportObject);
-            }
-        }).start();
-    }
-
-    private static String convertStreamToString(InputStream in) {
-        Scanner s = new Scanner(in).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    public byte[] getImage(String code) {
-        HttpURLConnection con = null;
-        InputStream is = null;
-        try {
-            con = (HttpURLConnection) (new URL(Constants.IMG_URL + code)).openConnection();
-            con.setRequestMethod("GET");
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.connect();
-
-            // Let's read the response
-            is = con.getInputStream();
-            byte[] buffer = new byte[1024];
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            while (is.read(buffer) != -1)
-                baos.write(buffer);
-
-            return baos.toByteArray();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (Throwable t) {
-            }
-            try {
-                con.disconnect();
-            } catch (Throwable t) {
-            }
-        }
-        return null;
-    }
 
     private void createRecyclerView(RecyclerView rView) {
         this.recyclerView = rView;
@@ -197,26 +125,23 @@ public class CitiesListFragment extends Fragment {
     }
 
     private void fillRecyclerView() {
-        new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(getActivity(), AppDatabase.class, "cities").build();
-            List<CityEntity> cityEntities = db.cityDao().getAll();
-            for (CityEntity city : cityEntities) {
-                loadFromApi(city.getName());
-            }
-        }).start();
+        callTask();
     }
 
     private void buttonToAddNewCityClicked() {
-        CityEntity newCity = new CityEntity();
         String name = cityNameContainer.getEditText().getText().toString();
-        if (!name.isEmpty()) {
-            loadFromApi(name);
-            newCity.setName(name);
-           /* new Thread(() -> {
-                AppDatabase db = Room.databaseBuilder(getActivity(), AppDatabase.class, "cities").build();
-                db.cityDao().insertCity(newCity);
-            }).start();*/
+        if (!name.isEmpty() && !listContainsCity(citiesList, name)) {
+            addNewCity(name);
         }
+    }
+
+    private boolean listContainsCity(List<City> citiesList, String name) {
+        for (City c : citiesList) {
+            if (c.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

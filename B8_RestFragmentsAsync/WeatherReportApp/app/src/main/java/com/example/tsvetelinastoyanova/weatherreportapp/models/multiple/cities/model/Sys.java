@@ -1,5 +1,5 @@
 
-package com.example.tsvetelinastoyanova.weatherreportapp.models;
+package com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

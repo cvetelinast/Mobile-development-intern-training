@@ -1,21 +1,20 @@
 
-package com.example.tsvetelinastoyanova.weatherreportapp.models;
+package com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherReportObject {
+public class WeatherObject {
 
     @SerializedName("coord")
     @Expose
     private Coord coord;
+    @SerializedName("sys")
+    @Expose
+    private Sys sys;
     @SerializedName("weather")
     @Expose
-    private List<Weather> weather = null;
-    @SerializedName("base")
-    @Expose
-    private String base;
+    private java.util.List<Weather> weather = null;
     @SerializedName("main")
     @Expose
     private Main main;
@@ -31,18 +30,12 @@ public class WeatherReportObject {
     @SerializedName("dt")
     @Expose
     private int dt;
-    @SerializedName("sys")
-    @Expose
-    private Sys sys;
     @SerializedName("id")
     @Expose
     private int id;
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("cod")
-    @Expose
-    private int cod;
 
     public Coord getCoord() {
         return coord;
@@ -52,20 +45,20 @@ public class WeatherReportObject {
         this.coord = coord;
     }
 
-    public List<Weather> getWeather() {
+    public Sys getSys() {
+        return sys;
+    }
+
+    public void setSys(Sys sys) {
+        this.sys = sys;
+    }
+
+    public java.util.List<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(List<Weather> weather) {
+    public void setWeather(java.util.List<Weather> weather) {
         this.weather = weather;
-    }
-
-    public String getBase() {
-        return base;
-    }
-
-    public void setBase(String base) {
-        this.base = base;
     }
 
     public Main getMain() {
@@ -108,14 +101,6 @@ public class WeatherReportObject {
         this.dt = dt;
     }
 
-    public Sys getSys() {
-        return sys;
-    }
-
-    public void setSys(Sys sys) {
-        this.sys = sys;
-    }
-
     public int getId() {
         return id;
     }
@@ -130,14 +115,6 @@ public class WeatherReportObject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getCod() {
-        return cod;
-    }
-
-    public void setCod(int cod) {
-        this.cod = cod;
     }
 
 }
