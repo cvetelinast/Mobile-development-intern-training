@@ -1,5 +1,6 @@
 package com.example.tsvetelinastoyanova.weatherreportapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -25,12 +26,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CitiesListFragment extends Fragment implements LoadCities.LoadCitiesDelegate, AddNewCity.AddNewCityDelegate {
-
+    OnHeadlineSelectedListener activityCallback;
     private List<City> citiesList = new ArrayList<>();
     private List<WeatherObject> weatherObjects = new ArrayList<>();
     private RecyclerView recyclerView;
     private CitiesAdapter adapter;
     private TextInputLayout cityNameContainer;
+
+    // Container Activity must implement this interface
+    public interface OnHeadlineSelectedListener {
+        public void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            activityCallback = (OnHeadlineSelectedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
 
     void callTask() {
         LoadCities task = new LoadCities();
@@ -40,10 +59,8 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
 
     @Override
     public void onLoadingCitiesEndWithResult(boolean success) {
-        if (success == false) {
-            Log.d("Tag", "NOT !!!!!!!! SUCCESS!");
-        } else if (success == true) {
-            Log.d("Tag", "SUCCESS!");
+        if (success) {
+            activityCallback.onWeatherObjectsLoaded(this.weatherObjects);
         }
     }
 
@@ -83,9 +100,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         }
     }
 
-    public CitiesListFragment() {
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +126,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         });
     }
 
-
     private void createRecyclerView(RecyclerView rView) {
         this.recyclerView = rView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -121,7 +134,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
     }
 
     private void fillRecyclerView() {

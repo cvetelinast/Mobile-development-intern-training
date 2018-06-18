@@ -41,15 +41,22 @@ public final class LoadCities extends AsyncTask<Context, Void, String> {
         if (cityEntities.size() == 0) {
             loadCitiesDelegate.onLoadingCitiesEndWithResult(false);
         } else {
-            ids = buildStringFromIds(cityEntities);
+            //  The limit of locations is 20.
+            //  In cycle, we separate cityEntities list to make call to only 20 locations
+            // NOTE: A single ID counts as a one API call! So, the above example is treated as a 3 API calls.
+            for (int i = 0; i < cityEntities.size()/20*20; i += 20) {
+                ids = buildStringFromIds(cityEntities.subList(i, i + 19));
+                connectToApi(ids);
+            }
+            // the rest locations, less than 20
+            // we get from cityEntities.size() / 20*20-1 to
+            ids = buildStringFromIds(cityEntities.subList(cityEntities.size() / 20*20-1, cityEntities.size()));
         }
-      //  The limit of locations is 20.
-      //  NOTE: A single ID counts as a one API call! So, the above example is treated as a 3 API calls.
         connectToApi(ids);
         return "";
     }
 
-    private String buildStringFromIds(List<CityEntity> cityEntities){
+    private String buildStringFromIds(List<CityEntity> cityEntities) {
         String ids = "";
         for (CityEntity city : cityEntities) {
             ids = ids.concat(city.getCityId() + ",");
