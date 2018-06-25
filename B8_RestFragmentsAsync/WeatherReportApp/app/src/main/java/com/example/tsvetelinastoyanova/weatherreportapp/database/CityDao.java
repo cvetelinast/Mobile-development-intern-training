@@ -22,4 +22,7 @@ public interface CityDao {
     @Query("UPDATE cities SET lastTemperature = :lastTemperature, lastImageId = :lastImageId WHERE name = :name")
     public void updateCity(String name, double lastTemperature, int lastImageId);
 
+    @Query("SELECT name FROM cities WHERE name = :name LIMIT 1")
+    public String getCity(String name);
+
 }

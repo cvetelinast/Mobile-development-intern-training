@@ -3,21 +3,25 @@ package com.example.tsvetelinastoyanova.weatherreportapp.async.tasks;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.tsvetelinastoyanova.weatherreportapp.ImageOperator;
 import com.example.tsvetelinastoyanova.weatherreportapp.database.AppDatabase;
 import com.example.tsvetelinastoyanova.weatherreportapp.database.CityEntity;
 import com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model.WeatherObject;
 
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class AddNewCity extends AsyncTask<String, Void, String> {
-    private WeatherObject object;
-    private AsyncTaskOperationsHandler handler = new AsyncTaskOperationsHandler();
-    private Context context;
+import javax.annotation.Nullable;
+
+public class AddNewCity extends AsyncTask<String, Void, WeatherObject> {
+    private WeakReference<Context> contextRef;
 
     private AddNewCityDelegate taskDelegate;
+
+    private boolean doesCityExist;
 
     public interface AddNewCityDelegate {
         void onAddingNewCityEndWithResult(boolean success);
@@ -25,43 +29,55 @@ public class AddNewCity extends AsyncTask<String, Void, String> {
         void onAddingNewCityFinishGettingData(WeatherObject result);
     }
 
+    public AddNewCity(Context context) {
+        contextRef = new WeakReference<>(context);
+    }
+
     public void setTaskDelegate(AddNewCityDelegate taskDelegate) {
         this.taskDelegate = taskDelegate;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     @Override
-    protected String doInBackground(String... city) {
-        URL url = handler.getConnectionToLoadWeatherForSingleCity(city[0]);
-        HttpURLConnection urlConnection = handler.getConnection(url);
-        this.object = handler.getSingleWeatherReportObjectFromInputStream(urlConnection);
-        if (this.object != null) {
-            addInDatabase(this.object);
+    protected WeatherObject doInBackground(String... city) {
+        URL url = AsyncTaskUtils.getConnectionToLoadWeatherForSingleCity(city[0]);
+        HttpURLConnection urlConnection = AsyncTaskUtils.getConnection(url);
+        WeatherObject object = AsyncTaskUtils.getSingleWeatherReportObjectFromInputStream(urlConnection);
+        if (object != null) {
+            addInDatabase(object);
         }
-        return "";
+        return object;
     }
 
     @Override
-    protected void onProgressUpdate(Void... values) {
+    protected void onPostExecute(@Nullable WeatherObject object) {
+        if (!doesCityExist) {
+            taskDelegate.onAddingNewCityFinishGettingData(object);
+            taskDelegate.onAddingNewCityEndWithResult(true);
+        }
     }
 
     private void addInDatabase(WeatherObject object) {
-        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "cities").build();
+        if (contextRef != null && contextRef.get() != null) {
+            AppDatabase db =
+                    Room.databaseBuilder(contextRef.get(), AppDatabase.class, "cities").build();
+            CityEntity c = setAttributesToCityEntity(object);
+            if (db.cityDao().getCity(object.getName()) == null) {
+                db.cityDao().insertCity(c);
+            } else {
+                doesCityExist = true;
+                db.cityDao().updateCity(c.getName(), c.getLastTemperature(), c.getLastImageId());
+            }
+        }
+    }
+
+    private CityEntity setAttributesToCityEntity(WeatherObject object) {
         CityEntity c = new CityEntity();
         c.setName(object.getName());
         c.setCityId(object.getId());
         c.setLastTemperature(object.getMain().getTemp());
         String imageId = object.getWeather().get(0).getIcon();
         c.setLastImageId(ImageOperator.getImageIdFromString(imageId));
-        db.cityDao().insertCity(c);
+        return c;
     }
 
-    @Override
-    protected void onPostExecute(String dummyString) {
-        taskDelegate.onAddingNewCityFinishGettingData(object);
-        taskDelegate.onAddingNewCityEndWithResult(true);
-    }
 }

@@ -1,10 +1,16 @@
 
 package com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.example.tsvetelinastoyanova.weatherreportapp.ImageOperator;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherObject {
+import java.util.ArrayList;
+
+public class WeatherObject implements Parcelable {
 
     @SerializedName("coord")
     @Expose
@@ -117,4 +123,51 @@ public class WeatherObject {
         this.name = name;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.coord, flags);
+        dest.writeParcelable(this.sys, flags);
+        dest.writeList(this.weather);
+        dest.writeParcelable(this.main, flags);
+        dest.writeInt(this.visibility);
+        dest.writeParcelable(this.wind, flags);
+        dest.writeParcelable(this.clouds, flags);
+        dest.writeInt(this.dt);
+        dest.writeInt(this.id);
+        dest.writeString(this.name);
+    }
+
+    public WeatherObject() {
+    }
+
+    protected WeatherObject(Parcel in) {
+        this.coord = in.readParcelable(Coord.class.getClassLoader());
+        this.sys = in.readParcelable(Sys.class.getClassLoader());
+        this.weather = new ArrayList<Weather>();
+        in.readList(this.weather, Weather.class.getClassLoader());
+        this.main = in.readParcelable(Main.class.getClassLoader());
+        this.visibility = in.readInt();
+        this.wind = in.readParcelable(Wind.class.getClassLoader());
+        this.clouds = in.readParcelable(Clouds.class.getClassLoader());
+        this.dt = in.readInt();
+        this.id = in.readInt();
+        this.name = in.readString();
+    }
+
+    public static final Parcelable.Creator<WeatherObject> CREATOR = new Parcelable.Creator<WeatherObject>() {
+        @Override
+        public WeatherObject createFromParcel(Parcel source) {
+            return new WeatherObject(source);
+        }
+
+        @Override
+        public WeatherObject[] newArray(int size) {
+            return new WeatherObject[size];
+        }
+    };
 }

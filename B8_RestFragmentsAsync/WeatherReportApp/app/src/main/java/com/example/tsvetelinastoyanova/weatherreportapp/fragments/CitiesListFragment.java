@@ -14,13 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.tsvetelinastoyanova.weatherreportapp.CitiesAdapter;
+import com.example.tsvetelinastoyanova.weatherreportapp.visualization.CitiesAdapter;
 import com.example.tsvetelinastoyanova.weatherreportapp.City;
 import com.example.tsvetelinastoyanova.weatherreportapp.ImageOperator;
 import com.example.tsvetelinastoyanova.weatherreportapp.R;
 import com.example.tsvetelinastoyanova.weatherreportapp.async.tasks.AddNewCity;
 import com.example.tsvetelinastoyanova.weatherreportapp.async.tasks.LoadCities;
 import com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model.WeatherObject;
+import com.example.tsvetelinastoyanova.weatherreportapp.visualization.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,13 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
     OnHeadlineSelectedListener activityCallback;
     private List<City> citiesList = new ArrayList<>();
     private List<WeatherObject> weatherObjects = new ArrayList<>();
-    private RecyclerView recyclerView;
     private CitiesAdapter adapter;
     private TextInputLayout cityNameContainer;
 
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
         public void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects);
+        public void onWeatherObjectClicked(int position);
     }
 
     @Override
@@ -49,12 +50,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
             throw new ClassCastException(context.toString()
                     + " must implement OnHeadlineSelectedListener");
         }
-    }
-
-    void callTask() {
-        LoadCities task = new LoadCities();
-        task.setLoadCitiesDelegate(this);
-        task.execute(getActivity().getApplicationContext());
     }
 
     @Override
@@ -76,14 +71,12 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
             this.citiesList.add(new City(result.getName(), result.getMain().getTemp(), id));
             adapter.notifyDataSetChanged();
             weatherObjects.add(result);
-            Log.d("Tag", "RESULT ADDING CITY!");
         }
     }
 
     void addNewCity(String city) {
-        AddNewCity task = new AddNewCity();
+        AddNewCity task = new AddNewCity(getActivity().getApplicationContext());
         task.setTaskDelegate(this);
-        task.setContext(getActivity().getApplicationContext());
         task.execute(city);
     }
 
@@ -96,7 +89,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
                 this.citiesList.add(new City(w.getName(), w.getMain().getTemp(), id));
             }
             adapter.notifyDataSetChanged();
-            Log.d("Tag", "YRAA!");
         }
     }
 
@@ -126,18 +118,20 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         });
     }
 
-    private void createRecyclerView(RecyclerView rView) {
-        this.recyclerView = rView;
+    private void createRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new CitiesAdapter(citiesList);
+        OnItemClickListener onItemClickListener = (view, position) -> activityCallback.onWeatherObjectClicked(position);
+        adapter = new CitiesAdapter(citiesList, onItemClickListener);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     private void fillRecyclerView() {
-        callTask();
+        LoadCities task = new LoadCities(getActivity().getApplicationContext());
+        task.setLoadCitiesDelegate(this);
+        task.execute();
     }
 
     private void buttonToAddNewCityClicked() {

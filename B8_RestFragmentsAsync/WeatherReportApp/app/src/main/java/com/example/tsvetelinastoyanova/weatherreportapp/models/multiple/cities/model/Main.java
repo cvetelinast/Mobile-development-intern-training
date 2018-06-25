@@ -1,10 +1,13 @@
 
 package com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Main {
+public class Main implements Parcelable {
 
     @SerializedName("temp")
     @Expose
@@ -66,4 +69,41 @@ public class Main {
         return Math.round((temp - 273.15) * 10) / 10.0;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(this.temp);
+        dest.writeInt(this.pressure);
+        dest.writeInt(this.humidity);
+        dest.writeDouble(this.tempMin);
+        dest.writeDouble(this.tempMax);
+    }
+
+    public Main() {
+    }
+
+    protected Main(Parcel in) {
+        this.temp = in.readDouble();
+        this.pressure = in.readInt();
+        this.humidity = in.readInt();
+        this.tempMin = in.readDouble();
+        this.tempMax = in.readDouble();
+    }
+
+    public static final Parcelable.Creator<Main> CREATOR = new Parcelable.Creator<Main>() {
+        @Override
+        public Main createFromParcel(Parcel source) {
+            return new Main(source);
+        }
+
+        @Override
+        public Main[] newArray(int size) {
+            return new Main[size];
+        }
+    };
 }
