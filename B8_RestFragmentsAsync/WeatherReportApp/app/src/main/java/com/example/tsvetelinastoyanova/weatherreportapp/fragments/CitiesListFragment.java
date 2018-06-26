@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.weatherreportapp.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.tsvetelinastoyanova.weatherreportapp.visualization.CitiesAdapter;
 import com.example.tsvetelinastoyanova.weatherreportapp.City;
@@ -36,6 +38,7 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
         public void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects);
+
         public void onWeatherObjectClicked(int position);
     }
 
@@ -123,7 +126,6 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
 
         OnItemClickListener onItemClickListener = (view, position) -> activityCallback.onWeatherObjectClicked(position);
         adapter = new CitiesAdapter(citiesList, onItemClickListener);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
@@ -136,7 +138,9 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
 
     private void buttonToAddNewCityClicked() {
         String name = cityNameContainer.getEditText().getText().toString();
-        if (!name.isEmpty() && !listContainsCity(citiesList, name)) {
+        if (!isNetworkConnected()) {
+            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        } else if (!name.isEmpty() && !listContainsCity(citiesList, name)) {
             addNewCity(name);
         }
     }
@@ -148,6 +152,11 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
             }
         }
         return false;
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 
     @Override

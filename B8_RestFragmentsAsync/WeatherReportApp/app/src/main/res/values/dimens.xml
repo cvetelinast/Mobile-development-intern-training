@@ -12,4 +12,5 @@
     <dimen name="main_weather_text_size">25sp</dimen>
     <dimen name="rest_weather_text_size">18sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="margin_card">10dp</dimen>
 </resources>
