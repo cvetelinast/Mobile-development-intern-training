@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background_weather_details"
+    android:padding="@dimen/padding_weather_details_fragment"
+    tools:context=".weatherdetails.WeatherDetailsFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/city_and_country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/heading_city"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="@dimen/large_icon_size"
+            android:layout_height="@dimen/large_icon_size"
+            android:layout_below="@+id/city_and_country" />
+
+        <TextView
+            android:id="@+id/degrees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/city_and_country"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:layout_toRightOf="@id/icon"
+            android:textSize="@dimen/degrees"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/weather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icon"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:layout_marginTop="@dimen/margin_weather"
+            android:gravity="center"
+            android:textSize="@dimen/main_weather_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/temp_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:layout_marginTop="@dimen/big_margin_weather"
+            android:textSize="@dimen/rest_weather_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/temp_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temp_min"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:layout_marginTop="@dimen/margin_weather"
+            android:textSize="@dimen/rest_weather_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temp_max"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:layout_marginTop="@dimen/margin_weather"
+            android:textSize="@dimen/rest_weather_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/pressure"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:textSize="@dimen/rest_weather_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/wind_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/humidity"
+            android:layout_marginLeft="@dimen/margin_weather"
+            android:textSize="@dimen/rest_weather_text_size"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</FrameLayout>

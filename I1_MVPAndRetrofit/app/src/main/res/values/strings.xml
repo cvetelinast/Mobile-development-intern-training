@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">WeatherReportRevisited</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment</string>
+    <string name="hint_city_input">Madrid</string>
+    <string name="add_city_button">Add</string>
+    <string name="added_city">City added successfully</string>
+
+    <!--temperature properties-->
+    <string name="temperature_min">Minimum temperature: %s</string>
+    <string name="temperature_max">Maximum temperature: %s</string>
+    <string name="pressure">Pressure: %d hpa</string>
+    <string name="humidity">Humidity: %d</string>
+    <string name="wind_speed">Speed of wind: %.2f m/s</string>
+    <string name="title_activity_details">DetailsActivity</string>
+
+</resources>
