@@ -24,7 +24,6 @@ public class AddNewCity extends AsyncTask<String, Void, WeatherObject> {
     private boolean doesCityExist;
 
     public interface AddNewCityDelegate {
-        void onAddingNewCityEndWithResult(boolean success);
 
         void onAddingNewCityFinishGettingData(WeatherObject result);
     }
@@ -52,7 +51,6 @@ public class AddNewCity extends AsyncTask<String, Void, WeatherObject> {
     protected void onPostExecute(@Nullable WeatherObject object) {
         if (!doesCityExist) {
             taskDelegate.onAddingNewCityFinishGettingData(object);
-            taskDelegate.onAddingNewCityEndWithResult(true);
         }
     }
 

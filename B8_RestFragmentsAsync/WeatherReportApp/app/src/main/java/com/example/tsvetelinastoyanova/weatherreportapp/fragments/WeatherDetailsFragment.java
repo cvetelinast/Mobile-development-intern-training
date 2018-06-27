@@ -43,7 +43,7 @@ public class WeatherDetailsFragment extends Fragment {
         degrees.setText(String.format(Constants.DEGREES_CELSIUS,object.getMain().getTemp()));
 
         TextView weather = getView().findViewById(R.id.weather);
-        weather.setText(object.getWeather().get(0).getMain());
+        weather.setText(object.getWeather().get(0).getDescription());
 
         TextView tempMin =  getView().findViewById(R.id.temp_min);
         tempMin.setText(getResources().getString(R.string.temperature_min,String.format(Constants.DEGREES_CELSIUS,object.getMain().getTempMin())));

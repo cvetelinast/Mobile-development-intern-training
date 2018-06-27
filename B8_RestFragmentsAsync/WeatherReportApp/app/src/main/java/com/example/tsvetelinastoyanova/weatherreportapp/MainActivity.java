@@ -9,6 +9,8 @@ import com.example.tsvetelinastoyanova.weatherreportapp.fragments.WeatherDetails
 import com.example.tsvetelinastoyanova.weatherreportapp.models.multiple.cities.model.WeatherObject;
 import com.example.tsvetelinastoyanova.weatherreportapp.util.Utils;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CitiesListFragment.OnHeadlineSelectedListener {
@@ -42,11 +44,6 @@ public class MainActivity extends AppCompatActivity implements CitiesListFragmen
     @Override
     public void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects) {
         this.weatherObjects = weatherObjects;
-        if (Utils.isTablet(this)) {
-           // weatherDetailsFragment.changeView(this.weatherObjects.get(0));
-            // problem with this
-        }
-
     }
 
     @Override
@@ -58,5 +55,18 @@ public class MainActivity extends AppCompatActivity implements CitiesListFragmen
             i.putExtra(Constants.WEATHER_OBJECTS, weatherObjects.get(position));
             startActivity(i);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        ArrayList<WeatherObject> temp = new ArrayList<>(weatherObjects);
+        savedInstanceState.putParcelableArrayList(Constants.WEATHER_OBJECTS, temp);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        weatherObjects = savedInstanceState.getParcelableArrayList(Constants.WEATHER_OBJECTS);
     }
 }

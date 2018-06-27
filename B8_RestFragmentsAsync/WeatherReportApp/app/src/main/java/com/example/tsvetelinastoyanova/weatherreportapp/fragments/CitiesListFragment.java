@@ -37,9 +37,9 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
 
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
-        public void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects);
+        void onWeatherObjectsLoaded(List<WeatherObject> weatherObjects);
 
-        public void onWeatherObjectClicked(int position);
+        void onWeatherObjectClicked(int position);
     }
 
     @Override
@@ -63,17 +63,14 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
     }
 
     @Override
-    public void onAddingNewCityEndWithResult(boolean success) {
-
-    }
-
-    @Override
     public void onAddingNewCityFinishGettingData(WeatherObject result) {
         if (result != null) {
             int id = ImageOperator.getImageIdFromString(result.getWeather().get(0).getIcon());
             this.citiesList.add(new City(result.getName(), result.getMain().getTemp(), id));
             adapter.notifyDataSetChanged();
             weatherObjects.add(result);
+            Toast.makeText(getContext(), R.string.added_city, Toast.LENGTH_SHORT).show();
+            cityNameContainer.getEditText().setText("");
         }
     }
 
