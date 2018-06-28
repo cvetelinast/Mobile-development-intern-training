@@ -27,6 +27,8 @@ import com.example.tsvetelinastoyanova.weatherreportapp.visualization.OnItemClic
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CitiesListFragment extends Fragment implements LoadCities.LoadCitiesDelegate, AddNewCity.AddNewCityDelegate {
     OnHeadlineSelectedListener activityCallback;
@@ -60,6 +62,11 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         if (success) {
             activityCallback.onWeatherObjectsLoaded(this.weatherObjects);
         }
+    }
+
+    @Override
+    public void onAddingNewCityEndWithResult(boolean success) {
+
     }
 
     @Override
@@ -103,8 +110,12 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
 
         addClickListenerToAddCityButton(view.findViewById(R.id.add_city_button));
         setTextContainer(view.findViewById(R.id.new_city_wrapper));
+        if (!isNetworkConnected()) {
+            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        }
         createRecyclerView(view.findViewById(R.id.recycler_view));
         fillRecyclerView();
+
         return view;
     }
 
@@ -137,9 +148,19 @@ public class CitiesListFragment extends Fragment implements LoadCities.LoadCitie
         String name = cityNameContainer.getEditText().getText().toString();
         if (!isNetworkConnected()) {
             Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-        } else if (!name.isEmpty() && !listContainsCity(citiesList, name)) {
+        } else if (!isNameValid(name)) {
+            Toast.makeText(getContext(), "Not a valid city.", Toast.LENGTH_SHORT).show();
+        } else if (!listContainsCity(citiesList, name)) {
             addNewCity(name);
+        } else {
+            Toast.makeText(getContext(), "This city already exist.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private boolean isNameValid(String name) {
+        Pattern ps = Pattern.compile("^[a-zA-Z ]+$");
+        Matcher ms = ps.matcher(name);
+        return !name.isEmpty() && ms.matches();
     }
 
     private boolean listContainsCity(List<City> citiesList, String name) {

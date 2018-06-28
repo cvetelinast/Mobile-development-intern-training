@@ -57,7 +57,7 @@ public class AsyncTaskUtils {
             Gson gson = new Gson();
             return gson.fromJson(json, WeatherObjects.class);
         } catch (Exception e) {
-            Log.d("Error", "There was a problem with opening url connection.");
+            Log.d("Error", "There was a problem with opening url connection or with making WeatherObject from json.");
             e.printStackTrace();
         } finally {
             try {
