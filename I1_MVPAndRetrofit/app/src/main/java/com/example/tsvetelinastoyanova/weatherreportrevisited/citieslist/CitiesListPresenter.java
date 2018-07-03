@@ -11,6 +11,7 @@ import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.Cities
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.CityDataSource;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local.AppDatabase;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
+import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local.LocalDataSource;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.model.WeatherObject;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.remote.GetDataService;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.remote.RetrofitClientInstance;
@@ -46,56 +47,38 @@ public class CitiesListPresenter implements CitiesListContract.Presenter {
     @Override
     public void start() {
         loadCities();
-        Log.d("tag", "CitiesListPresenter started");
     }
 
     @Override
-    public /*List<City> */ void loadCities() {
-      //  notMainThread.execute(() -> {
+    public void loadCities() {
         citiesRepository.getCities(new CityDataSource.GetCityCallback() {
             @Override
-            public void onCityLoaded(CityEntity city) {
-                Log.d("tag", "received city " + city.getName());
+            public void onCityLoaded(CityEntity cityEntity) {
+                fragment.showCityLoaded(CityEntityAdapter.convertCityEntityToCity(cityEntity));
             }
 
             @Override
-            public void onDataNotAvailable() {
-                    Log.d("tag", "Not available data");
+            public void onCityDoesNotExist() {
+                fragment.showErrorLoadingCities();
             }
         });
-           /*
-            if (contextRef != null && contextRef.get() != null) {
-                AppDatabase db = Room.databaseBuilder(contextRef.get(), AppDatabase.class, "cities").build();
-                List<CityEntity> cityEntities = db.cityDao().getAll();
-                if (cityEntities.size() > 0) {
-                    for (CityEntity city : cityEntities) {
-                        updateCity(city);
-                    }
-                }
-            }*/
-   //     });
-       // return cities;
     }
 
     @Override
     public void addNewCity(String cityName) {
-        if (!cityExists(cityName)) {
-            notMainThread.execute(() -> {
-                retrofit2.Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
-                GetDataService service = retrofit.create(GetDataService.class);
-                Call<WeatherObject> call = service.getWeatherForCity(Constants.API_KEY, cityName);
-                call.enqueue(new Callback<WeatherObject>() {
-                    @Override
-                    public void onResponse(Call<WeatherObject> call, Response<WeatherObject> response) {
-                        receiveWeatherForCity(response.body());
-                    }
-                    @Override
-                    public void onFailure(Call<WeatherObject> call, Throwable t) {
-                    }
-                });
-            });
-        }
+        citiesRepository.addCity(cityName, new CityDataSource.AddCityCallback() {
+            @Override
+            public void onCityAddedSuccessfully(CityEntity cityEntity) {
+                fragment.showNewCityAdded(CityEntityAdapter.convertCityEntityToCity(cityEntity));
+            }
+
+            @Override
+            public void onFail() {
+                fragment.showErrorAddingAddedCity();
+            }
+        });
     }
+
 
     @Override
     public void updateCity(CityEntity city) {
@@ -107,9 +90,10 @@ public class CitiesListPresenter implements CitiesListContract.Presenter {
             public void onResponse(Call<WeatherObject> call, Response<WeatherObject> response) {
                 WeatherObject weatherObject = response.body();
                 updateCityInDatabase(weatherObject);
-                fragment.showCityLoaded(CityEntityAdapter.convertCityEntityToCity(city));
+                fragment.showCityLoaded(CityEntityAdapter.convertWeatherObjectToCity(weatherObject));
                 weatherObjects.add(weatherObject);
             }
+
             @Override
             public void onFailure(Call<WeatherObject> call, Throwable t) {
             }
@@ -119,6 +103,11 @@ public class CitiesListPresenter implements CitiesListContract.Presenter {
     @Override
     public WeatherObject getWeatherObjectOnIndex(int index) {
         return weatherObjects.get(index);
+    }
+
+    @Override
+    public void addNewWeatherObject(WeatherObject weatherObject) {
+        weatherObjects.add(weatherObject);
     }
 
     @Override
@@ -136,10 +125,9 @@ public class CitiesListPresenter implements CitiesListContract.Presenter {
         return false;
     }
 
-    private void receiveWeatherForCity(WeatherObject weather) {
+    private void receiveWeatherForCity(CityEntity cityEntity) {
         notMainThread.execute(() -> {
-            CityEntity city = CityEntityAdapter.convertWeatherObjectToCityEntity(weather);
-            addInDatabase(city);
+            addInDatabase(cityEntity);
         });
     }
 

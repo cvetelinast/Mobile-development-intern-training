@@ -7,6 +7,8 @@
     <string name="add_city_button">Add</string>
     <string name="added_city">City added successfully</string>
     <string name="existing_city">The city was already added</string>
+    <string name="not_added_city">A problem with adding city occured.</string>
+    <string name="problem_loading_cities">A problem loading cities occured.</string>
 
     <!--temperature properties-->
     <string name="temperature_min">Minimum temperature: %s</string>

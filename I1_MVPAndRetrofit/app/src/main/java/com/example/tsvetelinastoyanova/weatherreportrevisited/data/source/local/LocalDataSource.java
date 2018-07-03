@@ -16,9 +16,16 @@ public interface LocalDataSource extends CityDataSource {
 
     }
 
+    interface AddCityCallback{
+
+        void onCityAddedSuccessfully(CityEntity cityEntity);
+
+        void onFail();
+    }
+
     void getCities(@NonNull LoadCitiesCallback callback);
 
-    void saveCity(@NonNull CityEntity city);
+    void addCity(@NonNull CityEntity cityEntity, AddCityCallback addCityCallback);
 
     //  void refreshCity();
 

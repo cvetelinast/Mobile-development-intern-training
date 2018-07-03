@@ -18,7 +18,7 @@ public class CityEntityAdapter {
     }
 
     public static City convertCityEntityToCity(CityEntity cityEntity) {
-       return new City(cityEntity.getName(), cityEntity.getLastTemperature(), cityEntity.getLastImageId());
+        return new City(cityEntity.getName(), cityEntity.getLastTemperature(), cityEntity.getLastImageId());
     }
 
     public static CityEntity convertWeatherObjectToCityEntity(WeatherObject object) {
@@ -29,5 +29,10 @@ public class CityEntityAdapter {
         String imageId = object.getWeather().get(0).getIcon();
         c.setLastImageId(ImageOperator.getImageIdFromString(imageId));
         return c;
+    }
+
+    public static City convertWeatherObjectToCity(WeatherObject weatherObject) {
+        String image = weatherObject.getWeather().get(0).getIcon();
+        return new City(weatherObject.getName(), weatherObject.getMain().getTemp(), ImageOperator.getImageIdFromString(image));
     }
 }

@@ -62,7 +62,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
 
     public CitiesAdapter(CitiesListContract.Presenter presenter, OnItemClickListener onItemClickListener/*, OnItemSwipeListener onItemSwipeListener*/) {
         this.presenter = presenter;
-        /*this.citiesList = */presenter.loadCities();
+      //  /*this.citiesList = */presenter.loadCities();
         this.onItemClickListener = onItemClickListener;
    //     this.onItemSwipeListener = onItemSwipeListener;
     }

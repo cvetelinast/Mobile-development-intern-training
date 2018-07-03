@@ -60,10 +60,6 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
         setTextContainer(view.findViewById(R.id.new_city_wrapper));
         recyclerView = view.findViewById(R.id.recycler_view);
         createRecyclerView(recyclerView);
-
-
-        presenter.start();
-
         return view;
     }
 
@@ -75,9 +71,8 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     @Override
     public void onResume() {
         super.onResume();
-        if (presenter != null) {
-            presenter.start();
-        }
+        Utils.checkNotNull(presenter);
+        presenter.start();
     }
 
     /*** Methods from CitiesListContract.View ***/
@@ -104,7 +99,12 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
     @Override
     public void showErrorAddingAddedCity() {
-        Toast.makeText(getContext(), R.string.existing_city, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.not_added_city, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showErrorLoadingCities() {
+        Toast.makeText(getContext(), R.string.problem_loading_cities, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -114,10 +114,8 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
     @Override
     public void showCityLoaded(City city) {
-    //    getActivity().runOnUiThread(() -> {
-            citiesAdapter.addNewCityToShow(city);
-            citiesAdapter.notifyDataSetChanged();
-     //   });
+        citiesAdapter.addNewCityToShow(city);
+        citiesAdapter.notifyDataSetChanged();
     }
 
     public static CitiesListFragment newInstance() {
@@ -134,15 +132,15 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
     private void createRecyclerView(RecyclerView recyclerView) {
         OnItemClickListener onItemClickListener = (view, position) -> setWeatherObjectWhenClicked(presenter.getWeatherObjectOnIndex(position));
-     //   OnSwipeTouchListener onSwipeTouchListener = (view, position) ->setOnSwipeTouchListener(presenter.getWeatherObjectOnIndex(position));
-      //  citiesAdapter = new CitiesAdapter(presenter, onItemClickListener, onSwipeTouchListener);
+        //   OnSwipeTouchListener onSwipeTouchListener = (view, position) ->setOnSwipeTouchListener(presenter.getWeatherObjectOnIndex(position));
+        citiesAdapter = new CitiesAdapter(presenter, onItemClickListener/*, onSwipeTouchListener*/);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(citiesAdapter);
     }
 
-    private OnSwipeTouchListener setOnSwipeTouchListener(WeatherObject weatherObject){
+    private OnSwipeTouchListener setOnSwipeTouchListener(WeatherObject weatherObject) {
         return new OnSwipeTouchListener(getActivity()) {
             public void onSwipeTop() {
                 Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();

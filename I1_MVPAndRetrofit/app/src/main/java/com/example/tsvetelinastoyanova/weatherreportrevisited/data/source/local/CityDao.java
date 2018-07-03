@@ -25,6 +25,10 @@ public interface CityDao {
     public void updateCity(String name, double lastTemperature, int lastImageId);
 
     @Query("SELECT name FROM cities WHERE name = :name LIMIT 1")
-    public String getCity(String name);
+    public String getCityName(String name);
+
+    @Query("SELECT * FROM cities WHERE name = :name LIMIT 1")
+    public CityEntity getCity(String name);
+
 
 }

@@ -15,6 +15,8 @@ public interface CitiesListContract {
 
         void showErrorAddingAddedCity();
 
+        void showErrorLoadingCities();
+
         void showCityDeleted(City deletedCity);
 
         void showCityLoaded(City city);
@@ -32,5 +34,7 @@ public interface CitiesListContract {
         void deleteCity(City city);
 
         WeatherObject getWeatherObjectOnIndex(int index);
+
+        void addNewWeatherObject(WeatherObject weatherObject);
     }
 }
