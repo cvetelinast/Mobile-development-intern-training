@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.weatherreportrevisited.network;
+package com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.remote;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -14,6 +14,7 @@ public class RetrofitClientInstance {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
+
         return retrofit;
     }
 }

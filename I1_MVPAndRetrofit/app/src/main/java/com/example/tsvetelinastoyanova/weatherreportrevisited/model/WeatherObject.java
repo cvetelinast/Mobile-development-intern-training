@@ -1,15 +1,15 @@
 
 package com.example.tsvetelinastoyanova.weatherreportrevisited.model;
 
-import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
+import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Example implements Parcelable
-{
+public class WeatherObject implements Parcelable {
 
     @SerializedName("coord")
     @Expose
@@ -47,39 +47,8 @@ public class Example implements Parcelable
     @SerializedName("cod")
     @Expose
     private int cod;
-    public final static Creator<Example> CREATOR = new Creator<Example>() {
 
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public Example createFromParcel(Parcel in) {
-            return new Example(in);
-        }
-
-        public Example[] newArray(int size) {
-            return (new Example[size]);
-        }
-
-    }
-    ;
-
-    protected Example(Parcel in) {
-        this.coord = ((Coord) in.readValue((Coord.class.getClassLoader())));
-        in.readList(this.weather, (com.example.tsvetelinastoyanova.weatherreportrevisited.model.Weather.class.getClassLoader()));
-        this.base = ((String) in.readValue((String.class.getClassLoader())));
-        this.main = ((Main) in.readValue((Main.class.getClassLoader())));
-        this.visibility = ((int) in.readValue((int.class.getClassLoader())));
-        this.wind = ((Wind) in.readValue((Wind.class.getClassLoader())));
-        this.clouds = ((Clouds) in.readValue((Clouds.class.getClassLoader())));
-        this.dt = ((int) in.readValue((int.class.getClassLoader())));
-        this.sys = ((Sys) in.readValue((Sys.class.getClassLoader())));
-        this.id = ((int) in.readValue((int.class.getClassLoader())));
-        this.name = ((String) in.readValue((String.class.getClassLoader())));
-        this.cod = ((int) in.readValue((int.class.getClassLoader())));
-    }
-
-    public Example() {
+    public WeatherObject() {
     }
 
     public Coord getCoord() {
@@ -178,23 +147,51 @@ public class Example implements Parcelable
         this.cod = cod;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(coord);
-        dest.writeList(weather);
-        dest.writeValue(base);
-        dest.writeValue(main);
-        dest.writeValue(visibility);
-        dest.writeValue(wind);
-        dest.writeValue(clouds);
-        dest.writeValue(dt);
-        dest.writeValue(sys);
-        dest.writeValue(id);
-        dest.writeValue(name);
-        dest.writeValue(cod);
-    }
-
+    @Override
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.coord, flags);
+        dest.writeTypedList(this.weather);
+        dest.writeString(this.base);
+        dest.writeParcelable(this.main, flags);
+        dest.writeInt(this.visibility);
+        dest.writeParcelable(this.wind, flags);
+        dest.writeParcelable(this.clouds, flags);
+        dest.writeInt(this.dt);
+        dest.writeParcelable(this.sys, flags);
+        dest.writeInt(this.id);
+        dest.writeString(this.name);
+        dest.writeInt(this.cod);
+    }
+
+    protected WeatherObject(Parcel in) {
+        this.coord = in.readParcelable(Coord.class.getClassLoader());
+        this.weather = in.createTypedArrayList(Weather.CREATOR);
+        this.base = in.readString();
+        this.main = in.readParcelable(Main.class.getClassLoader());
+        this.visibility = in.readInt();
+        this.wind = in.readParcelable(Wind.class.getClassLoader());
+        this.clouds = in.readParcelable(Clouds.class.getClassLoader());
+        this.dt = in.readInt();
+        this.sys = in.readParcelable(Sys.class.getClassLoader());
+        this.id = in.readInt();
+        this.name = in.readString();
+        this.cod = in.readInt();
+    }
+
+    public static final Parcelable.Creator<WeatherObject> CREATOR = new Parcelable.Creator<WeatherObject>() {
+        @Override
+        public WeatherObject createFromParcel(Parcel source) {
+            return new WeatherObject(source);
+        }
+
+        @Override
+        public WeatherObject[] newArray(int size) {
+            return new WeatherObject[size];
+        }
+    };
 }

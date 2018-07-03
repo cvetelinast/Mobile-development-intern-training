@@ -54,7 +54,7 @@ public class Main implements Parcelable
     }
 
     public double getTemp() {
-        return temp;
+        return convertTemperatureToCelsius(temp);
     }
 
     public void setTemp(double temp) {
@@ -78,7 +78,7 @@ public class Main implements Parcelable
     }
 
     public double getTempMin() {
-        return tempMin;
+        return convertTemperatureToCelsius(tempMin);
     }
 
     public void setTempMin(double tempMin) {
@@ -86,7 +86,7 @@ public class Main implements Parcelable
     }
 
     public double getTempMax() {
-        return tempMax;
+        return convertTemperatureToCelsius(tempMax);
     }
 
     public void setTempMax(double tempMax) {
@@ -103,6 +103,10 @@ public class Main implements Parcelable
 
     public int describeContents() {
         return  0;
+    }
+
+    public double convertTemperatureToCelsius(double temp) {
+        return Math.round((temp - 273.15) * 10) / 10.0;
     }
 
 }
