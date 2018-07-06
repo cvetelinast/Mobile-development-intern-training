@@ -19,11 +19,11 @@ import retrofit2.Response;
 
 public class CitiesRemoteDataSource implements CityDataSource {
     private static CitiesRemoteDataSource INSTANCE;
-    List<WeatherObject> weatherObjectList = new ArrayList<>();
+   // List<WeatherObject> weatherObjectList = new ArrayList<>();
 
     @Override
     public void getCity(@NonNull String cityName, @NonNull GetCityCallback callback) {
-        Utils.checkNotNull(cityName);
+       /* Utils.checkNotNull(cityName);
         Utils.checkNotNull(callback);
         retrofit2.Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
         GetDataService service = retrofit.create(GetDataService.class);
@@ -34,9 +34,9 @@ public class CitiesRemoteDataSource implements CityDataSource {
                 if (response.body() == null) {
                     callback.onCityDoesNotExist();
                 } else {
-                    synchronized (weatherObjectList) {
+                    *//*synchronized (weatherObjectList) {
                         weatherObjectList.add(response.body());
-                    }
+                    }*//*
                     callback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(response.body()));
                 }
             }
@@ -45,7 +45,7 @@ public class CitiesRemoteDataSource implements CityDataSource {
             public void onFailure(Call<WeatherObject> call, Throwable t) {
                 callback.onCityDoesNotExist();
             }
-        });
+        });*/
     }
 
     public static CitiesRemoteDataSource getInstance() {
@@ -55,13 +55,13 @@ public class CitiesRemoteDataSource implements CityDataSource {
         return INSTANCE;
     }
 
-    public List<WeatherObject> getWeatherObjectList() {
+    /*public List<WeatherObject> getWeatherObjectList() {
         return weatherObjectList;
-    }
+    }*/
 
-    public void clearWeatherObjects() {
+    /*public void clearWeatherObjects() {
         weatherObjectList.clear();
-    }
+    }*/
 
     public void getWeatherObject(@NonNull String cityName, @NonNull GetWeatherObjectCallback callback) {
         Utils.checkNotNull(cityName);
@@ -75,9 +75,9 @@ public class CitiesRemoteDataSource implements CityDataSource {
                 if (response.body() == null) {
                     callback.onFail();
                 } else {
-                    synchronized (weatherObjectList) {
+                   /* synchronized (weatherObjectList) {
                         weatherObjectList.add(response.body());
-                    }
+                    }*/
                     callback.onWeatherObjectLoaded(response.body());
                 }
             }

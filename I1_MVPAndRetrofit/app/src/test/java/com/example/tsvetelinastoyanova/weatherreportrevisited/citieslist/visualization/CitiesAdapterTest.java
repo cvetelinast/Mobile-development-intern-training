@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization;
 
 import android.media.Image;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.tsvetelinastoyanova.weatherreportrevisited.City;
@@ -24,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest()
+@PrepareForTest(RecyclerView.class)
 public class CitiesAdapterTest {
 
 // for (int i = 0; i < getCitiesList().size(); i++) {

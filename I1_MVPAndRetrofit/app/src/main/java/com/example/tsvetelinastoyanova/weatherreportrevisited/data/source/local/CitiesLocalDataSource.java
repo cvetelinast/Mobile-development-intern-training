@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.CityDataSource;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
@@ -103,6 +104,7 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
         Runnable runnable = () -> {
             cityDao.deleteCity(cityName);
             mAppExecutors.mainThread().execute(() -> {
+                Log.d("delete", "delete " + cityName);
                 callback.onCityDeletedSuccessfully();
             });
         };

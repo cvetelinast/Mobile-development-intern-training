@@ -82,9 +82,10 @@ public class CitiesRepository implements CityDataSource {
                             remoteDataSource.getWeatherObject(cityEntity.getName(), new GetWeatherObjectCallback() {
                                 @Override
                                 public void onWeatherObjectLoaded(WeatherObject weatherObject) {
-                                    synchronized (weatherObjectsCache) {
+                                    refreshWeatherObjectInCache(weatherObject);
+                                   /* synchronized (weatherObjectsCache) {
                                         weatherObjectsCache.add(weatherObject);
-                                    }
+                                    }*/
                                     getCityCallback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject));
                                 }
 
@@ -157,15 +158,15 @@ public class CitiesRepository implements CityDataSource {
         });
     }
 
-    public void updateCache() {
+   /* public void updateCache() {
         synchronized (weatherObjectsCache) {
             weatherObjectsCache.addAll(remoteDataSource.getWeatherObjectList());
             remoteDataSource.clearWeatherObjects();
         }
         //     cacheIsDirty = false;
-    }
+    }*/
 
-    public void refreshWeatherObjectInCache(String cityName) {
+   /* public void refreshWeatherObjectInCache(String cityName) {
         synchronized (weatherObjectsCache) {
             for (WeatherObject newObject : remoteDataSource.getWeatherObjectList()) {
                 if (newObject.getName().equals(cityName)) {
@@ -178,7 +179,7 @@ public class CitiesRepository implements CityDataSource {
                 }
             }
         }
-    }
+    }*/
 
     public void addCity(String cityName, @NonNull AddCityCallback callback) {
         /* 1) check if city exists in database
@@ -202,8 +203,10 @@ public class CitiesRepository implements CityDataSource {
                         localDataSource.addCity(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject), new LocalDataSource.AddCityCallback() {
                             @Override
                             public void onCityAddedSuccessfully(CityEntity cityEntity) {
+                                refreshWeatherObjectInCache(weatherObject);
+                                //  synchronized (weatherObjectsCache){weatherObjectsCache.add(weatherObject);}
                                 callback.onCityAddedSuccessfully(cityEntity);
-                                updateCache();
+                                // updateCache();
                             }
 
                             @Override
@@ -211,6 +214,7 @@ public class CitiesRepository implements CityDataSource {
                                 callback.onFail();
                             }
                         });
+
                     }
 
                     @Override
@@ -299,9 +303,10 @@ public class CitiesRepository implements CityDataSource {
                     remoteDataSource.getWeatherObject(oldCity.getName(), new GetWeatherObjectCallback() {
                         @Override
                         public void onWeatherObjectLoaded(WeatherObject weatherObject) {
-                            synchronized (weatherObjectsCache) {
-                                weatherObjectsCache.add(weatherObject);
-                            }
+                            refreshWeatherObjectInCache(weatherObject);
+                            //   synchronized (weatherObjectsCache) {
+                            //       weatherObjectsCache.add(weatherObject);
+                            //   }
                             CityEntity newCity = CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject);
                             localDataSource.refreshCity(newCity, (() -> {
                                 getCityCallback.onCityLoaded(newCity);
@@ -396,27 +401,48 @@ public class CitiesRepository implements CityDataSource {
         });
     }*/
 
+    private void refreshWeatherObjectInCache(WeatherObject newObject) {
+        boolean exist = false;
+        synchronized (weatherObjectsCache) {
+            for (int i = 0; i < weatherObjectsCache.size(); i++) {
+                if (weatherObjectsCache.get(i).getName().equals(newObject.getName())) {
+                    Log.d("refresh", "refresh " + weatherObjectsCache.get(i).getName());
+                    exist = true;
+                    weatherObjectsCache.set(i, newObject);
+                    return;
+                }
+            }
+            if (!exist) {
+                Log.d("refresh", "refresh - does not exist " + newObject);
+                weatherObjectsCache.add(newObject);
+            }
+        }
+    }
+
     private void deleteWeatherObjectFromCache(String cityName) {
-        for (WeatherObject weatherObject : weatherObjectsCache) {
-            if (weatherObject.getName().equals(cityName)) {
-                weatherObjectsCache.remove(weatherObject);
-                return;
+        synchronized (weatherObjectsCache) {
+            for (WeatherObject weatherObject : weatherObjectsCache) {
+                if (weatherObject.getName().equals(cityName)) {
+                    weatherObjectsCache.remove(weatherObject);
+                    return;
+                }
             }
         }
     }
 
     private void getWeatherObject(String cityName) {
-        remoteDataSource.getWeatherObject(cityName, new GetWeatherObjectCallback() {
-            @Override
-            public void onWeatherObjectLoaded(WeatherObject weatherObject) {
-                weatherObjectsCache.add(weatherObject);
-            }
+        synchronized (weatherObjectsCache) {
+            remoteDataSource.getWeatherObject(cityName, new GetWeatherObjectCallback() {
+                @Override
+                public void onWeatherObjectLoaded(WeatherObject weatherObject) {
+                    weatherObjectsCache.add(weatherObject);
+                }
 
-            @Override
-            public void onFail() {
+                @Override
+                public void onFail() {
 
-            }
-        });
+                }
+            });
+        }
     }
-
 }
