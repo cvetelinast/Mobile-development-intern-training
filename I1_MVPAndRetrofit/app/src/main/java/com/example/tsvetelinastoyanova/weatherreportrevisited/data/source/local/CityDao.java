@@ -19,16 +19,20 @@ public interface CityDao {
     void insertCity(CityEntity city);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertCities(CityEntity... cities);
+    void insertCities(CityEntity... cities);
 
     @Query("UPDATE cities SET lastTemperature = :lastTemperature, lastImageId = :lastImageId WHERE name = :name")
-    public void updateCity(String name, double lastTemperature, int lastImageId);
+    void updateCity(String name, double lastTemperature, int lastImageId);
 
     @Query("SELECT name FROM cities WHERE name = :name LIMIT 1")
-    public String getCityName(String name);
+    String getCityName(String name);
 
     @Query("SELECT * FROM cities WHERE name = :name LIMIT 1")
-    public CityEntity getCity(String name);
+    CityEntity getCity(String name);
 
+    @Query("DELETE FROM cities")
+    void deleteAll();
 
+    @Query("DELETE FROM cities WHERE name = :name")
+    void deleteCity(String name);
 }

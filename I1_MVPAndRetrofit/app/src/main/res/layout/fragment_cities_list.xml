@@ -1,44 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
-    android:padding="@dimen/padding_weather_list_fragment"
-    tools:context=".citieslist.CitiesListFragment">
+    tools:context=".MainActivity">
 
-    <android.support.v7.widget.LinearLayoutCompat
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        android:paddingHorizontal="@dimen/padding_weather_list_fragment"
+        android:paddingTop="@dimen/padding_weather_details_fragment"
+        tools:context=".citieslist.CitiesListFragment">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/new_city_wrapper"
+        <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_city_input">
+            android:orientation="vertical">
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/city"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/new_city_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences" />
+                android:hint="@string/hint_city_input">
 
-        </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
 
-        <Button
-            android:id="@+id/add_city_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="@string/add_city_button" />
+            </android.support.design.widget.TextInputLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical" />
+            <Button
+                android:id="@+id/add_city_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="@string/add_city_button" />
 
-    </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" />
 
-</FrameLayout>
+        </android.support.v7.widget.LinearLayoutCompat>
+
+    </FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

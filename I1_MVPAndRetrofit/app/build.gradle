@@ -53,4 +53,11 @@ dependencies {
     testImplementation "android.arch.persistence.room:testing:$room_version"
 
     implementation 'com.facebook.stetho:stetho:1.5.0'
+
+    // tests
+    testImplementation 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'org.powermock:powermock-api-mockito2:1.7.3'
+    testImplementation 'org.powermock:powermock-module-junit4:1.7.3'
+    testImplementation 'org.powermock:powermock-core:1.7.3'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.7.3'
 }

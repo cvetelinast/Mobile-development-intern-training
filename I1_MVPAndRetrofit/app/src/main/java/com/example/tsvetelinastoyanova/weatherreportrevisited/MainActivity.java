@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements CitiesListFragmen
         if (citiesListFragment == null) {
             // Create the fragment
             citiesListFragment = CitiesListFragment.newInstance();
-            CitiesListPresenter citiesListPresenter = new CitiesListPresenter(citiesListFragment, this.getApplicationContext(), Utils.provideCityRepository(getApplicationContext()));
+            CitiesListPresenter citiesListPresenter = new CitiesListPresenter(citiesListFragment, Utils.provideCityRepository(getApplicationContext()));
             citiesListFragment.setPresenter(citiesListPresenter);
             Utils.addFragmentToActivity(
                     getSupportFragmentManager(), citiesListFragment, R.id.list_fragment_container);

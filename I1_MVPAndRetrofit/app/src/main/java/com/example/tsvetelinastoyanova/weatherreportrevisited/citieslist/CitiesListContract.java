@@ -17,11 +17,17 @@ public interface CitiesListContract {
 
         void showErrorLoadingCities();
 
-        void showCityDeleted(City deletedCity);
+        void showCityDeleted();
+
+        void showErrorDeleteCity();
 
         void showCityLoaded(City city);
 
-        void setWeatherObjectWhenClicked(WeatherObject weatherObject);
+        void showCityUpdated(City city);
+
+        void setWeatherObjectWhenClicked(String cityName);
+
+        List<City> getDisplayedCities();
     }
 
     interface Presenter extends BasePresenter {
@@ -29,12 +35,14 @@ public interface CitiesListContract {
 
         void addNewCity(String s);
 
-        void updateCity(CityEntity s);
+    //    void updateCity(CityEntity s);
 
         void deleteCity(City city);
 
-        WeatherObject getWeatherObjectOnIndex(int index);
+        void refreshCities(List<City> cities);
 
-        void addNewWeatherObject(WeatherObject weatherObject);
+        WeatherObject getWeatherObjectOnClick(String cityName);
+
+    //    void addNewWeatherObject(WeatherObject weatherObject);
     }
 }

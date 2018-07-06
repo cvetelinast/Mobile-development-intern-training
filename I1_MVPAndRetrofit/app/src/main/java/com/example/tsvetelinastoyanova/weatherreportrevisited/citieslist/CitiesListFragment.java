@@ -1,12 +1,18 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +23,21 @@ import com.example.tsvetelinastoyanova.weatherreportrevisited.City;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.R;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization.CitiesAdapter;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization.OnItemClickListener;
-import com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization.OnSwipeTouchListener;
+import com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization.RecyclerItemTouchHelper;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.model.WeatherObject;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.util.Utils;
 
-public class CitiesListFragment extends Fragment implements CitiesListContract.View {
+import java.util.List;
+
+
+public class CitiesListFragment extends Fragment implements CitiesListContract.View, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     CitiesAdapter citiesAdapter;
     RecyclerView recyclerView;
     private CitiesListContract.Presenter presenter;
     private TextInputLayout cityNameContainer;
+    private CoordinatorLayout coordinatorLayout;
+
+    private boolean isFirstTimeLoading = true;
 
     /*** interface ***/
 
@@ -56,6 +68,7 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cities_list, container, false);
+        coordinatorLayout = view.findViewById(R.id.coordinator_layout);
         addClickListenerToAddCityButton(view.findViewById(R.id.add_city_button));
         setTextContainer(view.findViewById(R.id.new_city_wrapper));
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -72,14 +85,20 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     public void onResume() {
         super.onResume();
         Utils.checkNotNull(presenter);
-        presenter.start();
+        if (isFirstTimeLoading) {
+            isFirstTimeLoading = false;
+            presenter.start();
+        }
     }
 
     /*** Methods from CitiesListContract.View ***/
 
     @Override
-    public void setWeatherObjectWhenClicked(WeatherObject weatherObject) {
-        onClickCityDelegate.onClickCity(weatherObject);
+    public void setWeatherObjectWhenClicked(String cityName) {
+        WeatherObject weatherObject = presenter.getWeatherObjectOnClick(cityName);
+        if (weatherObject != null) { // if click while refreshing
+            onClickCityDelegate.onClickCity(weatherObject);
+        }
     }
 
     @Override
@@ -89,12 +108,9 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
     @Override
     public void showNewCityAdded(City newCity) {
-        getActivity().runOnUiThread(() -> {
-            citiesAdapter.addNewCityToShow(newCity);
-            citiesAdapter.notifyDataSetChanged();
-            Toast.makeText(getContext(), R.string.added_city, Toast.LENGTH_SHORT).show();
-            cityNameContainer.getEditText().setText("");
-        });
+        citiesAdapter.addNewCityToShow(newCity);
+        Toast.makeText(getContext(), R.string.added_city, Toast.LENGTH_SHORT).show();
+        cityNameContainer.getEditText().setText("");
     }
 
     @Override
@@ -108,18 +124,32 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     }
 
     @Override
-    public void showCityDeleted(City deletedCity) {
+    public void showCityDeleted() {
+        Toast.makeText(getContext(), R.string.city_deleted_success, Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void showErrorDeleteCity() {
+        Toast.makeText(getContext(), R.string.problem_deleting_cities, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showCityLoaded(City city) {
         citiesAdapter.addNewCityToShow(city);
-        citiesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showCityUpdated(City newCity) {
+        citiesAdapter.refreshCity(newCity);
     }
 
     public static CitiesListFragment newInstance() {
         return new CitiesListFragment();
+    }
+
+    @Override
+    public List<City> getDisplayedCities() {
+        return citiesAdapter.getCitiesList();
     }
 
     private void addClickListenerToAddCityButton(Button addCityButton) {
@@ -131,32 +161,50 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     }
 
     private void createRecyclerView(RecyclerView recyclerView) {
-        OnItemClickListener onItemClickListener = (view, position) -> setWeatherObjectWhenClicked(presenter.getWeatherObjectOnIndex(position));
-        //   OnSwipeTouchListener onSwipeTouchListener = (view, position) ->setOnSwipeTouchListener(presenter.getWeatherObjectOnIndex(position));
-        citiesAdapter = new CitiesAdapter(presenter, onItemClickListener/*, onSwipeTouchListener*/);
+        OnItemClickListener onItemClickListener = (view, position) -> setWeatherObjectWhenClicked(citiesAdapter.getCityNameOnIndex(position));
+        citiesAdapter = new CitiesAdapter(presenter, onItemClickListener);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(citiesAdapter);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
     }
 
-    private OnSwipeTouchListener setOnSwipeTouchListener(WeatherObject weatherObject) {
-        return new OnSwipeTouchListener(getActivity()) {
-            public void onSwipeTop() {
-                Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();
-            }
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof CitiesAdapter.MyViewHolder) {
+            // get the removed item name to display it in snack bar
+            String name = citiesAdapter.getCityNameOnIndex(position);
 
-            public void onSwipeRight() {
-                Toast.makeText(getActivity(), "right", Toast.LENGTH_SHORT).show();
-            }
+            // backup of removed item for undo purpose
+            final City deletedItem = citiesAdapter.getCityOnIndex(position);
+            final int deletedIndex = viewHolder.getAdapterPosition();
 
-            public void onSwipeLeft() {
-                Toast.makeText(getActivity(), "left", Toast.LENGTH_SHORT).show();
-            }
+            // remove the item from recycler view
+            citiesAdapter.removeCity(viewHolder.getAdapterPosition());
 
-            public void onSwipeBottom() {
-                Toast.makeText(getActivity(), "bottom", Toast.LENGTH_SHORT).show();
-            }
-        };
+            // showing snack bar with Undo option
+            Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, name + " removed from list with cities!", Snackbar.LENGTH_LONG);
+
+            snackbar.addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                @Override
+                public void onDismissed(Snackbar transientBottomBar, int event) {
+                    Log.i("onDismissed", "delete, event: " + event);
+                    if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
+                        presenter.deleteCity(deletedItem);
+                    }
+                }
+            });
+            snackbar.setAction("UNDO", ((view) ->  // undo is selected, restore the deleted item
+                    citiesAdapter.restoreCity(deletedItem, deletedIndex)
+            ));
+
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
     }
+
 }

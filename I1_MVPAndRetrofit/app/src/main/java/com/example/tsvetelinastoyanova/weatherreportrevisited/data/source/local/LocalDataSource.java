@@ -23,11 +23,24 @@ public interface LocalDataSource extends CityDataSource {
         void onFail();
     }
 
+    interface DeleteCityCallback{
+
+        void onCityDeletedSuccessfully();
+
+        void onFail();
+    }
+
+    interface RefreshCityCallback{
+
+        void onRefreshCitySuccessfully();
+
+    }
+
     void getCities(@NonNull LoadCitiesCallback callback);
 
     void addCity(@NonNull CityEntity cityEntity, AddCityCallback addCityCallback);
 
-    //  void refreshCity();
+    void refreshCity(@NonNull CityEntity cityEntity, LocalDataSource.RefreshCityCallback refreshCityCallback);
 
-    void deleteCity(@NonNull String cityName);
+    void deleteCity(@NonNull String cityName, LocalDataSource.DeleteCityCallback callback);
 }

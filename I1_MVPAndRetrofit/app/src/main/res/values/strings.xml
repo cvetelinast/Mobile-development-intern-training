@@ -1,14 +1,18 @@
 <resources>
     <string name="app_name">Weather Report App</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment</string>
+    <string name="hello_first_fragment">Hello first view</string>
+    <string name="hello_second_fragment">Hello second view</string>
     <string name="hint_city_input">Madrid</string>
     <string name="add_city_button">Add</string>
     <string name="added_city">City added successfully</string>
     <string name="existing_city">The city was already added</string>
     <string name="not_added_city">A problem with adding city occured.</string>
-    <string name="problem_loading_cities">A problem loading cities occured.</string>
+    <string name="problem_loading_cities">A problem loading cities occurred.</string>
+    <string name="problem_deleting_cities">A problem with deletion occurred.</string>
+    <string name="city_deleted_success">The city was deleted successfully.</string>
+    <string name="delete">Delete</string>
+    <string name="fragment_weather_details_toolbar">More information:</string>
 
     <!--temperature properties-->
     <string name="temperature_min">Minimum temperature: %s</string>

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.tsvetelinastoyanova.weatherreportrevisited.City;
@@ -19,23 +20,24 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
 
     private final List<City> citiesList = new ArrayList<>();
     private final OnItemClickListener onItemClickListener;
- //   private final OnItemSwipeListener onItemSwipeListener;
     private final CitiesListContract.Presenter presenter;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder implements CityRowView, View.OnClickListener/*, View.On*/ {
+    public static class MyViewHolder extends RecyclerView.ViewHolder implements CityRowView, View.OnClickListener {
 
         private OnItemClickListener onItemClickListener;
-     //   private final OnItemSwipeListener onItemSwipeListener;
         public TextView name, temperature;
         public ImageView icon;
+        public RelativeLayout viewBackground, viewForeground;
 
-        MyViewHolder(View view, OnItemClickListener onItemClickListener/*, OnItemSwipeListener onItemSwipeListener*/) {
+        MyViewHolder(View view, OnItemClickListener onItemClickListener) {
             super(view);
             name = view.findViewById(R.id.name);
             temperature = view.findViewById(R.id.temperature);
             icon = view.findViewById(R.id.icon);
+            viewBackground = view.findViewById(R.id.view_background);
+            viewForeground = view.findViewById(R.id.view_foreground);
+
             this.onItemClickListener = onItemClickListener;
-           /* this.onItemSwipeListener = onItemSwipeListener;*/
             view.setOnClickListener(this);
         }
 
@@ -60,15 +62,50 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
         }
     }
 
-    public CitiesAdapter(CitiesListContract.Presenter presenter, OnItemClickListener onItemClickListener/*, OnItemSwipeListener onItemSwipeListener*/) {
+    public CitiesAdapter(CitiesListContract.Presenter presenter, OnItemClickListener onItemClickListener) {
         this.presenter = presenter;
-      //  /*this.citiesList = */presenter.loadCities();
         this.onItemClickListener = onItemClickListener;
-   //     this.onItemSwipeListener = onItemSwipeListener;
+    }
+
+    public List<City> getCitiesList() {
+        return citiesList;
     }
 
     public void addNewCityToShow(City city) {
-        citiesList.add(city);
+        if(!citiesList.contains(city)) {
+            citiesList.add(city);
+            notifyDataSetChanged();
+        }
+    }
+
+    public String getCityNameOnIndex(int index) {
+        return citiesList.get(index).getName();
+    }
+
+    public City getCityOnIndex(int index) {
+        return citiesList.get(index);
+    }
+
+    public void removeCity(int position) {
+        citiesList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreCity(City city, int position) {
+        citiesList.add(position, city);
+        notifyItemInserted(position);
+    }
+
+    public void refreshCity(City newCity) {
+        for (int i = 0; i < getCitiesList().size(); i++) {
+            City c = getCitiesList().get(i);
+            if (c.getName().equals(newCity.getName())) {
+//                Log.d("tag","REFRESH: city: " + c.getName()+" from "+ c.getTemperature() + " to " + newCity.getTemperature() + " item number "+ i);
+                getCitiesList().set(i,newCity);
+                notifyItemChanged(i);
+                return;
+            }
+        }
     }
 
     @Override
@@ -76,7 +113,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.city, parent, false);
 
-        return new MyViewHolder(itemView, onItemClickListener/*, onItemSwipeListener*/);
+        return new MyViewHolder(itemView, onItemClickListener);
     }
 
     @Override

@@ -27,14 +27,12 @@ public interface CityDataSource {
         void onFail();
     }
 
+    interface GetWeatherObjectCallback {
 
-    /*interface GetCitiesOneByOneCallback {
+        void onWeatherObjectLoaded(WeatherObject weatherObject);
 
-        void onCitiesOneByOneLoaded(List<CityEntity> cities);
-
-        void onProblemLoadingCitiesOneByOne();
+        void onFail();
     }
 
-    void getCitiesOneByOne();*/
 }
 
