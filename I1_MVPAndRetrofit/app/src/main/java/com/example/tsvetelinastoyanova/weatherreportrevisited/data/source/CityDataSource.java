@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.model.WeatherObject;
 
-import java.util.List;
-
 public interface CityDataSource {
 
     interface GetCityCallback {
@@ -16,9 +14,7 @@ public interface CityDataSource {
         void onCityDoesNotExist();
     }
 
-
     void getCity(@NonNull String cityName, @NonNull GetCityCallback callback);
-
 
     interface AddCityCallback {
 

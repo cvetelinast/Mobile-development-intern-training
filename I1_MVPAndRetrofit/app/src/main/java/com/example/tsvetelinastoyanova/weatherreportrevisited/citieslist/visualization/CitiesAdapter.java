@@ -1,5 +1,6 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.visualization;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.widget.TextView;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.City;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.Constants;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.R;
-import com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist.CitiesListContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +20,13 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
 
     private final List<City> citiesList = new ArrayList<>();
     private final OnItemClickListener onItemClickListener;
-    private final CitiesListContract.Presenter presenter;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements CityRowView, View.OnClickListener {
 
         private OnItemClickListener onItemClickListener;
         public TextView name, temperature;
         public ImageView icon;
-        public RelativeLayout viewBackground, viewForeground;
+        RelativeLayout viewBackground, viewForeground;
 
         MyViewHolder(View view, OnItemClickListener onItemClickListener) {
             super(view);
@@ -62,8 +61,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
         }
     }
 
-    public CitiesAdapter(CitiesListContract.Presenter presenter, OnItemClickListener onItemClickListener) {
-        this.presenter = presenter;
+    public CitiesAdapter(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -72,7 +70,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
     }
 
     public void addNewCityToShow(City city) {
-        if(!citiesList.contains(city)) {
+        if (!citiesList.contains(city)) {
             citiesList.add(city);
             notifyDataSetChanged();
         }
@@ -100,8 +98,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
         for (int i = 0; i < getCitiesList().size(); i++) {
             City c = getCitiesList().get(i);
             if (c.getName().equals(newCity.getName())) {
-//                Log.d("tag","REFRESH: city: " + c.getName()+" from "+ c.getTemperature() + " to " + newCity.getTemperature() + " item number "+ i);
-                getCitiesList().set(i,newCity);
+                getCitiesList().set(i, newCity);
                 notifyItemChanged(i);
                 return;
             }
@@ -109,7 +106,8 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.city, parent, false);
 
@@ -117,7 +115,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.MyViewHold
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         City city = citiesList.get(position);
         holder.setName(city.getName());
         holder.setTemperature(city.getTemperature());

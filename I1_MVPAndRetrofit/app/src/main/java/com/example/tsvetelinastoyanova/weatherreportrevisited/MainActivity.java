@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements CitiesListFragmen
         CitiesListFragment citiesListFragment =
                 (CitiesListFragment) getSupportFragmentManager().findFragmentById(R.id.list_fragment_container);
         if (citiesListFragment == null) {
-            // Create the fragment
             citiesListFragment = CitiesListFragment.newInstance();
             CitiesListPresenter citiesListPresenter = new CitiesListPresenter(citiesListFragment, Utils.provideCityRepository(getApplicationContext()));
             citiesListFragment.setPresenter(citiesListPresenter);
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements CitiesListFragmen
         weatherDetailsFragment =
                 (WeatherDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_fragment_container);
         if (weatherDetailsFragment == null) {
-            // Create the fragment
             weatherDetailsFragment = WeatherDetailsFragment.newInstance();
             WeatherDetailsPresenter weatherDetailsPresenter = new WeatherDetailsPresenter();
             weatherDetailsFragment.setPresenter(weatherDetailsPresenter);

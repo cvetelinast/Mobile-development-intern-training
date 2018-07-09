@@ -13,6 +13,8 @@
     <string name="city_deleted_success">The city was deleted successfully.</string>
     <string name="delete">Delete</string>
     <string name="fragment_weather_details_toolbar">More information:</string>
+    <string name="undo">UNDO</string>
+    <string name="city_removed_message">%s removed from list with cities."</string>
 
     <!--temperature properties-->
     <string name="temperature_min">Minimum temperature: %s</string>

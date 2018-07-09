@@ -9,4 +9,5 @@ public interface Constants {
     String COUNTRY_CITY = "%s, %s";
     String WEATHER_OBJECTS = "weatherObjects";
     String API_KEY = "956b0cec24dc9a86dddab6ed85a14dd5";
+    String DATABASE_NAME = "cities";
 }

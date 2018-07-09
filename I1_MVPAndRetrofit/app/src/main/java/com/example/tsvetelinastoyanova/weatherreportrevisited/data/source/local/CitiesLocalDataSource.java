@@ -1,7 +1,6 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.CityDataSource;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
@@ -21,18 +20,6 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
                                   @NonNull CityDao cityDao) {
         mAppExecutors = appExecutors;
         this.cityDao = cityDao;
-    }
-
-    public static CitiesLocalDataSource getInstance(@NonNull AppExecutors appExecutors,
-                                                    @NonNull CityDao cityDao) {
-        if (INSTANCE == null) {
-            synchronized (CitiesLocalDataSource.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new CitiesLocalDataSource(appExecutors, cityDao);
-                }
-            }
-        }
-        return INSTANCE;
     }
 
     @Override
@@ -60,14 +47,12 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
             final CityEntity city = cityDao.getCity(cityName);
             mAppExecutors.mainThread().execute(() -> {
                 if (city == null) {
-                    // This will be called if the table is new or just empty.
                     callback.onCityDoesNotExist();
                 } else {
                     callback.onCityLoaded(city);
                 }
             });
         };
-
         mAppExecutors.databaseIO().execute(runnable);
     }
 
@@ -77,9 +62,7 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
         Utils.checkNotNull(addCityCallback);
         Runnable runnable = () -> {
             cityDao.insertCity(cityEntity);
-            mAppExecutors.mainThread().execute(() -> {
-                addCityCallback.onCityAddedSuccessfully(cityEntity);
-            });
+            mAppExecutors.mainThread().execute(() -> addCityCallback.onCityAddedSuccessfully(cityEntity));
         };
         mAppExecutors.databaseIO().execute(runnable);
     }
@@ -90,9 +73,7 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
         Utils.checkNotNull(refreshCityCallback);
         Runnable runnable = () -> {
             cityDao.updateCity(newCity.getName(), newCity.getLastTemperature(), newCity.getLastImageId());
-            mAppExecutors.mainThread().execute(() -> {
-                refreshCityCallback.onRefreshCitySuccessfully();
-            });
+            mAppExecutors.mainThread().execute(() -> refreshCityCallback.onRefreshCitySuccessfully());
         };
         mAppExecutors.databaseIO().execute(runnable);
     }
@@ -103,19 +84,20 @@ public class CitiesLocalDataSource implements CityDataSource, LocalDataSource {
         Utils.checkNotNull(callback);
         Runnable runnable = () -> {
             cityDao.deleteCity(cityName);
-            mAppExecutors.mainThread().execute(() -> {
-                Log.d("delete", "delete " + cityName);
-                callback.onCityDeletedSuccessfully();
-            });
+            mAppExecutors.mainThread().execute(() -> callback.onCityDeletedSuccessfully());
         };
         mAppExecutors.databaseIO().execute(runnable);
     }
 
-
-    public void clearDatabase() {
-        Runnable runnable = () -> {
-            cityDao.deleteAll();
-        };
-        mAppExecutors.databaseIO().execute(runnable);
+    public static CitiesLocalDataSource getInstance(@NonNull AppExecutors appExecutors,
+                                                    @NonNull CityDao cityDao) {
+        if (INSTANCE == null) {
+            synchronized (CitiesLocalDataSource.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new CitiesLocalDataSource(appExecutors, cityDao);
+                }
+            }
+        }
+        return INSTANCE;
     }
 }

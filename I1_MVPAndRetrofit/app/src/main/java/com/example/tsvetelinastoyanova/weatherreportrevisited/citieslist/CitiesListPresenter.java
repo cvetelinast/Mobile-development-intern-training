@@ -103,8 +103,8 @@ public class CitiesListPresenter implements CitiesListContract.Presenter {
     private void setTimerToRefresh() {
         refresh = () -> {
             refreshCities(view.getDisplayedCities());
-            handler.postDelayed(refresh, 10000);
-            //handler.postDelayed(refresh, 900000);
+            //handler.postDelayed(refresh, 10000);
+            handler.postDelayed(refresh, 900000);
         };
         handler.post(refresh);
     }

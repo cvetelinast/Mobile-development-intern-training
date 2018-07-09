@@ -1,7 +1,7 @@
 package com.example.tsvetelinastoyanova.weatherreportrevisited.data.source;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 import com.example.tsvetelinastoyanova.weatherreportrevisited.City;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
@@ -21,9 +21,7 @@ public class CitiesRepository implements CityDataSource {
     private final LocalDataSource localDataSource;
     private final CitiesRemoteDataSource remoteDataSource;
 
-    private final List<WeatherObject> weatherObjectsCache = new ArrayList<>();
-
-    private boolean cacheIsDirty = false;
+    List<WeatherObject> weatherObjectsCache = new ArrayList<>();
 
     private CitiesRepository(@NonNull LocalDataSource localDataSource,
                              @NonNull CitiesRemoteDataSource remoteDataSource) {
@@ -43,6 +41,9 @@ public class CitiesRepository implements CityDataSource {
         INSTANCE = null;
     }
 
+//    public List<WeatherObject> getWeatherObjectsCache() {
+//        return weatherObjectsCache;
+//    }
 
     public void getCities(@NonNull CityDataSource.GetCityCallback getCityCallback) {
         /*
@@ -57,87 +58,50 @@ public class CitiesRepository implements CityDataSource {
                 2.1) success - return cityEntities from DB one by one
                 2.2) fail - error
          */
-
-
-        //  cacheIsDirty = true;   // todo: where to make cache dirty
         Utils.checkNotNull(getCityCallback);
-        if (!cacheIsDirty && !weatherObjectsCache.isEmpty()) {
-            Log.d("tag", "Load from cache weather objects " + weatherObjectsCache.size());
-            synchronized (weatherObjectsCache) {
-                for (WeatherObject weatherObject : weatherObjectsCache) {
-                    Log.d("tag", "loading city " + weatherObject.getName());
-                    CityEntity cityEntity = CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject);
-                    getCityCallback.onCityLoaded(cityEntity);
-                }
-            }
+        if (!weatherObjectsCache.isEmpty()) {
+            getCitiesFromCache(getCityCallback);
         } else {
-            localDataSource.getCities(new LocalDataSource.LoadCitiesCallback() {
-                @Override
-                public void onCitiesLoaded(List<CityEntity> cities) {
-                    // todo tyk
-                    if (!cities.isEmpty()) {
-                        Log.d("tag", "cities not empty, length " + cities.size());
-                        for (CityEntity cityEntity : cities) {
-
-                            remoteDataSource.getWeatherObject(cityEntity.getName(), new GetWeatherObjectCallback() {
-                                @Override
-                                public void onWeatherObjectLoaded(WeatherObject weatherObject) {
-                                    refreshWeatherObjectInCache(weatherObject);
-                                   /* synchronized (weatherObjectsCache) {
-                                        weatherObjectsCache.add(weatherObject);
-                                    }*/
-                                    getCityCallback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject));
-                                }
-
-                                @Override
-                                public void onFail() {
-                                    getCityCallback.onCityDoesNotExist();
-                                }
-                            });
-
-                           /* remoteDataSource.getCity(cityEntity.getName(), new GetCityCallback() {
-                                @Override
-                                public void onCityLoaded(CityEntity city) {
-                                    Log.d("tag", "loading city " + city.getName());
-                                    getCityCallback.onCityLoaded(city);
-                                    updateCache();
-                                }
-
-                                @Override
-                                public void onCityDoesNotExist() {
-                                    getCityCallback.onCityDoesNotExist();
-                                }
-                            });*/
-                        }
-                    } else {
-                        Log.d("tag", "cities empty");
-                    }
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    getCityCallback.onCityDoesNotExist();
-                }
-            });
-        } /*else {
-            localDataSource.getCities(new LocalDataSource.LoadCitiesCallback() {
-                @Override
-                public void onCitiesLoaded(List<CityEntity> cities) {
-                    for (CityEntity cityEntity : cities) {
-                        getCityCallback.onCityLoaded(cityEntity);
-                    }
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    getCityCallback.onCityDoesNotExist();
-                }
-            });
-        }*/
+            getCitiesFromDataSource(getCityCallback);
+        }
     }
 
-    public void saveCity(@NonNull CityEntity city) {
+    private void getCitiesFromDataSource(@NonNull GetCityCallback getCityCallback) {
+        localDataSource.getCities(new LocalDataSource.LoadCitiesCallback() {
+            @Override
+            public void onCitiesLoaded(List<CityEntity> cities) {
+                if (!cities.isEmpty()) {
+                    for (CityEntity cityEntity : cities) {
+                        remoteDataSource.getWeatherObject(cityEntity.getName(), new GetWeatherObjectCallback() {
+                            @Override
+                            public void onWeatherObjectLoaded(WeatherObject weatherObject) {
+                                refreshWeatherObjectInCache(weatherObject);
+                                getCityCallback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject));
+                            }
 
+                            @Override
+                            public void onFail() {
+                                getCityCallback.onCityDoesNotExist();
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                getCityCallback.onCityDoesNotExist();
+            }
+        });
+    }
+
+    private void getCitiesFromCache(@NonNull GetCityCallback getCityCallback) {
+        synchronized (weatherObjectsCache) {
+            for (WeatherObject weatherObject : weatherObjectsCache) {
+                CityEntity cityEntity = CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject);
+                getCityCallback.onCityLoaded(cityEntity);
+            }
+        }
     }
 
     @Override
@@ -153,33 +117,10 @@ public class CitiesRepository implements CityDataSource {
 
             @Override
             public void onCityDoesNotExist() {
-                Log.d("Tag", "on city not available");
+                callback.onCityDoesNotExist();
             }
         });
     }
-
-   /* public void updateCache() {
-        synchronized (weatherObjectsCache) {
-            weatherObjectsCache.addAll(remoteDataSource.getWeatherObjectList());
-            remoteDataSource.clearWeatherObjects();
-        }
-        //     cacheIsDirty = false;
-    }*/
-
-   /* public void refreshWeatherObjectInCache(String cityName) {
-        synchronized (weatherObjectsCache) {
-            for (WeatherObject newObject : remoteDataSource.getWeatherObjectList()) {
-                if (newObject.getName().equals(cityName)) {
-                    for (int i = 0; i < weatherObjectsCache.size(); i++) {
-                        if (newObject.getName().equals(cityName)) {
-                            weatherObjectsCache.set(i, newObject);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 
     public void addCity(String cityName, @NonNull AddCityCallback callback) {
         /* 1) check if city exists in database
@@ -204,9 +145,7 @@ public class CitiesRepository implements CityDataSource {
                             @Override
                             public void onCityAddedSuccessfully(CityEntity cityEntity) {
                                 refreshWeatherObjectInCache(weatherObject);
-                                //  synchronized (weatherObjectsCache){weatherObjectsCache.add(weatherObject);}
                                 callback.onCityAddedSuccessfully(cityEntity);
-                                // updateCache();
                             }
 
                             @Override
@@ -214,7 +153,6 @@ public class CitiesRepository implements CityDataSource {
                                 callback.onFail();
                             }
                         });
-
                     }
 
                     @Override
@@ -222,30 +160,6 @@ public class CitiesRepository implements CityDataSource {
                         callback.onFail();
                     }
                 });
-
-
-                /*remoteDataSource.getCity(cityName, new GetCityCallback() {
-                    @Override
-                    public void onCityLoaded(CityEntity city) {
-                        localDataSource.addCity(city, new LocalDataSource.AddCityCallback() {
-                            @Override
-                            public void onCityAddedSuccessfully(CityEntity cityEntity) {
-                                callback.onCityAddedSuccessfully(cityEntity);
-                                updateCache();
-                            }
-
-                            @Override
-                            public void onFail() {
-                                callback.onFail();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCityDoesNotExist() {
-                        callback.onFail();
-                    }
-                });*/
             }
 
             @Override
@@ -273,19 +187,25 @@ public class CitiesRepository implements CityDataSource {
 
     public WeatherObject getWeatherObjectWithName(String cityName) {
         synchronized (weatherObjectsCache) {
-            for (WeatherObject weatherObject : weatherObjectsCache) {
+            int saveIndex;
+            for (WeatherObject weatherObject: weatherObjectsCache) {
                 if (weatherObject.getName().equals(cityName)) {
                     return weatherObject;
                 }
             }
-            getWeatherObject(cityName);
-            for (WeatherObject weatherObject : weatherObjectsCache) {
-                if (weatherObject.getName().equals(cityName)) {
-                    return weatherObject;
+            saveIndex = weatherObjectsCache.size();
+
+            addWeatherObjectToCacheFromRemote(cityName);
+
+            if (saveIndex > weatherObjectsCache.size()) {
+                for (int i = saveIndex - 1; i < weatherObjectsCache.size(); i++) {
+                    if (weatherObjectsCache.get(i).getName().equals(cityName)) {
+                        return weatherObjectsCache.get(i);
+                    }
                 }
             }
         }
-        return null; // todo: kakvo pravim ako ne sushtestvyva takuv grad
+        return null;
     }
 
     public void refreshCities(List<City> cities, @NonNull CityDataSource.GetCityCallback getCityCallback) {
@@ -304,13 +224,8 @@ public class CitiesRepository implements CityDataSource {
                         @Override
                         public void onWeatherObjectLoaded(WeatherObject weatherObject) {
                             refreshWeatherObjectInCache(weatherObject);
-                            //   synchronized (weatherObjectsCache) {
-                            //       weatherObjectsCache.add(weatherObject);
-                            //   }
                             CityEntity newCity = CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject);
-                            localDataSource.refreshCity(newCity, (() -> {
-                                getCityCallback.onCityLoaded(newCity);
-                            }));
+                            localDataSource.refreshCity(newCity, (() -> getCityCallback.onCityLoaded(newCity)));
                         }
 
                         @Override
@@ -319,103 +234,25 @@ public class CitiesRepository implements CityDataSource {
                         }
                     });
                 }
-
-
-                   /* remoteDataSource.getCity(oldCity.getName(), new GetCityCallback() {
-                        @Override
-                        public void onCityLoaded(CityEntity newCity) {
-                            refreshWeatherObjectInCache(newCity.getName());
-                            localDataSource.refreshCity(newCity, (() -> {
-                                getCityCallback.onCityLoaded(newCity);
-                            }));
-                        }
-
-                        @Override
-                        public void onCityDoesNotExist() {
-                            getCityCallback.onCityDoesNotExist();
-                        }
-                    });
-                }*/
 
                 @Override
                 public void onCityDoesNotExist() {
                     getCityCallback.onCityDoesNotExist();
                 }
             });
-                   /*
-                    refreshWeatherObjectsInCache();
-                    localDataSource.refreshCity(cityEntity, new LocalDataSource.RefreshCityCallback() {
-                        @Override
-                        public void onRefreshCitySuccessfully() {
-                            getCityCallback.onCityLoaded(cityEntity);
-                        }
-                    });*/
-                    /*refreshCity(cityEntity, new AddCityCallback() {
-                        @Override
-                        public void onCityAddedSuccessfully(CityEntity cityEntity) {
-                            getCityCallback.onCityLoaded(cityEntity);
-                        }
-
-                        @Override
-                        public void onFail() {
-                            getCityCallback.onCityDoesNotExist();
-                        }
-                    });*/
         }
-
-               /* @Override
-                public void onCityDoesNotExist() {
-                    getCityCallback.onCityDoesNotExist();
-                }
-            });*/
     }
-    // getCities(getCityCallback);
-/*
-// todo: dolniqt blok e ako resha da ne gi triq vednaga, no togava kato vlqza sled nqkolko sekyndi v prilojenieto, pak shte se pokajat iztritite ot predi malko
-        for (City c : cities) {
-            remoteDataSource.getCity(c.getName(), new GetCityCallback() {
-                @Override
-                public void onCityLoaded(CityEntity cityEntity) {
-                    getCityCallback.onCityLoaded(cityEntity);
-                }
 
-                @Override
-                public void onCityDoesNotExist() {
-                    getCityCallback.onCityDoesNotExist();
-                }
-            });
-        }*/
-
-
-   /* private void refreshCity(CityEntity city, @NonNull AddCityCallback callback) {
-        localDataSource.addCity(city, new LocalDataSource.AddCityCallback() {
-            @Override
-            public void onCityAddedSuccessfully(CityEntity cityEntity) {
-                callback.onCityAddedSuccessfully(cityEntity);
-                updateCache();
-            }
-            @Override
-            public void onFail() {
-                callback.onFail();
-            }
-        });
-    }*/
-
-    private void refreshWeatherObjectInCache(WeatherObject newObject) {
-        boolean exist = false;
-        synchronized (weatherObjectsCache) {
+    public void refreshWeatherObjectInCache(WeatherObject newObject) {
+        synchronized (this) {
             for (int i = 0; i < weatherObjectsCache.size(); i++) {
                 if (weatherObjectsCache.get(i).getName().equals(newObject.getName())) {
-                    Log.d("refresh", "refresh " + weatherObjectsCache.get(i).getName());
-                    exist = true;
                     weatherObjectsCache.set(i, newObject);
                     return;
                 }
             }
-            if (!exist) {
-                Log.d("refresh", "refresh - does not exist " + newObject);
-                weatherObjectsCache.add(newObject);
-            }
+
+            weatherObjectsCache.add(newObject);
         }
     }
 
@@ -430,7 +267,7 @@ public class CitiesRepository implements CityDataSource {
         }
     }
 
-    private void getWeatherObject(String cityName) {
+    private void addWeatherObjectToCacheFromRemote(String cityName) {
         synchronized (weatherObjectsCache) {
             remoteDataSource.getWeatherObject(cityName, new GetWeatherObjectCallback() {
                 @Override

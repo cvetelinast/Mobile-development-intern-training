@@ -3,6 +3,7 @@ package com.example.tsvetelinastoyanova.weatherreportrevisited.citieslist;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -30,9 +31,10 @@ import com.example.tsvetelinastoyanova.weatherreportrevisited.util.Utils;
 import java.util.List;
 
 
-public class CitiesListFragment extends Fragment implements CitiesListContract.View, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
-    CitiesAdapter citiesAdapter;
-    RecyclerView recyclerView;
+public class CitiesListFragment extends Fragment implements CitiesListContract.View,
+        RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+
+    private CitiesAdapter citiesAdapter;
     private CitiesListContract.Presenter presenter;
     private TextInputLayout cityNameContainer;
     private CoordinatorLayout coordinatorLayout;
@@ -55,8 +57,7 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
         try {
             onClickCityDelegate = (OnClickCityDelegate) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
+            throw new ClassCastException(context.toString() + " must implement OnHeadlineSelectedListener");
         }
     }
 
@@ -66,19 +67,14 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cities_list, container, false);
         coordinatorLayout = view.findViewById(R.id.coordinator_layout);
         addClickListenerToAddCityButton(view.findViewById(R.id.add_city_button));
         setTextContainer(view.findViewById(R.id.new_city_wrapper));
-        recyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         createRecyclerView(recyclerView);
         return view;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     @Override
@@ -152,6 +148,40 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
         return citiesAdapter.getCitiesList();
     }
 
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof CitiesAdapter.MyViewHolder) {
+            String currentCityName = citiesAdapter.getCityNameOnIndex(position);
+
+            // backup of removed item for undo purpose
+            final City deletedItem = citiesAdapter.getCityOnIndex(position);
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            citiesAdapter.removeCity(viewHolder.getAdapterPosition());
+
+            showSnackbarWithUndo(currentCityName, deletedItem, deletedIndex);
+        }
+    }
+
+    private void showSnackbarWithUndo(String name, City deletedItem, int deletedIndex) {
+        Snackbar snackbar = Snackbar
+                .make(coordinatorLayout, getResources().getString(R.string.city_removed_message, name), Snackbar.LENGTH_LONG);
+
+        snackbar.addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
+            @Override
+            public void onDismissed(Snackbar transientBottomBar, int event) {
+                if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
+                    presenter.deleteCity(deletedItem);
+                }
+            }
+        }).setAction(R.string.undo, ((view) ->  // undo is selected, restore the deleted item
+                citiesAdapter.restoreCity(deletedItem, deletedIndex)
+        ));
+
+        snackbar.setActionTextColor(Color.YELLOW);
+        snackbar.show();
+    }
+
     private void addClickListenerToAddCityButton(Button addCityButton) {
         addCityButton.setOnClickListener((v) -> presenter.addNewCity(cityNameContainer.getEditText().getText().toString()));
     }
@@ -162,7 +192,7 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
     private void createRecyclerView(RecyclerView recyclerView) {
         OnItemClickListener onItemClickListener = (view, position) -> setWeatherObjectWhenClicked(citiesAdapter.getCityNameOnIndex(position));
-        citiesAdapter = new CitiesAdapter(presenter, onItemClickListener);
+        citiesAdapter = new CitiesAdapter(onItemClickListener);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -170,41 +200,6 @@ public class CitiesListFragment extends Fragment implements CitiesListContract.V
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-    }
-
-    @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        if (viewHolder instanceof CitiesAdapter.MyViewHolder) {
-            // get the removed item name to display it in snack bar
-            String name = citiesAdapter.getCityNameOnIndex(position);
-
-            // backup of removed item for undo purpose
-            final City deletedItem = citiesAdapter.getCityOnIndex(position);
-            final int deletedIndex = viewHolder.getAdapterPosition();
-
-            // remove the item from recycler view
-            citiesAdapter.removeCity(viewHolder.getAdapterPosition());
-
-            // showing snack bar with Undo option
-            Snackbar snackbar = Snackbar
-                    .make(coordinatorLayout, name + " removed from list with cities!", Snackbar.LENGTH_LONG);
-
-            snackbar.addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                @Override
-                public void onDismissed(Snackbar transientBottomBar, int event) {
-                    Log.i("onDismissed", "delete, event: " + event);
-                    if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
-                        presenter.deleteCity(deletedItem);
-                    }
-                }
-            });
-            snackbar.setAction("UNDO", ((view) ->  // undo is selected, restore the deleted item
-                    citiesAdapter.restoreCity(deletedItem, deletedIndex)
-            ));
-
-            snackbar.setActionTextColor(Color.YELLOW);
-            snackbar.show();
-        }
     }
 
 }

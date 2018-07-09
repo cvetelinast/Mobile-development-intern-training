@@ -5,6 +5,8 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.example.tsvetelinastoyanova.weatherreportrevisited.Constants;
+import com.example.tsvetelinastoyanova.weatherreportrevisited.R;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.CityEntity;
 
 @Database(entities = {CityEntity.class}, version = 1, exportSchema = false)
@@ -20,7 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
         synchronized (sLock) {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, "cities")
+                        AppDatabase.class, Constants.DATABASE_NAME)
                         .build();
             }
             return INSTANCE;

@@ -10,7 +10,6 @@ import com.example.tsvetelinastoyanova.weatherreportrevisited.R;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.CitiesRepository;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local.AppDatabase;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local.CitiesLocalDataSource;
-import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.local.LocalDataSource;
 import com.example.tsvetelinastoyanova.weatherreportrevisited.data.source.remote.CitiesRemoteDataSource;
 
 public class Utils {
