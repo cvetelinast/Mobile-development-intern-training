@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Weather Report App</string>
+
+    <string name="hello_first_fragment">Hello first view</string>
+    <string name="hello_second_fragment">Hello second view</string>
+    <string name="hint_city_input">Madrid</string>
+    <string name="add_city_button">Add</string>
+    <string name="added_city">City added successfully</string>
+    <string name="existing_city">The city was already added</string>
+    <string name="not_added_city">A problem with adding city occured.</string>
+    <string name="problem_loading_cities">A problem loading cities occurred.</string>
+    <string name="problem_deleting_cities">A problem with deletion occurred.</string>
+    <string name="city_deleted_success">The city was deleted successfully.</string>
+    <string name="delete">Delete</string>
+    <string name="fragment_weather_details_toolbar">More information:</string>
+    <string name="undo">UNDO</string>
+    <string name="city_removed_message">%s removed from list with cities."</string>
+
+    <!--temperature properties-->
+    <string name="temperature_min">Minimum temperature: %s</string>
+    <string name="temperature_max">Maximum temperature: %s</string>
+    <string name="pressure">Pressure: %d hpa</string>
+    <string name="humidity">Humidity: %d</string>
+    <string name="wind_speed">Speed of wind: %.2f m/s</string>
+    <string name="title_activity_details">DetailsActivity</string>
+
+</resources>
