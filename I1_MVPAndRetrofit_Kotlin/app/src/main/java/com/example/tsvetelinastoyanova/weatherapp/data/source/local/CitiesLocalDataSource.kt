@@ -1,55 +1,35 @@
 package com.example.tsvetelinastoyanova.weatherapp.data.source.local
 
-import android.content.Context
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
 import com.example.tsvetelinastoyanova.weatherapp.util.AppExecutors
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
+import io.reactivex.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class CitiesLocalDataSource private constructor(private val mAppExecutors: AppExecutors,
                                                 private val cityDao: CityDao) : CityDataSource, LocalDataSource {
 
-    override fun getCities(callback: LocalDataSource.LoadCitiesCallback) {
-        Utils.checkNotNull(callback)
-        val runnable = {
-            val cities = cityDao.all
-            mAppExecutors.mainThread().execute({
-                if (cities.isEmpty()) {
-                    callback.onDataNotAvailable()
-                } else {
-                    callback.onCitiesLoaded(cities)
-                }
-            })
-        }
-
-        mAppExecutors.databaseIO().execute(runnable)
+    override fun getCities(): Flowable<List<CityEntity>> {
+        return cityDao.getAll().subscribeOn(Schedulers.single())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun getCity(cityName: String, callback: CityDataSource.GetCityCallback) {
+    override fun getCity(cityName: String): Single<CityEntity> {
         Utils.checkNotNull(cityName)
-        Utils.checkNotNull(callback)
-        val runnable = {
-            val city = cityDao.getCity(cityName)
-            mAppExecutors.mainThread().execute({
-
-                if (city == null) {
-                    callback.onCityDoesNotExist()
-                } else {
-                    callback.onCityLoaded(city)
-                }
-            })
-        }
-        mAppExecutors.databaseIO().execute(runnable)
+        return cityDao.getCity(cityName)
+                .observeOn(Schedulers.single())
     }
 
-    override fun addCity(cityEntity: CityEntity, addCityCallback: LocalDataSource.AddCityCallback) {
+    override fun addCity(cityEntity: CityEntity): Single<CityEntity> {
         Utils.checkNotNull(cityEntity)
-        Utils.checkNotNull(addCityCallback)
-        val runnable = {
+        return Single.fromCallable {
             cityDao.insertCity(cityEntity)
-            mAppExecutors.mainThread().execute({ addCityCallback.onCityAddedSuccessfully(cityEntity) })
+            cityEntity
         }
-        mAppExecutors.databaseIO().execute(runnable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
     }
 
     override fun refreshCity(newCity: CityEntity, refreshCityCallback: LocalDataSource.RefreshCityCallback) {

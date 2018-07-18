@@ -1,7 +1,10 @@
 package com.example.tsvetelinastoyanova.weatherapp.model.currentweather
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class CurrentWeatherObject(
         @SerializedName("coord") val coord: Coord,
         @SerializedName("weather") val weather: List<Weather>,
@@ -15,4 +18,4 @@ data class CurrentWeatherObject(
         @SerializedName("id") val id: Int,
         @SerializedName("name") val name: String,
         @SerializedName("cod") val cod: Int
-)
+) : Parcelable

@@ -36,7 +36,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
                 view.showNewCityAdded(CityEntityAdapter.convertCityEntityToCity(cityEntity))
             }
 
-            override fun onFail() {
+            override fun onCityExistsInDatabase() {
                 view.showErrorAddingAddedCity()
             }
         })

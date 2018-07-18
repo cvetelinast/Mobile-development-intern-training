@@ -11,6 +11,7 @@ import com.example.tsvetelinastoyanova.weatherapp.R
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.util.ImageOperator
 import kotlinx.android.synthetic.main.fragment_weather_details.*
+import kotlinx.android.synthetic.main.fragment_weather_details.view.*
 
 
 class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
@@ -24,8 +25,8 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_weather_details, container, false)
-        toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black_24dp)
-        toolbar.setNavigationOnClickListener({ _ -> activity?.onBackPressed() })
+        view.toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black_24dp)
+        view.toolbar.setNavigationOnClickListener({ _ -> activity?.onBackPressed() })
         return view
     }
 

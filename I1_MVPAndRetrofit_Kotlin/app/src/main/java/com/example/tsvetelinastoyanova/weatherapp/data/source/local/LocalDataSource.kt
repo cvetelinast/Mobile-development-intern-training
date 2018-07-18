@@ -2,6 +2,10 @@ package com.example.tsvetelinastoyanova.weatherapp.data.source.local
 
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 
 
 interface LocalDataSource : CityDataSource {
@@ -17,7 +21,7 @@ interface LocalDataSource : CityDataSource {
 
         fun onCityAddedSuccessfully(cityEntity: CityEntity)
 
-        fun onFail()
+        fun onCityExistsInDatabase()
     }
 
     interface DeleteCityCallback {
@@ -33,9 +37,9 @@ interface LocalDataSource : CityDataSource {
 
     }
 
-    fun getCities(callback: LoadCitiesCallback)
+    fun getCities(): Flowable<List<CityEntity>>
 
-    fun addCity(cityEntity: CityEntity, addCityCallback: AddCityCallback)
+    fun addCity(cityEntity: CityEntity): Single<CityEntity>
 
     fun refreshCity(cityEntity: CityEntity, refreshCityCallback: LocalDataSource.RefreshCityCallback)
 

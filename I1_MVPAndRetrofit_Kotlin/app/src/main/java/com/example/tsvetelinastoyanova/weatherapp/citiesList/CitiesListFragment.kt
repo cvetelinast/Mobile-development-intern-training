@@ -22,6 +22,7 @@ import com.example.tsvetelinastoyanova.weatherapp.citiesList.visualization.Citie
 import com.example.tsvetelinastoyanova.weatherapp.citiesList.visualization.RecyclerItemTouchHelper
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import kotlinx.android.synthetic.main.fragment_cities_list.*
+import kotlinx.android.synthetic.main.fragment_cities_list.view.*
 
 
 class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
@@ -54,9 +55,9 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_cities_list, container, false)
-        addClickListenerToAddCityButton(addCityButton)
-        setTextContainer(newCityWrapper)
-        createRecyclerView(recyclerView)
+        addClickListenerToAddCityButton(view.addCityButton)
+        setTextContainer(view.newCityWrapper)
+        createRecyclerView(view.recyclerView)
         return view
     }
 
