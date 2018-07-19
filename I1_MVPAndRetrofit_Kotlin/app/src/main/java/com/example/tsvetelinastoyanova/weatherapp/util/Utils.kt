@@ -42,6 +42,15 @@ object Utils {
         transaction.commit()
     }
 
+    fun removeFragment(fragmentManager: FragmentManager,
+                       fragment: Fragment) {
+        checkNotNull(fragmentManager)
+        checkNotNull(fragment)
+        val transaction = fragmentManager.beginTransaction()
+        transaction.remove(fragment)
+        transaction.commit()
+    }
+
     fun <T> checkNotNull(reference: T?): T {
         if (reference == null) {
             throw NullPointerException()

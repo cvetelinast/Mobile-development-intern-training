@@ -10,6 +10,7 @@
     <string name="not_added_city">A problem with adding city occured.</string>
     <string name="problem_loading_cities">A problem loading cities occurred.</string>
     <string name="problem_deleting_cities">A problem with deletion occurred.</string>
+    <string name="problem_not_valid_city_name">This city is not valid.</string>
     <string name="city_deleted_success">The city was deleted successfully.</string>
     <string name="delete">Delete</string>
     <string name="fragment_weather_details_toolbar">More information:</string>

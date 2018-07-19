@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.Constants
 import com.example.tsvetelinastoyanova.weatherapp.R
+import kotlinx.android.synthetic.main.city.view.*
 import java.util.ArrayList
 
 typealias OnItemClickListener = (View, Int) -> Unit
@@ -19,18 +20,13 @@ class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : Recy
     val citiesList: MutableList<City> = ArrayList()
 
     class MyViewHolder internal constructor(view: View, private val onItemClickListener: OnItemClickListener) : RecyclerView.ViewHolder(view), CityRowView, View.OnClickListener {
-        var name: TextView
-        var temperature: TextView
-        var icon: ImageView
-        internal var viewBackground: RelativeLayout
-        internal var viewForeground: RelativeLayout
+        private var name: TextView = view.name
+        var temperature: TextView = view.temperature
+        var icon: ImageView = view.icon
+        internal var viewBackground: RelativeLayout = view.view_background
+        internal var viewForeground: RelativeLayout = view.view_foreground
 
         init {
-            name = view.findViewById(R.id.name)
-            temperature = view.findViewById(R.id.temperature)
-            icon = view.findViewById(R.id.icon)
-            viewBackground = view.findViewById(R.id.view_background)
-            viewForeground = view.findViewById(R.id.view_foreground)
             view.setOnClickListener(this)
         }
 
@@ -79,7 +75,7 @@ class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : Recy
     fun refreshCity(newCity: City) {
         for (i in 0 until citiesList.size) {
             val c = citiesList[i]
-            if (c.name.equals(newCity.name)) {
+            if (c.name == newCity.name) {
                 citiesList[i] = newCity
                 notifyItemChanged(i)
                 return

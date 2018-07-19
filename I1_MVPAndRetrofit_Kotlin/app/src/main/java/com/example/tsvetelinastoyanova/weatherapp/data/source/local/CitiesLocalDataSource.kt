@@ -32,18 +32,27 @@ class CitiesLocalDataSource private constructor(private val mAppExecutors: AppEx
                 .subscribeOn(Schedulers.single())
     }
 
-    override fun refreshCity(newCity: CityEntity, refreshCityCallback: LocalDataSource.RefreshCityCallback) {
+    override fun refreshCity(newCity: CityEntity): Single<CityEntity> {
         Utils.checkNotNull(newCity)
-        Utils.checkNotNull(refreshCityCallback)
-        val runnable = lambda@{
+        return Single.fromCallable {
+            cityDao.updateCity(newCity.name, newCity.lastTemperature, newCity.lastImageId)
 
-            newCity.name?.let {
-                cityDao.updateCity(it, newCity.lastTemperature, newCity.lastImageId)
-                mAppExecutors.mainThread().execute({ refreshCityCallback.onRefreshCitySuccessfully() })
-            }
-            return@lambda
+            val cityEntity = CityEntity()
+            cityEntity.name = newCity.name; cityEntity.lastTemperature = newCity.lastTemperature; cityEntity.lastImageId = newCity.lastImageId
+            cityEntity
         }
-        mAppExecutors.databaseIO().execute(runnable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
+
+        /* val runnable = lambda@{
+             newCity.name?.let {
+                 cityDao.updateCity(it, newCity.lastTemperature, newCity.lastImageId)
+                 mAppExecutors.mainThread().execute({ refreshCityCallback.onRefreshCitySuccessfully() })
+             }
+             return@lambda
+         }
+
+         mAppExecutors.databaseIO().execute(runnable)*/
     }
 
     override fun deleteCity(cityName: String, callback: LocalDataSource.DeleteCityCallback) {

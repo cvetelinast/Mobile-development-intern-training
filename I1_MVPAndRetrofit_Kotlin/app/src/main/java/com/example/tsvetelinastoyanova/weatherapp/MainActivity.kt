@@ -34,38 +34,36 @@ class MainActivity : AppCompatActivity(), CitiesListFragment.OnClickCityDelegate
             weatherDetailsFragment?.changeView(currentWeatherObject)
         } else {
             val i = Intent(this@MainActivity, WeatherDetailsActivity::class.java)
-            if (currentWeatherObject != null) {
-                // todo: put parcellable
-                i.putExtra(Constants.WEATHER_OBJECTS, currentWeatherObject)
-                startActivity(i)
-            }
+            i.putExtra(Constants.WEATHER_OBJECTS, currentWeatherObject)
+            startActivity(i)
         }
     }
 
     private fun createCitiesListFragment() {
         var citiesListFragment: CitiesListFragment? = supportFragmentManager.findFragmentById(R.id.list_fragment_container) as? CitiesListFragment
-        if (citiesListFragment == null) {
-            citiesListFragment = CitiesListFragment()
-            val citiesRepository: CitiesRepository? = Utils.provideCityRepository(applicationContext)
-            citiesRepository?.let {
-                val citiesListPresenter = CitiesListPresenter(citiesListFragment, it)
-                citiesListFragment.setPresenter(citiesListPresenter)
-                Utils.addFragmentToActivity(
-                        supportFragmentManager, citiesListFragment, R.id.list_fragment_container)
-            }
+        if (citiesListFragment != null) {
+            Utils.removeFragment(supportFragmentManager, citiesListFragment)
+        }
+        citiesListFragment = CitiesListFragment()
+        val citiesRepository: CitiesRepository? = Utils.provideCityRepository(applicationContext)
+        citiesRepository?.let {
+            val citiesListPresenter = CitiesListPresenter(citiesListFragment, it)
+            citiesListFragment.setPresenter(citiesListPresenter)
+            Utils.addFragmentToActivity(
+                    supportFragmentManager, citiesListFragment, R.id.list_fragment_container)
         }
     }
 
     private fun createWeatherDetailsFragment() {
         var weatherDetailsFragment: WeatherDetailsFragment? = supportFragmentManager.findFragmentById(R.id.details_fragment_container) as? WeatherDetailsFragment
-        if (weatherDetailsFragment == null) {
-            weatherDetailsFragment = WeatherDetailsFragment.newInstance()
-            val weatherDetailsPresenter = WeatherDetailsPresenter()
-            weatherDetailsFragment.setPresenter(weatherDetailsPresenter)
-            this.weatherDetailsFragment = weatherDetailsFragment
-            Utils.addFragmentToActivity(
-                    supportFragmentManager, weatherDetailsFragment, R.id.details_fragment_container)
+        if (weatherDetailsFragment != null) {
+            Utils.removeFragment(supportFragmentManager, weatherDetailsFragment)
         }
+        weatherDetailsFragment = WeatherDetailsFragment.newInstance()
+        val weatherDetailsPresenter = WeatherDetailsPresenter()
+        weatherDetailsFragment.setPresenter(weatherDetailsPresenter)
+        this.weatherDetailsFragment = weatherDetailsFragment
+        Utils.addFragmentToActivity(
+                supportFragmentManager, weatherDetailsFragment, R.id.details_fragment_container)
     }
-
 }

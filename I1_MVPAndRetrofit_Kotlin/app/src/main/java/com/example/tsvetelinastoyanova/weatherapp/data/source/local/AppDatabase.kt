@@ -7,9 +7,6 @@ import android.content.Context
 import com.example.tsvetelinastoyanova.weatherapp.Constants
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 
-/**
- * The Room database that contains the Users table
- */
 @Database(entities = [CityEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -22,8 +19,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): AppDatabase =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE ?:
-                    buildDatabase(context)
+                    INSTANCE ?: buildDatabase(context)
                             .also { INSTANCE = it }
                 }
 

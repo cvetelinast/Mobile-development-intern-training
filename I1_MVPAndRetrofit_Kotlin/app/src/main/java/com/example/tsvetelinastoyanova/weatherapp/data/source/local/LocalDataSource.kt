@@ -41,7 +41,7 @@ interface LocalDataSource : CityDataSource {
 
     fun addCity(cityEntity: CityEntity): Single<CityEntity>
 
-    fun refreshCity(cityEntity: CityEntity, refreshCityCallback: LocalDataSource.RefreshCityCallback)
+    fun refreshCity(cityEntity: CityEntity) : Single<CityEntity>
 
     fun deleteCity(cityName: String, callback: LocalDataSource.DeleteCityCallback)
 }

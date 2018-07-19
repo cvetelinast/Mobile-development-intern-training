@@ -18,6 +18,8 @@ interface CitiesListContract {
 
         fun showErrorDeleteCity()
 
+        fun showErrorNotValidCityName()
+
         fun showCityLoaded(city: City)
 
         fun showCityUpdated(city: City)
@@ -30,7 +32,7 @@ interface CitiesListContract {
     interface Presenter : BasePresenter {
         fun loadCities()
 
-        fun addNewCity(s: String)
+        fun addNewCity(s: String?)
 
         //    void updateCity(CityEntity s);
 

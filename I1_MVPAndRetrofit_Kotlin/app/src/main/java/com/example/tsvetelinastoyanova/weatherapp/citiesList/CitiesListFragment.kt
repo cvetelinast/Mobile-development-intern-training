@@ -26,12 +26,9 @@ import kotlinx.android.synthetic.main.fragment_cities_list.view.*
 
 
 class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
-
     private var citiesAdapter: CitiesAdapter? = null
     private var presenter: CitiesListContract.Presenter? = null
     private var cityNameContainer: TextInputLayout? = null
-
-    private var isFirstTimeLoading = true
 
     /*** interface  */
 
@@ -63,12 +60,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onResume() {
         super.onResume()
-        presenter?.let {
-            if (isFirstTimeLoading) {
-                isFirstTimeLoading = false
-                it.start()
-            }
-        }
+        presenter?.let(CitiesListContract.Presenter::start)
     }
 
     /*** Methods from CitiesListContract.View  */
@@ -81,9 +73,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     }
 
     override fun setPresenter(presenter: CitiesListContract.Presenter) {
-        presenter.let {
-            this.presenter = presenter
-        }
+        this.presenter = presenter
     }
 
     override fun showNewCityAdded(newCity: City) {
@@ -106,6 +96,10 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun showErrorDeleteCity() {
         Toast.makeText(context, R.string.problem_deleting_cities, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showErrorNotValidCityName() {
+        Toast.makeText(context, R.string.problem_not_valid_city_name, Toast.LENGTH_SHORT).show()
     }
 
     override fun showCityLoaded(city: City) {
@@ -146,7 +140,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
                     }
                 }
             }
-        }).setAction(R.string.undo, { view ->
+        }).setAction(R.string.undo, { _ ->
             // undo is selected, restore the deleted item
             deletedItem?.let {
                 citiesAdapter?.restoreCity(deletedItem, deletedIndex)
@@ -170,7 +164,6 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
             citiesAdapter?.let {
                 setWeatherObjectWhenClicked(it.getCityNameOnIndex(position))
             }
-
             return@lambda
         }
 

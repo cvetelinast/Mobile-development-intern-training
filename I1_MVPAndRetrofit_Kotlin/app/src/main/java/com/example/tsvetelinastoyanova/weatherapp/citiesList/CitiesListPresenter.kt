@@ -30,16 +30,20 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
         })
     }
 
-    override fun addNewCity(cityName: String) {
-        citiesRepository.addCity(cityName, object : LocalDataSource.AddCityCallback {
-            override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
-                view.showNewCityAdded(CityEntityAdapter.convertCityEntityToCity(cityEntity))
-            }
+    override fun addNewCity(cityName: String?) {
+        if (cityName == null) {
+            cityName ?: view.showErrorNotValidCityName()
+        } else {
+            citiesRepository.addCity(cityName, object : LocalDataSource.AddCityCallback {
+                override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
+                    view.showNewCityAdded(CityEntityAdapter.convertCityEntityToCity(cityEntity))
+                }
 
-            override fun onCityExistsInDatabase() {
-                view.showErrorAddingAddedCity()
-            }
-        })
+                override fun onCityExistsInDatabase() {
+                    view.showErrorAddingAddedCity()
+                }
+            })
+        }
     }
 
     override fun deleteCity(city: City) {
@@ -76,6 +80,6 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
     private fun setTimerToRefresh() {
         Handler().postDelayed({
             refreshCities(view.getDisplayedCities())
-        }, 900000)
+        }, 10000/*900000*/)
     }
 }
