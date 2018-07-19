@@ -22,6 +22,8 @@ interface LocalDataSource : CityDataSource {
         fun onCityAddedSuccessfully(cityEntity: CityEntity)
 
         fun onCityExistsInDatabase()
+
+        fun onNotValidCity()
     }
 
     interface DeleteCityCallback {
@@ -41,7 +43,7 @@ interface LocalDataSource : CityDataSource {
 
     fun addCity(cityEntity: CityEntity): Single<CityEntity>
 
-    fun refreshCity(cityEntity: CityEntity) : Single<CityEntity>
+    fun refreshCity(cityEntity: CityEntity): Single<CityEntity>
 
-    fun deleteCity(cityName: String, callback: LocalDataSource.DeleteCityCallback)
+    fun deleteCity(cityName: String): Single<String>
 }

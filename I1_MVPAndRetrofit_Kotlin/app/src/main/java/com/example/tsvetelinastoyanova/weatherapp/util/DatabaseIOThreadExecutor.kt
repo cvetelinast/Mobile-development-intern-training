@@ -3,7 +3,7 @@ package com.example.tsvetelinastoyanova.weatherapp.util
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class DatabaseIOThreadExecutor : Executor {
+/*class DatabaseIOThreadExecutor : Executor {
 
     private val mDiskIO: Executor
 
@@ -14,4 +14,4 @@ class DatabaseIOThreadExecutor : Executor {
     override fun execute(command: Runnable) {
         mDiskIO.execute(command)
     }
-}
+}*/

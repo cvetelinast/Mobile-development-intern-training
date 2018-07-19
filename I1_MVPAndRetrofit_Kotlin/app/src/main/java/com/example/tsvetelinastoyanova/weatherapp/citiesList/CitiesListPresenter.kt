@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.weatherapp.citiesList
 
 import android.os.Handler
+import android.util.Log
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CitiesRepository
@@ -41,6 +42,10 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
 
                 override fun onCityExistsInDatabase() {
                     view.showErrorAddingAddedCity()
+                }
+
+                override fun onNotValidCity() {
+                    view.showErrorNotValidCityName()
                 }
             })
         }

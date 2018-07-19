@@ -5,7 +5,7 @@ import android.os.Looper
 import android.support.annotation.VisibleForTesting
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-
+/*
 
 class AppExecutors @VisibleForTesting
 internal constructor(private val databaseIO: Executor, private val networkIO: Executor, private val mainThread: Executor) {
@@ -37,4 +37,4 @@ internal constructor(private val databaseIO: Executor, private val networkIO: Ex
 
         private val THREAD_COUNT = 3
     }
-}
+}*/

@@ -23,7 +23,7 @@ object Utils {
         checkNotNull(context)
         val database = AppDatabase.getInstance(context)
 
-        val localDataSource: CitiesLocalDataSource? = CitiesLocalDataSource.getInstance(AppExecutors(), database.cityDao())
+        val localDataSource: CitiesLocalDataSource? = CitiesLocalDataSource.getInstance(database.cityDao())
         val remoteDataSource: CitiesRemoteDataSource? = CitiesRemoteDataSource.getInstance()
         localDataSource?.apply {
             remoteDataSource?.let {

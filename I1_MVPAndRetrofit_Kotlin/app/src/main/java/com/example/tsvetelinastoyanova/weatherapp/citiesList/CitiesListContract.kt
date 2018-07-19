@@ -26,7 +26,7 @@ interface CitiesListContract {
 
         fun setWeatherObjectWhenClicked(cityName: String)
 
-        fun getDisplayedCities() : MutableList<City>?
+        fun getDisplayedCities(): MutableList<City>?
     }
 
     interface Presenter : BasePresenter {
@@ -34,15 +34,10 @@ interface CitiesListContract {
 
         fun addNewCity(s: String?)
 
-        //    void updateCity(CityEntity s);
-
         fun deleteCity(city: City)
 
         fun refreshCities(cities: MutableList<City>?)
 
         fun getWeatherObjectOnClick(cityName: String): CurrentWeatherObject?
-
-
-        //    void addNewWeatherObject(WeatherObject weatherObject);
     }
 }

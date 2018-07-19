@@ -9,10 +9,8 @@ import com.example.tsvetelinastoyanova.weatherapp.model.forecast.ForecastObject
 import com.example.tsvetelinastoyanova.weatherapp.util.CityEntityAdapter
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
@@ -24,9 +22,6 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
 
     internal var weatherObjectsCache: MutableList<CurrentWeatherObject> = ArrayList()
     internal var forecastObjectsCache: MutableList<ForecastObject> = ArrayList()
-
-
-    private val disposables = CompositeDisposable()
 
     companion object {
         @Volatile
@@ -78,31 +73,6 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
                         { currentWeatherObject -> getCityCallback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(currentWeatherObject)) },
                         { error -> getCityCallback.onCityDoesNotExist() }
                 )
-
-
-        /*   localDataSource.getCities(
-           object : LocalDataSource.LoadCitiesCallback {
-               override fun onCitiesLoaded(cities: List<CityEntity>) {
-                   if (!cities.isEmpty()) {
-                       for (cityEntity in cities) {
-                           cityEntity.name?.let {
-                               val weatherObjectSingle = remoteDataSource.getWeatherObject(it)
-                               val disposable = weatherObjectSingle
-                                       .subscribe(
-                                               { weatherObject ->
-                                                   refreshWeatherObjectInCache(weatherObject)
-                                                   getCityCallback.onCityLoaded(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject)) // trqbva da vleze tyk, no ne vliza
-                                               },
-                                               { error -> getCityCallback.onCityDoesNotExist() })
-                           }
-                       }
-                   }
-               }
-
-               override fun onDataNotAvailable() {
-                   getCityCallback.onCityDoesNotExist()
-               }
-           })*/
     }
 
     private fun getCitiesFromCache(getCityCallback: CityDataSource.GetCityCallback) {
@@ -133,85 +103,38 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
         Utils.checkNotNull(cityName)
         Utils.checkNotNull(callback)
 
-        // OLD:
-        /*
-         localDataSource.getCity(cityName, object : CityDataSource.GetCityCallback {
-            override fun onCityDoesNotExist(){
-                remoteDataSource.getWeatherObject(cityName, object : CityDataSource.GetWeatherObjectCallback {
-            override fun onWeatherObjectLoaded(weatherObject: CurrentWeatherObject) {
-            // todo: tyk
-
-            //       val observable: Observable<CityEntity> = localDataSource.addCity(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject))
-            localDataSource.addCity(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject),
-                    object : LocalDataSource.AddCityCallback {
-                        override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
-                            refreshWeatherObjectInCache(weatherObject)
-                            callback.onCityAddedSuccessfully(cityEntity)
-                        }
-
-                        override fun onCityExistsInDatabase() {
-                            callback.onCityExistsInDatabase()
-                        }
-                    })
-            *//* observable.subscribe(
-                     { value ->
-                         refreshWeatherObjectInCache(weatherObject)
-                         callback.onCityAddedSuccessfully(value)
-                     },
-                     { err -> callback.onCityExistsInDatabase() }
-             )*//*
-        }
-
-        override fun onCityExistsInDatabase() {
-            callback.onCityExistsInDatabase()
-        }
-    })
-    }*/
-
-        /*  override fun onCityLoaded(city: CityEntity) {
-        callback.onCityExistsInDatabase()
-        }
-        })*/
-
-        // NEW:
-        val getCitySingle = localDataSource.getCity(cityName)
         val s = remoteDataSource.getWeatherObject(cityName)
                 .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
                 .flatMap { weatherObject ->
                     localDataSource.addCity(CityEntityAdapter.convertWeatherObjectToCityEntity(weatherObject))
                             .map { cityEntity: CityEntity -> cityEntity to weatherObject }
-                }.doOnSuccess {
+                }
+                .doOnSuccess {
                     refreshWeatherObjectInCache(it.second)
                     callback.onCityAddedSuccessfully(it.first)
-                }.map { it.first }
+                }
+                .map { it.first }
 
-        val disposable = getCitySingle
+
+        localDataSource.getCity(cityName)
                 .doOnSuccess { callback.onCityExistsInDatabase() }
                 .onErrorResumeNext(s)
-                .subscribe()
-
-        disposables.add(disposable)
+                .subscribe(
+                        {},
+                        { error -> callback.onNotValidCity() }
+                )
     }
 
-/*
-.subscribe(
-      { cityEntity ->},
-      { callback.onCityExistsInDatabase()}
-)}
-*/
 
     fun deleteCity(cityName: String, deleteCityCallback: LocalDataSource.DeleteCityCallback) {
         Utils.checkNotNull(cityName)
-        localDataSource.deleteCity(cityName, object : LocalDataSource.DeleteCityCallback {
-            override fun onCityDeletedSuccessfully() {
-                deleteWeatherObjectFromCache(cityName)
-                deleteCityCallback.onCityDeletedSuccessfully()
-            }
-
-            override fun onFail() {
-                deleteCityCallback.onFail()
-            }
-        })
+        localDataSource.deleteCity(cityName)
+                .doOnError { error -> deleteCityCallback.onFail() }
+                .flatMap { delete -> deleteWeatherObjectFromCache(delete) }
+                .subscribe(
+                        { city -> deleteCityCallback.onCityDeletedSuccessfully() },
+                        { fail -> deleteCityCallback.onFail() }
+                )
     }
 
     fun getWeatherObjectWithName(cityName: String): CurrentWeatherObject? {
@@ -239,56 +162,28 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
 
     fun refreshCities(cities: List<City>, getCityCallback: CityDataSource.GetCityCallback) {
         /* foreach city
-        load from DB
-        get name and load from API
-        refresh cache
-        refresh DB
-        refresh UI
+            load from DB
+            get name and load from API
+            refresh cache
+            refresh DB
+            refresh UI
         */
-/*Flowable.fromIterable(cities).forEach{city ->  getCity(city.name)}
-        (cities.forEach{
-    city ->  getCity(city.name)
-})*/
-        for (c in cities) {
-            val observable: Single<CityEntity> = getCity(c.name)
-
-            observable
-                    .doOnError { error -> getCityCallback.onCityDoesNotExist() }
-                    .flatMap { city -> remoteDataSource.getWeatherObject(city.name) }
-                    .doOnError { error -> getCityCallback.onCityDoesNotExist() }
-                    .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
-                    .flatMap { weatherObject -> refreshWeatherObjectInCache(weatherObject) }
-                    .doOnError { error -> getCityCallback.onCityDoesNotExist() }
-                    .map { newCity -> CityEntityAdapter.convertWeatherObjectToCityEntity(newCity) }
-                    .flatMap { newCity -> localDataSource.refreshCity(newCity) }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            { success -> getCityCallback.onCityLoaded(success) },
-                            { error -> getCityCallback.onCityDoesNotExist() }
-                    )
-        }
-
-        /* for (c in cities) {
-             val observable: Single<CityEntity> = getCity(c.name)
-
-             observable.subscribe(
-                     { oldCity ->
-                         remoteDataSource.getWeatherObject(oldCity.name)
-                                 .subscribe(
-                                         { weatherObject -> val currentWeatherObject = Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject)
-                                             refreshWeatherObjectInCache(currentWeatherObject)
-                                             val newCity = CityEntityAdapter.convertWeatherObjectToCityEntity(currentWeatherObject)
-                                             localDataSource.refreshCity(newCity)
-                                             *//*  localDataSource.refreshCity(newCity, LocalDataSource.RefreshCityCallback {
-                                              getCityCallback.onCityLoaded(newCity) }) *//*
-                                        },
-                                        { error -> getCityCallback.onCityDoesNotExist() }
-                                )
-                    },
-                    { err -> getCityCallback.onCityDoesNotExist() }
-            )
-        }*/
+        Flowable.fromIterable(cities)
+                .flatMap { city -> getCity(city.name).toFlowable() }
+                .doOnError { error -> getCityCallback.onCityDoesNotExist() }
+                .flatMap { city -> remoteDataSource.getWeatherObject(city.name).toFlowable() }
+                .doOnError { error -> getCityCallback.onCityDoesNotExist() }
+                .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
+                .flatMap { weatherObject -> refreshWeatherObjectInCache(weatherObject).toFlowable() }
+                .doOnError { error -> getCityCallback.onCityDoesNotExist() }
+                .map { newCity -> CityEntityAdapter.convertWeatherObjectToCityEntity(newCity) }
+                .flatMap { newCity -> localDataSource.refreshCity(newCity).toFlowable() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        { success -> getCityCallback.onCityLoaded(success) },
+                        { error -> getCityCallback.onCityDoesNotExist() }
+                )
     }
 
     fun refreshWeatherObjectInCache(newObject: CurrentWeatherObject): Single<CurrentWeatherObject> {
@@ -310,15 +205,18 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
         }
     }
 
-    private fun deleteWeatherObjectFromCache(cityName: String) {
+    private fun deleteWeatherObjectFromCache(cityName: String): Single<String> {
         synchronized(weatherObjectsCache) {
-            for (weatherObject in weatherObjectsCache) {
+            loop@ for (weatherObject in weatherObjectsCache) {
                 if (weatherObject.name == cityName) {
                     weatherObjectsCache.remove(weatherObject)
-                    return
+                    break@loop
                 }
             }
         }
+        return Single.just(cityName)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
     }
 
     private fun addWeatherObjectToCacheFromRemote(cityName: String) {

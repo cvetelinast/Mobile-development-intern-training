@@ -2,24 +2,24 @@ package com.example.tsvetelinastoyanova.weatherapp.data.source.local
 
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
-import com.example.tsvetelinastoyanova.weatherapp.util.AppExecutors
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class CitiesLocalDataSource private constructor(private val mAppExecutors: AppExecutors,
-                                                private val cityDao: CityDao) : CityDataSource, LocalDataSource {
+class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : CityDataSource, LocalDataSource {
 
     override fun getCities(): Flowable<List<CityEntity>> {
         return cityDao.getAll().subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
     }
 
     override fun getCity(cityName: String): Single<CityEntity> {
         Utils.checkNotNull(cityName)
         return cityDao.getCity(cityName)
-                .observeOn(Schedulers.single())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
     }
 
     override fun addCity(cityEntity: CityEntity): Single<CityEntity> {
@@ -43,38 +43,28 @@ class CitiesLocalDataSource private constructor(private val mAppExecutors: AppEx
         }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.single())
-
-        /* val runnable = lambda@{
-             newCity.name?.let {
-                 cityDao.updateCity(it, newCity.lastTemperature, newCity.lastImageId)
-                 mAppExecutors.mainThread().execute({ refreshCityCallback.onRefreshCitySuccessfully() })
-             }
-             return@lambda
-         }
-
-         mAppExecutors.databaseIO().execute(runnable)*/
     }
 
-    override fun deleteCity(cityName: String, callback: LocalDataSource.DeleteCityCallback) {
+    override fun deleteCity(cityName: String): Single<String> {
         Utils.checkNotNull(cityName)
-        Utils.checkNotNull(callback)
-        val runnable = {
+
+        return Single.fromCallable {
             cityDao.deleteCity(cityName)
-            mAppExecutors.mainThread().execute({ callback.onCityDeletedSuccessfully() })
+            cityName
         }
-        mAppExecutors.databaseIO().execute(runnable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.single())
     }
 
     companion object {
 
         private var INSTANCE: CitiesLocalDataSource? = null
 
-        fun getInstance(appExecutors: AppExecutors,
-                        cityDao: CityDao): CitiesLocalDataSource? {
+        fun getInstance(cityDao: CityDao): CitiesLocalDataSource? {
             if (INSTANCE == null) {
                 synchronized(CitiesLocalDataSource::class.java) {
                     if (INSTANCE == null) {
-                        INSTANCE = CitiesLocalDataSource(appExecutors, cityDao)
+                        INSTANCE = CitiesLocalDataSource(cityDao)
                     }
                 }
             }
