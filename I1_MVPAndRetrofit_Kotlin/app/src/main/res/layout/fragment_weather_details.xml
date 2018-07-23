@@ -7,32 +7,10 @@
     android:background="@drawable/gradient_background_weather_details"
     tools:context=".weatherdetails.WeatherDetailsFragment">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/white"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="More information:"
-                android:textSize="10pt"
-                android:textStyle="bold"/>
-        </android.support.v7.widget.Toolbar>
-
-    </android.support.design.widget.AppBarLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/margin_toolbar"
+        android:layout_marginTop="@dimen/margin_bars"
         android:paddingHorizontal="@dimen/padding_weather_details_fragment">
 
         <TextView

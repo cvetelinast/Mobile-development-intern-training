@@ -19,7 +19,9 @@ class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : Recy
 
     val citiesList: MutableList<City> = ArrayList()
 
-    class MyViewHolder internal constructor(view: View, private val onItemClickListener: OnItemClickListener) : RecyclerView.ViewHolder(view), CityRowView, View.OnClickListener {
+    class MyViewHolder internal constructor(view: View, private val onItemClickListener: OnItemClickListener) :
+            RecyclerView.ViewHolder(view), CityRowView, View.OnClickListener {
+
         private var name: TextView = view.name
         var temperature: TextView = view.temperature
         var icon: ImageView = view.icon
@@ -73,11 +75,10 @@ class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : Recy
     }
 
     fun refreshCity(newCity: City) {
-        for (i in 0 until citiesList.size) {
-            val c = citiesList[i]
-            if (c.name == newCity.name) {
-                citiesList[i] = newCity
-                notifyItemChanged(i)
+        for ((index, city) in citiesList.withIndex()) {
+            if (city.name == newCity.name) {
+                citiesList[index] = newCity
+                notifyItemChanged(index)
                 return
             }
         }

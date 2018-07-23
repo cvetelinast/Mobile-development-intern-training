@@ -2,6 +2,7 @@ package com.example.tsvetelinastoyanova.weatherapp.data.source.remote
 
 import com.example.tsvetelinastoyanova.weatherapp.Constants
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
+import com.example.tsvetelinastoyanova.weatherapp.model.forecast.ForecastObject
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,7 +14,7 @@ class CitiesRemoteDataSource {
 
         private var INSTANCE: CitiesRemoteDataSource? = null
 
-        fun getInstance(): CitiesRemoteDataSource? {
+        fun getInstance(): CitiesRemoteDataSource {
             if (INSTANCE == null) {
                 synchronized(CitiesRemoteDataSource::class.java) {
                     if (INSTANCE == null) {
@@ -21,15 +22,22 @@ class CitiesRemoteDataSource {
                     }
                 }
             }
-            return INSTANCE
+            return INSTANCE!!
         }
     }
 
     fun getWeatherObject(cityName: String): Single<CurrentWeatherObject> {
-        Utils.checkNotNull(cityName)
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getWeatherForCity(Constants.API_KEY, cityName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun getForecastForCity(city: String): Single<ForecastObject> {
+        val retrofit = RetrofitClient.instance
+        val service = retrofit.create(GetDataService::class.java)
+        return service.getForecastForCity(Constants.API_KEY, city)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

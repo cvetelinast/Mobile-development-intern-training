@@ -6,20 +6,16 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
 interface CityDao {
 
     @Query("SELECT * FROM cities")
-    fun getAll(): Flowable<List<CityEntity>>
+    fun getAll(): Single<List<CityEntity>>
 
     @Insert
     fun insertCity(city: CityEntity)
-
-    /* @Query("INSERT INTO cities VALUES (:city)")
-     fun insertCity(city: CityEntity): Observable<CityEntity>*/
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCities(vararg cities: CityEntity)

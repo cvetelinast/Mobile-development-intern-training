@@ -2,28 +2,25 @@ package com.example.tsvetelinastoyanova.weatherapp.data.source.local
 
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
-import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : CityDataSource, LocalDataSource {
 
-    override fun getCities(): Flowable<List<CityEntity>> {
+    override fun getCities(): Single<List<CityEntity>> {
         return cityDao.getAll().subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.single())
     }
 
     override fun getCity(cityName: String): Single<CityEntity> {
-        Utils.checkNotNull(cityName)
         return cityDao.getCity(cityName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.single())
     }
 
     override fun addCity(cityEntity: CityEntity): Single<CityEntity> {
-        Utils.checkNotNull(cityEntity)
         return Single.fromCallable {
             cityDao.insertCity(cityEntity)
             cityEntity
@@ -33,7 +30,6 @@ class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : 
     }
 
     override fun refreshCity(newCity: CityEntity): Single<CityEntity> {
-        Utils.checkNotNull(newCity)
         return Single.fromCallable {
             cityDao.updateCity(newCity.name, newCity.lastTemperature, newCity.lastImageId)
 
@@ -46,8 +42,6 @@ class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : 
     }
 
     override fun deleteCity(cityName: String): Single<String> {
-        Utils.checkNotNull(cityName)
-
         return Single.fromCallable {
             cityDao.deleteCity(cityName)
             cityName
@@ -60,7 +54,7 @@ class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : 
 
         private var INSTANCE: CitiesLocalDataSource? = null
 
-        fun getInstance(cityDao: CityDao): CitiesLocalDataSource? {
+        fun getInstance(cityDao: CityDao): CitiesLocalDataSource {
             if (INSTANCE == null) {
                 synchronized(CitiesLocalDataSource::class.java) {
                     if (INSTANCE == null) {
@@ -68,7 +62,7 @@ class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : 
                     }
                 }
             }
-            return INSTANCE
+            return INSTANCE!!
         }
     }
 }

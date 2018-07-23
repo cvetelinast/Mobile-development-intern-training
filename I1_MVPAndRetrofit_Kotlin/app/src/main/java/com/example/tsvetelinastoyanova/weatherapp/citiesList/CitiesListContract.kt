@@ -6,6 +6,7 @@ import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 
 interface CitiesListContract {
+
     interface View : BaseView<Presenter> {
 
         fun showNewCityAdded(newCity: City)
@@ -30,6 +31,7 @@ interface CitiesListContract {
     }
 
     interface Presenter : BasePresenter {
+
         fun loadCities()
 
         fun addNewCity(s: String?)

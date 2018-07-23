@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.weatherapp.weatherdetails
+package com.example.tsvetelinastoyanova.weatherapp.weatherdetails.weather
 
 import com.example.tsvetelinastoyanova.weatherapp.BasePresenter
 import com.example.tsvetelinastoyanova.weatherapp.BaseView

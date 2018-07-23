@@ -17,6 +17,10 @@
     <string name="undo">UNDO</string>
     <string name="city_removed_message">%s removed from list with cities."</string>
 
+    <string name="problem_loading_forecast">A problem loading forecast occurred."</string>
+
+
+
     <!--temperature properties-->
     <string name="temperature_min">Minimum temperature: %s</string>
     <string name="temperature_max">Maximum temperature: %s</string>
@@ -24,5 +28,8 @@
     <string name="humidity">Humidity: %d</string>
     <string name="wind_speed">Speed of wind: %.2f m/s</string>
     <string name="title_activity_details">DetailsActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

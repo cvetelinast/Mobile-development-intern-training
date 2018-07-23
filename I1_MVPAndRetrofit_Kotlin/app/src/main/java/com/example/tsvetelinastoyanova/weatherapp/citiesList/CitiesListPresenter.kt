@@ -1,18 +1,15 @@
 package com.example.tsvetelinastoyanova.weatherapp.citiesList
 
 import android.os.Handler
-import android.util.Log
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CitiesRepository
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSource
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
-import com.example.tsvetelinastoyanova.weatherapp.util.CityEntityAdapter
+import com.example.tsvetelinastoyanova.weatherapp.util.convertCityEntityToCity
 
-
-class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepository: CitiesRepository) : CitiesListContract.Presenter {
-    private val citiesRepository: CitiesRepository = citiesRepository
+class CitiesListPresenter(private val view: CitiesListContract.View, private val citiesRepository: CitiesRepository) : CitiesListContract.Presenter {
 
     override fun start() {
         loadCities()
@@ -22,7 +19,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
     override fun loadCities() {
         citiesRepository.getCities(object : CityDataSource.GetCityCallback {
             override fun onCityLoaded(cityEntity: CityEntity) {
-                view.showCityLoaded(CityEntityAdapter.convertCityEntityToCity(cityEntity))
+                view.showCityLoaded(convertCityEntityToCity(cityEntity))
             }
 
             override fun onCityDoesNotExist() {
@@ -37,7 +34,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
         } else {
             citiesRepository.addCity(cityName, object : LocalDataSource.AddCityCallback {
                 override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
-                    view.showNewCityAdded(CityEntityAdapter.convertCityEntityToCity(cityEntity))
+                    view.showNewCityAdded(convertCityEntityToCity(cityEntity))
                 }
 
                 override fun onCityExistsInDatabase() {
@@ -72,7 +69,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
         cities?.let {
             citiesRepository.refreshCities(cities, object : CityDataSource.GetCityCallback {
                 override fun onCityLoaded(cityEntity: CityEntity) {
-                    view.showCityUpdated(CityEntityAdapter.convertCityEntityToCity(cityEntity))
+                    view.showCityUpdated(convertCityEntityToCity(cityEntity))
                 }
 
                 override fun onCityDoesNotExist() {
@@ -85,6 +82,6 @@ class CitiesListPresenter(private val view: CitiesListContract.View, citiesRepos
     private fun setTimerToRefresh() {
         Handler().postDelayed({
             refreshCities(view.getDisplayedCities())
-        }, 10000/*900000*/)
+        }, 900000)
     }
 }

@@ -42,12 +42,8 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        try {
-            onClickCityDelegate = context as OnClickCityDelegate?
-        } catch (e: ClassCastException) {
-            throw ClassCastException(context?.toString() + " must implement OnHeadlineSelectedListener")
-        }
 
+        onClickCityDelegate = context as? OnClickCityDelegate ?: throw ClassCastException(context?.toString() + " must implement OnHeadlineSelectedListener")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,7 +56,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onResume() {
         super.onResume()
-        presenter?.let(CitiesListContract.Presenter::start)
+        presenter?.start()
     }
 
     /*** Methods from CitiesListContract.View  */
@@ -111,17 +107,14 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
-        if (viewHolder is CitiesAdapter.MyViewHolder) {
-            val currentCityName = citiesAdapter?.getCityNameOnIndex(position)
+        val currentCityName = citiesAdapter?.getCityNameOnIndex(position)
+        // backup of removed item for undo purpose
+        val deletedItem = citiesAdapter?.getCityOnIndex(position)
+        val deletedIndex = viewHolder.adapterPosition
 
-            // backup of removed item for undo purpose
-            val deletedItem = citiesAdapter?.getCityOnIndex(position)
-            val deletedIndex = viewHolder.getAdapterPosition()
+        citiesAdapter?.removeCity(viewHolder.adapterPosition)
 
-            citiesAdapter?.removeCity(viewHolder.getAdapterPosition())
-
-            showSnackbarWithUndo(currentCityName, deletedItem, deletedIndex)
-        }
+        showSnackbarWithUndo(currentCityName, deletedItem, deletedIndex)
     }
 
     override fun getDisplayedCities(): MutableList<City>? {
@@ -130,7 +123,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     private fun showSnackbarWithUndo(name: String?, deletedItem: City?, deletedIndex: Int) {
         val snackbar = Snackbar
-                .make(coordinatorLayout, resources.getString(R.string.city_removed_message, name), Snackbar.LENGTH_LONG)
+            .make(coordinatorLayout, resources.getString(R.string.city_removed_message, name), Snackbar.LENGTH_LONG)
 
         snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
             override fun onDismissed(transientBottomBar: Snackbar, event: Int) {
@@ -152,7 +145,10 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     }
 
     private fun addClickListenerToAddCityButton(addCityButton: Button) {
-        addCityButton.setOnClickListener { _ -> presenter?.addNewCity(cityNameContainer?.editText?.text.toString()) }
+        addCityButton.setOnClickListener { _ ->
+            val newCityName = cityNameContainer?.editText?.text.toString()
+            presenter?.addNewCity(newCityName)
+        }
     }
 
     private fun setTextContainer(t: TextInputLayout) {

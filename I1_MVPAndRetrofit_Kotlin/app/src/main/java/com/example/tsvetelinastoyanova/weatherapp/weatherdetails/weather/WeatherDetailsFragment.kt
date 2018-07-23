@@ -10,13 +10,28 @@ import com.example.tsvetelinastoyanova.weatherapp.Constants
 import com.example.tsvetelinastoyanova.weatherapp.R
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.util.ImageOperator
+import com.example.tsvetelinastoyanova.weatherapp.util.Utils
+import com.example.tsvetelinastoyanova.weatherapp.weatherdetails.weather.WeatherDetailsContract
 import kotlinx.android.synthetic.main.fragment_weather_details.*
-import kotlinx.android.synthetic.main.fragment_weather_details.view.*
 
 
 class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
 
     private var presenter: WeatherDetailsContract.Presenter? = null
+
+    /*** interface ***/
+
+    private var onLoadedChildFragmentDelegate: OnLoadedChildFragmentDelegate? = null
+
+    interface OnLoadedChildFragmentDelegate {
+        fun onLoadedWeatherFragment()
+    }
+
+    fun setDelegate(delegate: OnLoadedChildFragmentDelegate) {
+        onLoadedChildFragmentDelegate = delegate
+    }
+
+    /*** Methods from Fragment ***/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +40,6 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_weather_details, container, false)
-        view.toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black_24dp)
-        view.toolbar.setNavigationOnClickListener({ _ -> activity?.onBackPressed() })
         return view
     }
 
@@ -39,6 +52,8 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
         presenter?.let {
             it.start()
         }
+        Utils.checkNotNull(onLoadedChildFragmentDelegate)
+        onLoadedChildFragmentDelegate?.onLoadedWeatherFragment()
     }
 
     override fun changeView(weatherObject: CurrentWeatherObject) {
@@ -59,7 +74,6 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
     }
 
     companion object {
-
         fun newInstance(): WeatherDetailsFragment {
             return WeatherDetailsFragment()
         }
