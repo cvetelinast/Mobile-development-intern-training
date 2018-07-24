@@ -6,10 +6,10 @@
     android:layout_gravity="top"
     tools:context=".weatherdetails.forecast.ForecastFragment">
 
-    <TextView
+    <com.github.mikephil.charting.charts.CombinedChart
+        android:id="@+id/combined_chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/margin_bars"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_marginTop="@dimen/margin_bars" />
 
 </FrameLayout>

@@ -28,16 +28,6 @@ fun convertWeatherObjectToCityEntity(weatherObjectsList: CurrentWeatherObject): 
     return c
 }
 
-fun convertFirstWeatherObjectToCityEntity(weatherObjectsList: ForecastObject): CityEntity {
-    val c = CityEntity()
-    c.name = weatherObjectsList.city.name
-    c.cityId = weatherObjectsList.city.id
-    c.lastTemperature = weatherObjectsList.list[0].main.temp
-    val imageId = weatherObjectsList.list[0].weather[0].icon
-    c.lastImageId = ImageOperator.getImageIdFromString(imageId)
-    return c
-}
-
 fun convertWeatherObjectToCity(weatherObject: ForecastObject): City {
     val image = weatherObject.list[0].weather[0].icon
     return City(weatherObject.city.name, weatherObject.list[0].main.temp, ImageOperator.getImageIdFromString(image))

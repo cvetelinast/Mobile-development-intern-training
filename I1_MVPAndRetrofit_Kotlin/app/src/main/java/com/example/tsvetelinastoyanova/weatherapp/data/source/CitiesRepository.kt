@@ -1,6 +1,5 @@
 package com.example.tsvetelinastoyanova.weatherapp.data.source
 
-import android.util.Log
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSource
@@ -8,6 +7,7 @@ import com.example.tsvetelinastoyanova.weatherapp.data.source.remote.CitiesRemot
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.model.forecast.ForecastObject
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
+import com.example.tsvetelinastoyanova.weatherapp.util.convertToWeatherObjectWithCelsiusTemperature
 import com.example.tsvetelinastoyanova.weatherapp.util.convertWeatherObjectToCityEntity
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -55,13 +55,13 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
         localDataSource.getCities()
             .flatMapPublisher { listOfCityEntities -> Flowable.fromIterable(listOfCityEntities) }
             .flatMapSingle { cityEntity: CityEntity -> remoteDataSource.getWeatherObject(cityEntity.name) }
-            .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
+            .map { weatherObject -> weatherObject.convertToWeatherObjectWithCelsiusTemperature() }
             .subscribe(
                 { currentWeatherObject ->
                     refreshWeatherObjectInCache(currentWeatherObject)
                     getCityCallback.onCityLoaded(convertWeatherObjectToCityEntity(currentWeatherObject))
                 },
-                { error -> getCityCallback.onCityDoesNotExist() }
+                { _ -> getCityCallback.onCityDoesNotExist() }
             )
     }
 
@@ -79,17 +79,17 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
     }
 
     fun addCity(cityName: String, callback: LocalDataSource.AddCityCallback) {
-        /* 1) check if city exists in database
-            1.1) exists - onCityAlreadyExists()
-            1.2) does not exist - api request()
-                1.2.1) success
-                    1.2.1.1) write to DB
-                        1.2.1.1.1) success - return message
-                        1.2.1.1.2) fail - return message
-                1.2.2) fail - return message */
+        /*** 1) check if city exists in database
+        1.1) exists - onCityAlreadyExists()
+        1.2) does not exist - api request()
+        1.2.1) success
+        1.2.1.1) write to DB
+        1.2.1.1.1) success - return message
+        1.2.1.1.2) fail - return message
+        1.2.2) fail - return message */
 
         val onErrorRecoverFlowable: Single<CityState> = remoteDataSource.getWeatherObject(cityName)
-            .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
+            .map { weatherObject -> weatherObject.convertToWeatherObjectWithCelsiusTemperature() }
             .flatMap { weatherObject -> addCityInLocalDataSource(weatherObject) }
             .map { (cityEntity, currentWeatherObject) -> AddedSuccessfully(currentWeatherObject, cityEntity) }
 
@@ -103,7 +103,7 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
                         callback.onCityAddedSuccessfully(result.cityEntity)
                     }
                 },
-                { error -> callback.onNotValidCity() }
+                { _ -> callback.onNotValidCity() }
             )
     }
 
@@ -114,11 +114,11 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
 
     fun deleteCity(cityName: String, deleteCityCallback: LocalDataSource.DeleteCityCallback) {
         localDataSource.deleteCity(cityName)
-            .doOnError { error -> deleteCityCallback.onFail() }
+            .doOnError { _ -> deleteCityCallback.onFail() }
             .map { delete -> deleteWeatherObjectFromCache(delete) }
             .subscribe(
                 { _ -> deleteCityCallback.onCityDeletedSuccessfully() },
-                { error -> deleteCityCallback.onFail() }
+                { _ -> deleteCityCallback.onFail() }
             )
     }
 
@@ -151,14 +151,15 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
          * get name and load from API
          * refresh cache
          * refresh DB
-         *refresh UI
+         * refresh UI
          ***/
+
         Flowable.fromIterable(cities)
             .flatMapSingle { city -> getCity(city.name) }
-            .doOnError { error -> getCityCallback.onCityDoesNotExist() }
+            .doOnError { _ -> getCityCallback.onCityDoesNotExist() }
             .flatMapSingle { city -> remoteDataSource.getWeatherObject(city.name) }
-            .doOnError { error -> getCityCallback.onCityDoesNotExist() }
-            .map { weatherObject -> Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject) }
+            .doOnError { _ -> getCityCallback.onCityDoesNotExist() }
+            .map { weatherObject -> weatherObject.convertToWeatherObjectWithCelsiusTemperature() }
             .map { weatherObject ->
                 refreshWeatherObjectInCache(weatherObject)
                 weatherObject
@@ -169,23 +170,15 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
             .subscribeOn(Schedulers.io())
             .subscribe(
                 { success -> getCityCallback.onCityLoaded(success) },
-                { error -> getCityCallback.onCityDoesNotExist() }
+                { _ -> getCityCallback.onCityDoesNotExist() }
             )
     }
 
     fun getForecastForCity(city: String): Single<ForecastObject> {
-        /***
-         * 1) If cache
-         *      load from cache
-         * 2) Else
-         *      load from remote data source
-         *      save in cache
-         ***/
         if (!forecastObjectsCache.isEmpty()) {
             return getForecastFromCache(city)
         } else {
-            val result = getForecastFromDataSource(city)
-            return result
+            return getForecastFromDataSource(city)
         }
     }
 
@@ -200,12 +193,9 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
     private fun getForecastFromDataSource(city: String): Single<ForecastObject> {
         return remoteDataSource.getForecastForCity(city)
             .map { newObject ->
-                Log.d("tag", "New object $newObject")
                 addForecastObjectInCache(newObject)
                 newObject
             }
-            .doOnSuccess { value -> Log.d("tag", "Value: $value") }
-            .doOnError { error -> Log.d("tag", "Error: $error") }
     }
 
     private fun addForecastObjectInCache(newObject: ForecastObject) {

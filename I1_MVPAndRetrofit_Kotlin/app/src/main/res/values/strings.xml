@@ -29,7 +29,8 @@
     <string name="wind_speed">Speed of wind: %.2f m/s</string>
     <string name="title_activity_details">DetailsActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--forecast attributes-->
+    <string name="temperature">Temperature</string>
+    <string name="speed_of_wind">Speed of wind</string>
 
 </resources>

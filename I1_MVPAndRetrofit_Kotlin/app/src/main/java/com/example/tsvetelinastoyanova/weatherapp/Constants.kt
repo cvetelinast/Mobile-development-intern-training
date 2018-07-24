@@ -11,5 +11,9 @@ interface Constants {
         val WEATHER_OBJECTS = "weatherObjects"
         val API_KEY = "956b0cec24dc9a86dddab6ed85a14dd5"
         val DATABASE_NAME = "cities"
+
+        // fragments names
+        val WEATHER_DETAILS_FRAGMENT = "Weather details"
+        val FORECAST_FRAGMENT = "Forecast"
     }
 }

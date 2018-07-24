@@ -1,16 +1,20 @@
-package com.example.tsvetelinastoyanova.weatherapp.weatherdetails.forecast
+package com.example.tsvetelinastoyanova.weatherapp.weatherdetails
 
 import com.example.tsvetelinastoyanova.weatherapp.BasePresenter
 import com.example.tsvetelinastoyanova.weatherapp.BaseView
 import com.example.tsvetelinastoyanova.weatherapp.model.forecast.ForecastObject
 
-interface ForecastContract {
+interface WeatherDetailsContainerContract {
 
     interface View : BaseView<Presenter> {
 
-        fun showForecastForCity(forecastObject: ForecastObject)
+        fun showErrorLoadingForecast()
+
+        fun showSuccessfullyLoadedForecast(forecastObject: ForecastObject)
     }
 
     interface Presenter : BasePresenter {
+
+        fun startGettingForecastForCity(city: String)
     }
 }

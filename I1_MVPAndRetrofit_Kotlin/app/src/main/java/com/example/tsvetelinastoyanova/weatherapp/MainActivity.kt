@@ -9,6 +9,7 @@ import com.example.tsvetelinastoyanova.weatherapp.data.source.CitiesRepository
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import com.example.tsvetelinastoyanova.weatherapp.weatherdetails.WeatherDetailsContainerFragment
+import com.example.tsvetelinastoyanova.weatherapp.weatherdetails.WeatherDetailsContainerPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity(), CitiesListFragment.OnClickCityDelegate
 
     override fun onClickCity(currentWeatherObject: CurrentWeatherObject) {
         if (Utils.isTablet(this)) {
-            weatherDetailsContainerFragment?.clickOnCity(currentWeatherObject)
+            weatherDetailsContainerFragment?.clickOnCity(currentWeatherObject, true)
         } else {
             val i = Intent(this@MainActivity, WeatherDetailsActivity::class.java)
             i.putExtra(Constants.WEATHER_OBJECTS, currentWeatherObject)
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity(), CitiesListFragment.OnClickCityDelegate
             val citiesListPresenter = CitiesListPresenter(citiesListFragment, it)
             citiesListFragment.setPresenter(citiesListPresenter)
             Utils.addFragmentToActivity(
-                    supportFragmentManager, citiesListFragment, R.id.list_fragment_container)
+                supportFragmentManager, citiesListFragment, R.id.list_fragment_container)
         }
     }
 
@@ -58,11 +59,13 @@ class MainActivity : AppCompatActivity(), CitiesListFragment.OnClickCityDelegate
         if (weatherDetailsContainerFragment != null) {
             Utils.removeFragment(supportFragmentManager, weatherDetailsContainerFragment)
         }
-        weatherDetailsContainerFragment = WeatherDetailsContainerFragment.newInstance()
+        weatherDetailsContainerFragment = WeatherDetailsContainerFragment()//.newInstance()
+        val weatherDetailsContainerPresenter = WeatherDetailsContainerPresenter(weatherDetailsContainerFragment, Utils.provideCityRepository(this))
+        weatherDetailsContainerFragment.setPresenter(weatherDetailsContainerPresenter)
 //        val weatherDetailsPresenter = WeatherDetailsPresenter()
 //        weatherDetailsContainerFragment.setPresenter(weatherDetailsPresenter)
         this.weatherDetailsContainerFragment = weatherDetailsContainerFragment
         Utils.addFragmentToActivity(
-                supportFragmentManager, weatherDetailsContainerFragment, R.id.details_fragment_container)
+            supportFragmentManager, weatherDetailsContainerFragment, R.id.details_fragment_container)
     }
 }

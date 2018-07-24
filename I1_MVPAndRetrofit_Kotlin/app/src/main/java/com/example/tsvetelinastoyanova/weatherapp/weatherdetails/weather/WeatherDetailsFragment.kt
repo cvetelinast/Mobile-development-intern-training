@@ -21,13 +21,13 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
 
     /*** interface ***/
 
-    private var onLoadedChildFragmentDelegate: OnLoadedChildFragmentDelegate? = null
+    private var onLoadedChildFragmentDelegate: OnLoadedWeatherFragmentDelegate? = null
 
-    interface OnLoadedChildFragmentDelegate {
+    interface OnLoadedWeatherFragmentDelegate {
         fun onLoadedWeatherFragment()
     }
 
-    fun setDelegate(delegate: OnLoadedChildFragmentDelegate) {
+    fun setWeatherDelegate(delegate: OnLoadedWeatherFragmentDelegate) {
         onLoadedChildFragmentDelegate = delegate
     }
 
@@ -44,6 +44,7 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
     }
 
     override fun setPresenter(presenter: WeatherDetailsContract.Presenter) {
+        Utils.checkNotNull(presenter)
         this.presenter = presenter
     }
 
@@ -54,6 +55,10 @@ class WeatherDetailsFragment : Fragment(), WeatherDetailsContract.View {
         }
         Utils.checkNotNull(onLoadedChildFragmentDelegate)
         onLoadedChildFragmentDelegate?.onLoadedWeatherFragment()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
     }
 
     override fun changeView(weatherObject: CurrentWeatherObject) {
