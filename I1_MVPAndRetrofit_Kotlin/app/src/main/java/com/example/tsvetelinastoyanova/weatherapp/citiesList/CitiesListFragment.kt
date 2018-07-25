@@ -42,7 +42,6 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-
         onClickCityDelegate = context as? OnClickCityDelegate ?: throw ClassCastException(context?.toString() + " must implement OnHeadlineSelectedListener")
     }
 
@@ -57,6 +56,12 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     override fun onResume() {
         super.onResume()
         presenter?.start()
+    }
+
+    companion object {
+        fun newInstance(): CitiesListFragment {
+            return CitiesListFragment()
+        }
     }
 
     /*** Methods from CitiesListContract.View  */

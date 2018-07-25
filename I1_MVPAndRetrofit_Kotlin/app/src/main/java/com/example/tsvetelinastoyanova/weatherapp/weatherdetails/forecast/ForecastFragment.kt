@@ -1,9 +1,9 @@
 package com.example.tsvetelinastoyanova.weatherapp.weatherdetails.forecast
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.graphics.ColorUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,9 +23,9 @@ import java.util.*
 
 class ForecastFragment : Fragment(), ForecastContract.View {
 
+    private val NUMBER_OF_VALUES_ON_X_COORD = 12
     private lateinit var presenter: ForecastContract.Presenter
     private var chart: CombinedChart? = null
-    private val NUMBER_OF_VALUES_ON_X_COORD = 12
 
     /*** interface ***/
 
@@ -40,40 +40,45 @@ class ForecastFragment : Fragment(), ForecastContract.View {
         onLoadedForecastFragmentDelegate = delegate
     }
 
-    /*** Methods from Fragment ***/
+    /*** Methods from View ***/
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun showForecastForCity(forecastObject: ForecastObject) {
+        val temperatures = forecastObject.list
+            .map { l ->
+                l.main.temp.convertTemperatureToCelsius()
+                // Utils.(l.main.temp)
+            }.take(NUMBER_OF_VALUES_ON_X_COORD)
+        val windSpeedValues = forecastObject.list
+            .map { l -> l.wind.speed }
+            .take(NUMBER_OF_VALUES_ON_X_COORD)
+        val times = forecastObject.list
+            .map { l ->
+                val text = l.dtTxt;text
+                .split(" ")[1].removeSuffix(":00")
+            }
+            .take(NUMBER_OF_VALUES_ON_X_COORD)
+
+        drawChart(windSpeedValues, temperatures, times)
     }
+
+    /*** Methods from Fragment ***/
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view: View = inflater.inflate(R.layout.fragment_forecast_child, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_forecast, container, false)
 
         this.chart = view.findViewById(R.id.combined_chart)
         return view
     }
 
     override fun onStart() {
-        ////////////////////////////////////////////////////////////////////
         super.onStart()
-        Utils.checkNotNull(onLoadedForecastFragmentDelegate) // tyk vnimatelno
+        Utils.checkNotNull(onLoadedForecastFragmentDelegate)
         onLoadedForecastFragmentDelegate?.onLoadedForecastFragment()
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
+    /*** Others ***/
 
     companion object {
         @JvmStatic
@@ -84,6 +89,68 @@ class ForecastFragment : Fragment(), ForecastContract.View {
     override fun setPresenter(presenter: ForecastContract.Presenter) {
         Utils.checkNotNull(presenter)
         this.presenter = presenter
+    }
+
+    private fun drawChart(windSpeedValues: List<Double>, temperatures: List<Double>, times: List<String>) {
+        val chart = this.chart
+        chart?.let {
+            doChartSettings(chart)
+            doLegendSettings(chart)
+
+            val minWindSpeed: Double = windSpeedValues.min() ?: 0.0
+            val minTemperature: Double = temperatures.min() ?: 0.0
+            val min = if (minWindSpeed < minTemperature) minWindSpeed else minTemperature
+
+            val xAxis = axisFormatting(chart, min, times)
+            val data = CombinedData()
+
+            data.setData(generateLineData(temperatures))
+            data.setData(generateBarData(windSpeedValues))
+
+            xAxis.axisMaximum = data.xMax + 0.25f
+
+            chart.data = data
+            chart.invalidate()
+        }
+    }
+
+    private fun axisFormatting(chart: CombinedChart, min: Double, times: List<String>): XAxis {
+        val rightAxis = chart.axisRight
+        rightAxis.setDrawGridLines(false)
+        rightAxis.axisMinimum = min.toFloat()
+
+        val leftAxis = chart.axisLeft
+        leftAxis.setDrawGridLines(false)
+        leftAxis.axisMinimum = min.toFloat()
+
+        val xAxis = chart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTH_SIDED
+        xAxis.axisMinimum = -0.2f
+        xAxis.granularity = 1f
+
+        xAxis.valueFormatter = IAxisValueFormatter { value, _ -> times[value.toInt()] }
+        return xAxis
+    }
+
+    private fun doChartSettings(chart: CombinedChart) {
+        chart.description.isEnabled = false
+        chart.setBackgroundColor(ColorUtils.setAlphaComponent(Color.WHITE, 170))
+        chart.setDrawGridBackground(false)
+        chart.setDrawBarShadow(false)
+        chart.isHighlightFullBarEnabled = false
+        chart.animateY(1500)
+
+        // draw bars behind lines
+        chart.drawOrder = arrayOf(CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE)
+    }
+
+    private fun doLegendSettings(chart: CombinedChart) {
+        val l = chart.legend
+        l.isWordWrapEnabled = true
+        l.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+        l.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+        l.orientation = Legend.LegendOrientation.HORIZONTAL
+        l.setDrawInside(false)
     }
 
     private fun generateLineData(temperatures: List<Double>): LineData {
@@ -131,86 +198,5 @@ class ForecastFragment : Fragment(), ForecastContract.View {
         set.valueTextColor = Color.BLACK
         set.valueTextSize = 14f
         set.axisDependency = YAxis.AxisDependency.LEFT
-    }
-
-    override fun showForecastForCity(forecastObject: ForecastObject) {
-        val temperatures = forecastObject.list
-            .map { l ->
-                l.main.temp.convertTemperatureToCelsius()
-                // Utils.(l.main.temp)
-            }.take(NUMBER_OF_VALUES_ON_X_COORD)
-        val windSpeedValues = forecastObject.list
-            .map { l -> l.wind.speed }
-            .take(NUMBER_OF_VALUES_ON_X_COORD)
-        val times = forecastObject.list
-            .map { l ->
-                val text = l.dtTxt;text
-                .split(" ")[1].removeSuffix(":00")
-            }
-            .take(NUMBER_OF_VALUES_ON_X_COORD)
-
-        drawChart(windSpeedValues, temperatures, times)
-    }
-
-    private fun drawChart(windSpeedValues: List<Double>, temperatures: List<Double>, times: List<String>) {
-        val chart = this.chart
-        chart?.let {
-            doChartSettings(chart)
-            doLegendSettings(chart)
-
-            val minWindSpeed: Double = windSpeedValues.min() ?: 0.0
-            val minTemperature: Double = temperatures.min() ?: 0.0
-            val min = if (minWindSpeed < minTemperature) minWindSpeed else minTemperature
-
-            val xAxis = axisFormatting(chart, min, times)
-            val data = CombinedData()
-
-            data.setData(generateLineData(temperatures))
-            data.setData(generateBarData(windSpeedValues))
-
-            xAxis.axisMaximum = data.xMax + 0.25f
-
-            chart.data = data
-            chart.invalidate()
-        }
-    }
-
-    private fun axisFormatting(chart: CombinedChart, min: Double, times: List<String>): XAxis {
-        val rightAxis = chart.axisRight
-        rightAxis.setDrawGridLines(false)
-        rightAxis.axisMinimum = min.toFloat()
-
-        val leftAxis = chart.axisLeft
-        leftAxis.setDrawGridLines(false)
-        leftAxis.axisMinimum = min.toFloat()
-
-        val xAxis = chart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTH_SIDED
-        xAxis.axisMinimum = -0.2f
-        xAxis.granularity = 1f
-
-        xAxis.valueFormatter = IAxisValueFormatter { value, _ -> times[value.toInt()] }
-        return xAxis
-    }
-
-    private fun doLegendSettings(chart: CombinedChart) {
-        val l = chart.legend
-        l.isWordWrapEnabled = true
-        l.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
-        l.orientation = Legend.LegendOrientation.HORIZONTAL
-        l.setDrawInside(false)
-    }
-
-    private fun doChartSettings(chart: CombinedChart) {
-        chart.description.isEnabled = false
-        chart.setBackgroundColor(Color.WHITE)
-        chart.setDrawGridBackground(false)
-        chart.setDrawBarShadow(false)
-        chart.isHighlightFullBarEnabled = false
-        chart.animateY(1500)
-
-        // draw bars behind lines
-        chart.drawOrder = arrayOf(CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE)
     }
 }
