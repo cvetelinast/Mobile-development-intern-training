@@ -8,6 +8,8 @@ import com.example.tsvetelinastoyanova.weatherapp.data.source.CitiesRepository
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.AppDatabase
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.CitiesLocalDataSource
 import com.example.tsvetelinastoyanova.weatherapp.data.source.remote.CitiesRemoteDataSource
+import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
+import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.Main
 
 object Utils {
     fun isTablet(context: Context): Boolean {
@@ -47,5 +49,16 @@ object Utils {
             throw NullPointerException()
         }
         return reference
+    }
+
+    fun convertToWeatherObjectWithCelsiusTemperature(c: CurrentWeatherObject): CurrentWeatherObject {
+        val main = Main(temp = convertTemperatureToCelsius(c.main.temp), pressure = c.main.pressure, humidity = c.main.humidity,
+            tempMin = convertTemperatureToCelsius(c.main.tempMin), tempMax = convertTemperatureToCelsius(c.main.tempMax))
+        return CurrentWeatherObject(coord = c.coord, weather = c.weather, base = c.base, main = main, visibility = c.visibility,
+            wind = c.wind, clouds = c.clouds, dt = c.dt, sys = c.sys, id = c.id, name = c.name, cod = c.cod)
+    }
+
+    private fun convertTemperatureToCelsius(temp: Double): Double {
+        return Math.round((temp - 273.15) * 10) / 10.0
     }
 }

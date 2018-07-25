@@ -22,9 +22,19 @@ class WeatherDetailsActivity : AppCompatActivity() {
         /*val temp = supportFragmentManager.findFragmentById(R.id.fragment_container) as? WeatherDetailsContainerFragment
         supportFragmentManager.beginTransaction().remove(temp).commit()*/
 
+        var tempFragment: WeatherDetailsContainerFragment? = supportFragmentManager.findFragmentById(R.id.fragment_container) as? WeatherDetailsContainerFragment
+        if (tempFragment == null) {
+            //Utils.removeFragment(supportFragmentManager, tempFragment)
+
+            weatherDetailsContainerFragment = WeatherDetailsContainerFragment()/*.newInstance()*/
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, weatherDetailsContainerFragment).commit()
+        } else {
+            weatherDetailsContainerFragment = tempFragment
+        }
+
         Log.d("tag", "Creating new weatherDetailsContainerFragment")
-        weatherDetailsContainerFragment = WeatherDetailsContainerFragment()/*.newInstance()*/
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, weatherDetailsContainerFragment).commit()
+       /* weatherDetailsContainerFragment = WeatherDetailsContainerFragment()*//*.newInstance()*//*
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, weatherDetailsContainerFragment).commit()*/
 
         if (this.weatherObject == null) {
             val weatherObject: CurrentWeatherObject? = intent.getParcelableExtra(Constants.WEATHER_OBJECTS)

@@ -27,6 +27,9 @@ class WeatherDetailsContainerFragment : Fragment(), WeatherDetailsContainerContr
     private var currentWeatherObject: CurrentWeatherObject? = null
     private lateinit var weatherDetailsFragment: WeatherDetailsFragment/*? = null*/
     private /*lateinit */var forecastFragment: ForecastFragment? = null
+
+    private var shouldCreateFragments = true
+
     private var isWeatherFragmentLoaded: Boolean = false
     private var isForecastFragmentLoaded: Boolean = false
 
@@ -44,6 +47,7 @@ class WeatherDetailsContainerFragment : Fragment(), WeatherDetailsContainerContr
 
     /*** Fragment methods ***/
     override fun setPresenter(presenter: WeatherDetailsContainerContract.Presenter) {
+        Utils.checkNotNull(presenter)
         this.presenter = presenter
     }
 
@@ -114,35 +118,62 @@ class WeatherDetailsContainerFragment : Fragment(), WeatherDetailsContainerContr
     private fun setupViewPager(viewPager: ViewPager) {
         val activity = requireActivity()
         val adapter = ViewPagerAdapter(activity.supportFragmentManager)
+        adapter.init()
         setupWeatherDetailsFragment(adapter)
         setupForecastFragment(adapter)
         viewPager.adapter = adapter
     }
 
     private fun setupWeatherDetailsFragment(adapter: ViewPagerAdapter) {
-        weatherDetailsFragment = WeatherDetailsFragment()
-        weatherDetailsFragment.setPresenter(WeatherDetailsPresenter())
-        weatherDetailsFragment.setWeatherDelegate(this)
-        adapter.addFragment(weatherDetailsFragment, Constants.WEATHER_DETAILS_FRAGMENT)
+        if (shouldCreateFragments/*adapter.count == 0*/) {
+            weatherDetailsFragment = WeatherDetailsFragment()
+            weatherDetailsFragment.setPresenter(WeatherDetailsPresenter())
+            weatherDetailsFragment.setWeatherDelegate(this)
+            adapter.addFragment(weatherDetailsFragment, Constants.WEATHER_DETAILS_FRAGMENT)
+        } else {
+            weatherDetailsFragment = adapter.getItem(0) as WeatherDetailsFragment
+            weatherDetailsFragment.setPresenter(WeatherDetailsPresenter())
+            weatherDetailsFragment.setWeatherDelegate(this)
+        }
     }
 
     private fun setupForecastFragment(adapter: ViewPagerAdapter) {
-        forecastFragment = ForecastFragment.newInstance()
-        forecastFragment?.let {
-            val presenter = ForecastPresenter(it)
-            it.setPresenter(presenter)
-            it.setForecastDelegate(this)
-            adapter.addFragment(it, Constants.FORECAST_FRAGMENT)
+        if (shouldCreateFragments/*adapter.count <= 1*/) {
+            forecastFragment = ForecastFragment.newInstance()
+            forecastFragment?.let {
+                val presenter = ForecastPresenter(it)
+                it.setPresenter(presenter)
+                it.setForecastDelegate(this)
+                adapter.addFragment(it, Constants.FORECAST_FRAGMENT)
+            }
+        } else {
+            forecastFragment = adapter.getItem(1) as ForecastFragment
+            forecastFragment?.let {
+                val presenter = ForecastPresenter(it)
+                it.setPresenter(presenter)
+                it.setForecastDelegate(this)
+            }
         }
+        //   forecastFragment = ForecastFragment.newInstance()
+
     }
 
     override fun onDetach() {
         super.onDetach()
     }
 
-    internal inner class ViewPagerAdapter(manager: FragmentManager) : FragmentPagerAdapter(manager) {
+    internal inner class ViewPagerAdapter(val manager: FragmentManager) : FragmentPagerAdapter(manager) {
         private val fragmentList = ArrayList<Fragment>()
         private val fragmentTitleList = ArrayList<String>()
+
+        fun init() {
+            val countFragments = manager.fragments.size
+            if (countFragments > 2) {
+                this.addFragment(manager.fragments[countFragments - 2] as WeatherDetailsFragment, Constants.WEATHER_DETAILS_FRAGMENT)
+                this.addFragment(manager.fragments[countFragments - 1] as ForecastFragment, Constants.FORECAST_FRAGMENT)
+                shouldCreateFragments = false
+            }
+        }
 
         override fun getItem(position: Int): Fragment {
             return fragmentList[position]
@@ -151,6 +182,15 @@ class WeatherDetailsContainerFragment : Fragment(), WeatherDetailsContainerContr
         override fun getCount(): Int {
             return fragmentList.size
         }
+
+        /* fun getItemWithTitle(title: String): Fragment {
+             for(i in fragmentList.indices){
+                 val currentTitle = getPageTitle(i) ?: ""
+                 if(currentTitle == title){
+                     return fragmentList[i]
+                 }
+             }
+         }*/
 
         fun addFragment(fragment: WeatherDetailsFragment, title: String) {
             fragmentList.add(fragment)

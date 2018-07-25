@@ -1,5 +1,6 @@
 package com.example.tsvetelinastoyanova.weatherapp.data.source
 
+import android.util.Log
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSource
@@ -55,7 +56,11 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
         localDataSource.getCities()
             .flatMapPublisher { listOfCityEntities -> Flowable.fromIterable(listOfCityEntities) }
             .flatMapSingle { cityEntity: CityEntity -> remoteDataSource.getWeatherObject(cityEntity.name) }
-            .map { weatherObject -> weatherObject.convertToWeatherObjectWithCelsiusTemperature() }
+            .map { weatherObject ->
+                Log.d("tag", "Weather object: ${weatherObject.name}")
+                weatherObject.convertToWeatherObjectWithCelsiusTemperature()
+                /*Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject)*/
+            }
             .subscribe(
                 { currentWeatherObject ->
                     refreshWeatherObjectInCache(currentWeatherObject)
