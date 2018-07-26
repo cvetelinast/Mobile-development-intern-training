@@ -1,13 +1,11 @@
 package com.example.tsvetelinastoyanova.weatherapp.data.source
 
-import android.util.Log
 import com.example.tsvetelinastoyanova.weatherapp.City
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSource
 import com.example.tsvetelinastoyanova.weatherapp.data.source.remote.CitiesRemoteDataSource
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.model.forecast.ForecastObject
-import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import com.example.tsvetelinastoyanova.weatherapp.util.convertToWeatherObjectWithCelsiusTemperature
 import com.example.tsvetelinastoyanova.weatherapp.util.convertWeatherObjectToCityEntity
 import io.reactivex.Flowable
@@ -15,7 +13,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-
 
 sealed class CityState
 object ExistsInDatabase : CityState()
@@ -57,9 +54,7 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
             .flatMapPublisher { listOfCityEntities -> Flowable.fromIterable(listOfCityEntities) }
             .flatMapSingle { cityEntity: CityEntity -> remoteDataSource.getWeatherObject(cityEntity.name) }
             .map { weatherObject ->
-                Log.d("tag", "Weather object: ${weatherObject.name}")
                 weatherObject.convertToWeatherObjectWithCelsiusTemperature()
-                /*Utils.convertToWeatherObjectWithCelsiusTemperature(weatherObject)*/
             }
             .subscribe(
                 { currentWeatherObject ->
@@ -239,9 +234,7 @@ class CitiesRepository private constructor(localDataSource: LocalDataSource,
     private fun addWeatherObjectToCacheFromRemote(cityName: String) {
         synchronized(weatherObjectsCache) {
             remoteDataSource.getWeatherObject(cityName)
-                .subscribe(
-                    { weatherObject -> weatherObjectsCache.add(weatherObject) }
-                )
+                .subscribe { weatherObject -> weatherObjectsCache.add(weatherObject) }
         }
     }
 }

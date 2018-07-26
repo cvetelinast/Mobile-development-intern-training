@@ -6,6 +6,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Wind(
-        @SerializedName("speed") val speed: Double,
-        @SerializedName("deg") val deg: Int
+    @SerializedName("speed") val speed: Double,
+    @SerializedName("deg") val deg: Double
 ) : Parcelable

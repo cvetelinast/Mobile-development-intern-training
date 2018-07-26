@@ -9,7 +9,8 @@ import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSou
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.util.convertCityEntityToCity
 
-class CitiesListPresenter(private val view: CitiesListContract.View, private val citiesRepository: CitiesRepository) : CitiesListContract.Presenter {
+class CitiesListPresenter(private val view: CitiesListContract.View,
+                          private val citiesRepository: CitiesRepository) : CitiesListContract.Presenter {
 
     override fun start() {
         loadCities()
@@ -30,7 +31,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View, private val
 
     override fun addNewCity(cityName: String?) {
         if (cityName == null) {
-            cityName ?: view.showErrorNotValidCityName()
+            view.showErrorNotValidCityName()
         } else {
             citiesRepository.addCity(cityName, object : LocalDataSource.AddCityCallback {
                 override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
@@ -60,10 +61,9 @@ class CitiesListPresenter(private val view: CitiesListContract.View, private val
         })
     }
 
+    override fun getWeatherObjectOnClick(cityName: String) =
+        citiesRepository.getWeatherObjectWithName(cityName)
 
-    override fun getWeatherObjectOnClick(cityName: String): CurrentWeatherObject? {
-        return citiesRepository.getWeatherObjectWithName(cityName)
-    }
 
     override fun refreshCities(cities: MutableList<City>?) {
         cities?.let {
@@ -79,9 +79,8 @@ class CitiesListPresenter(private val view: CitiesListContract.View, private val
         }
     }
 
-    private fun setTimerToRefresh() {
-        Handler().postDelayed({
-            refreshCities(view.getDisplayedCities())
-        }, 900000)
-    }
+    private fun setTimerToRefresh() = Handler().postDelayed({
+        refreshCities(view.getDisplayedCities())
+    }, 900000)
+
 }

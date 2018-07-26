@@ -11,6 +11,8 @@ interface CitiesListContract {
 
         fun showNewCityAdded(newCity: City)
 
+        fun showErrorInternetConnection()
+
         fun showErrorAddingAddedCity()
 
         fun showErrorLoadingCities()

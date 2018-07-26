@@ -21,18 +21,20 @@ import com.example.tsvetelinastoyanova.weatherapp.R
 import com.example.tsvetelinastoyanova.weatherapp.citiesList.visualization.CitiesAdapter
 import com.example.tsvetelinastoyanova.weatherapp.citiesList.visualization.RecyclerItemTouchHelper
 import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
+import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import kotlinx.android.synthetic.main.fragment_cities_list.*
 import kotlinx.android.synthetic.main.fragment_cities_list.view.*
 
+class CitiesListFragment : Fragment(), CitiesListContract.View,
+    RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
-class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+    private lateinit var presenter: CitiesListContract.Presenter
     private var citiesAdapter: CitiesAdapter? = null
-    private var presenter: CitiesListContract.Presenter? = null
     private var cityNameContainer: TextInputLayout? = null
 
     /*** interface  */
 
-    private var onClickCityDelegate: OnClickCityDelegate? = null
+    private lateinit var onClickCityDelegate: OnClickCityDelegate
 
     interface OnClickCityDelegate {
         fun onClickCity(currentWeatherObject: CurrentWeatherObject)
@@ -42,7 +44,8 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        onClickCityDelegate = context as? OnClickCityDelegate ?: throw ClassCastException(context?.toString() + " must implement OnHeadlineSelectedListener")
+        onClickCityDelegate = context as? OnClickCityDelegate ?: throw ClassCastException(context?.toString()
+            + " must implement OnHeadlineSelectedListener")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +58,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter.start()
     }
 
     companion object {
@@ -67,9 +70,9 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     /*** Methods from CitiesListContract.View  */
 
     override fun setWeatherObjectWhenClicked(cityName: String) {
-        val weatherObject = presenter?.getWeatherObjectOnClick(cityName)
+        val weatherObject = presenter.getWeatherObjectOnClick(cityName)
         weatherObject?.let {
-            onClickCityDelegate?.onClickCity(weatherObject)
+            onClickCityDelegate.onClickCity(weatherObject)
         }
     }
 
@@ -81,6 +84,10 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
         citiesAdapter?.addNewCityToShow(newCity)
         Toast.makeText(context, R.string.added_city, Toast.LENGTH_SHORT).show()
         cityNameContainer?.editText?.setText("")
+    }
+
+    override fun showErrorInternetConnection() {
+        Toast.makeText(context, R.string.problem_network_connection, Toast.LENGTH_LONG).show()
     }
 
     override fun showErrorAddingAddedCity() {
@@ -134,16 +141,16 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
             override fun onDismissed(transientBottomBar: Snackbar, event: Int) {
                 if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
                     deletedItem?.let {
-                        presenter?.deleteCity(it)
+                        presenter.deleteCity(it)
                     }
                 }
             }
-        }).setAction(R.string.undo, { _ ->
+        }).setAction(R.string.undo) { _ ->
             // undo is selected, restore the deleted item
             deletedItem?.let {
-                citiesAdapter?.restoreCity(deletedItem, deletedIndex)
+                citiesAdapter?.restoreCity(it, deletedIndex)
             }
-        })
+        }
 
         snackbar.setActionTextColor(Color.YELLOW)
         snackbar.show()
@@ -152,7 +159,11 @@ class CitiesListFragment : Fragment(), CitiesListContract.View, RecyclerItemTouc
     private fun addClickListenerToAddCityButton(addCityButton: Button) {
         addCityButton.setOnClickListener { _ ->
             val newCityName = cityNameContainer?.editText?.text.toString()
-            presenter?.addNewCity(newCityName)
+            if (Utils.isNetworkAvailable(activity)) {
+                presenter.addNewCity(newCityName)
+            } else {
+                showErrorInternetConnection()
+            }
         }
     }
 

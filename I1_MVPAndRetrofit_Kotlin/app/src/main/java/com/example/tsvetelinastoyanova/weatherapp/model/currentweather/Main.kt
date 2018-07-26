@@ -6,9 +6,9 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Main(
-        @SerializedName("temp") val temp: Double,
-        @SerializedName("pressure") val pressure: Int,
-        @SerializedName("humidity") val humidity: Int,
-        @SerializedName("temp_min") val tempMin: Double,
-        @SerializedName("temp_max") val tempMax: Double
+    @SerializedName("temp") val temp: Double,
+    @SerializedName("pressure") val pressure: Double,
+    @SerializedName("humidity") val humidity: Int,
+    @SerializedName("temp_min") val tempMin: Double,
+    @SerializedName("temp_max") val tempMax: Double
 ) : Parcelable

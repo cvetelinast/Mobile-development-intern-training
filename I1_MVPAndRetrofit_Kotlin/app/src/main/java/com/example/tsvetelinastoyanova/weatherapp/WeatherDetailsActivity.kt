@@ -7,7 +7,6 @@ import com.example.tsvetelinastoyanova.weatherapp.util.Utils
 import com.example.tsvetelinastoyanova.weatherapp.weatherdetails.WeatherDetailsContainerFragment
 import com.example.tsvetelinastoyanova.weatherapp.weatherdetails.WeatherDetailsContainerPresenter
 
-
 class WeatherDetailsActivity : AppCompatActivity() {
     private var weatherObject: CurrentWeatherObject? = null
     private lateinit var weatherDetailsContainerFragment: WeatherDetailsContainerFragment

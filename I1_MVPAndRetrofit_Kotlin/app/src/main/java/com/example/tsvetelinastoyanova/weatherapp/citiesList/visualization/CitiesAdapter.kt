@@ -15,17 +15,17 @@ import java.util.ArrayList
 
 typealias OnItemClickListener = (View, Int) -> Unit
 
-class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : RecyclerView.Adapter<CitiesAdapter.MyViewHolder>() {
+class CitiesAdapter(private val onItemClickListener: OnItemClickListener)
+    : RecyclerView.Adapter<CitiesAdapter.MyViewHolder>() {
 
     val citiesList: MutableList<City> = ArrayList()
 
     class MyViewHolder internal constructor(view: View, private val onItemClickListener: OnItemClickListener) :
-            RecyclerView.ViewHolder(view), CityRowView, View.OnClickListener {
+        RecyclerView.ViewHolder(view), CityRowView, View.OnClickListener {
 
         private var name: TextView = view.name
-        var temperature: TextView = view.temperature
-        var icon: ImageView = view.icon
-        internal var viewBackground: RelativeLayout = view.view_background
+        private var temperature: TextView = view.temperature
+        private var icon: ImageView = view.icon
         internal var viewForeground: RelativeLayout = view.view_foreground
 
         init {
@@ -86,7 +86,7 @@ class CitiesAdapter(private val onItemClickListener: OnItemClickListener) : Recy
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-                .inflate(R.layout.city, parent, false)
+            .inflate(R.layout.city, parent, false)
 
         return MyViewHolder(itemView, onItemClickListener)
     }

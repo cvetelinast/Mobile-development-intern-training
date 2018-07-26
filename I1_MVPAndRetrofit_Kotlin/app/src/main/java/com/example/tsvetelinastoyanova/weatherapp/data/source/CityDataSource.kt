@@ -3,7 +3,6 @@ package com.example.tsvetelinastoyanova.weatherapp.data.source
 import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import io.reactivex.Single
 
-
 interface CityDataSource {
 
     interface GetCityCallback {

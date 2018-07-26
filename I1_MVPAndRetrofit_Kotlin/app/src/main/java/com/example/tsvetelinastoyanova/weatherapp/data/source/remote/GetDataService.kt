@@ -9,8 +9,8 @@ import retrofit2.http.Query
 interface GetDataService {
 
     @GET("weather")
-    fun getWeatherForCity(@Query("APPID") appId: String, @Query("q") city: String): Single<CurrentWeatherObject>
+    fun getWeatherForCity(@Query("APPID") appId: String, @Query("q", encoded = false) city: String): Single<CurrentWeatherObject>
 
     @GET("forecast")
-    fun getForecastForCity(@Query("APPID") appId: String, @Query("q") city: String): Single<ForecastObject>
+    fun getForecastForCity(@Query("APPID") appId: String, @Query("q", encoded = false) city: String): Single<ForecastObject>
 }

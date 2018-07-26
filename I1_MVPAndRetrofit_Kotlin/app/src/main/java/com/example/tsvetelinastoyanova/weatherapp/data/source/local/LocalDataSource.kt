@@ -7,6 +7,7 @@ import io.reactivex.Single
 
 
 interface LocalDataSource : CityDataSource {
+
     interface AddCityCallback {
 
         fun onCityAddedSuccessfully(cityEntity: CityEntity)
