@@ -6,7 +6,7 @@ import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : CityDataSource, LocalDataSource {
+open class CitiesLocalDataSource private constructor(private val cityDao: CityDao) : CityDataSource, LocalDataSource {
 
     override fun getCities(): Single<List<CityEntity>> = cityDao.getAll()
         .subscribeOn(Schedulers.single())

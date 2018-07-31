@@ -3,6 +3,7 @@ package com.example.tsvetelinastoyanova.weatherapp.citiesList
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.design.widget.BaseTransientBottomBar
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputLayout
@@ -91,7 +92,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View,
     }
 
     override fun showErrorAddingAddedCity() {
-        Toast.makeText(context, R.string.not_added_city, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, R.string.existing_city, Toast.LENGTH_SHORT).show()
     }
 
     override fun showErrorLoadingCities() {
@@ -158,7 +159,7 @@ class CitiesListFragment : Fragment(), CitiesListContract.View,
 
     private fun addClickListenerToAddCityButton(addCityButton: Button) {
         addCityButton.setOnClickListener { _ ->
-            val newCityName = cityNameContainer?.editText?.text.toString()
+            val newCityName = getCityFromInputField()
             if (Utils.isNetworkAvailable(activity)) {
                 presenter.addNewCity(newCityName)
             } else {
@@ -187,5 +188,9 @@ class CitiesListFragment : Fragment(), CitiesListContract.View,
 
         val itemTouchHelperCallback = RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this)
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
+    }
+
+    override fun getCityFromInputField(): String {
+        return cityNameContainer?.editText?.text.toString()
     }
 }

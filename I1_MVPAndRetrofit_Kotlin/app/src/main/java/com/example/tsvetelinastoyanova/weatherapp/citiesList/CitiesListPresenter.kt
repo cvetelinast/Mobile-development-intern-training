@@ -6,7 +6,6 @@ import com.example.tsvetelinastoyanova.weatherapp.data.CityEntity
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CitiesRepository
 import com.example.tsvetelinastoyanova.weatherapp.data.source.CityDataSource
 import com.example.tsvetelinastoyanova.weatherapp.data.source.local.LocalDataSource
-import com.example.tsvetelinastoyanova.weatherapp.model.currentweather.CurrentWeatherObject
 import com.example.tsvetelinastoyanova.weatherapp.util.convertCityEntityToCity
 
 class CitiesListPresenter(private val view: CitiesListContract.View,
@@ -33,7 +32,7 @@ class CitiesListPresenter(private val view: CitiesListContract.View,
         if (cityName == null) {
             view.showErrorNotValidCityName()
         } else {
-            citiesRepository.addCity(cityName, object : LocalDataSource.AddCityCallback {
+            citiesRepository.addNotAddedCity(cityName, object : LocalDataSource.AddCityCallback {
                 override fun onCityAddedSuccessfully(cityEntity: CityEntity) {
                     view.showNewCityAdded(convertCityEntityToCity(cityEntity))
                 }

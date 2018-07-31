@@ -1,5 +1,6 @@
 package com.example.tsvetelinastoyanova.weatherapp.citiesList
 
+import android.support.annotation.VisibleForTesting
 import com.example.tsvetelinastoyanova.weatherapp.BasePresenter
 import com.example.tsvetelinastoyanova.weatherapp.BaseView
 import com.example.tsvetelinastoyanova.weatherapp.City
@@ -30,6 +31,9 @@ interface CitiesListContract {
         fun setWeatherObjectWhenClicked(cityName: String)
 
         fun getDisplayedCities(): MutableList<City>?
+
+        @VisibleForTesting
+        fun getCityFromInputField(): String
     }
 
     interface Presenter : BasePresenter {

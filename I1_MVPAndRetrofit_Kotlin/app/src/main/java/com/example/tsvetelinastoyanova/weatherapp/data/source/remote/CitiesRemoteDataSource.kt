@@ -7,7 +7,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class CitiesRemoteDataSource {
+open class CitiesRemoteDataSource {
     companion object {
 
         private var INSTANCE: CitiesRemoteDataSource? = null
@@ -24,7 +24,7 @@ class CitiesRemoteDataSource {
         }
     }
 
-    fun getWeatherObject(city: String): Single<CurrentWeatherObject> {
+    open fun getWeatherObject(city: String): Single<CurrentWeatherObject> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getWeatherForCity(Constants.API_KEY, city)
