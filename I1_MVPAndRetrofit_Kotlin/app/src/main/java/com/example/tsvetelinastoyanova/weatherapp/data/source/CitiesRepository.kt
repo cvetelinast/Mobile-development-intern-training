@@ -41,19 +41,19 @@ open class CitiesRepository(private val localDataSource: LocalDataSource,
     }
 
     @VisibleForTesting
-    fun getSizeOfCache(): Int {
+    open fun getSizeOfCache(): Int {
         return weatherObjectsCache.size
     }
 
-    fun getCities(getCityCallback: CityDataSource.GetCityCallback) {
-        if (!weatherObjectsCache.isEmpty()) {
+    open fun getCities(getCityCallback: CityDataSource.GetCityCallback) {
+        if (getSizeOfCache() > 0) {
             getCitiesFromCache(getCityCallback)
         } else {
             getCitiesFromDataSource(getCityCallback)
         }
     }
 
-    private fun getCitiesFromDataSource(getCityCallback: CityDataSource.GetCityCallback) {
+    open fun getCitiesFromDataSource(getCityCallback: CityDataSource.GetCityCallback) {
         localDataSource.getCities()
             .filter { list -> list.isNotEmpty() }
             .flatMapPublisher { listOfCityEntities ->
@@ -87,7 +87,7 @@ open class CitiesRepository(private val localDataSource: LocalDataSource,
         return localDataSource.getCity(cityName)
     }
 
-    fun addNotAddedCity(cityName: String, callback: LocalDataSource.AddCityCallback) {
+    open fun addNotAddedCity(cityName: String, callback: LocalDataSource.AddCityCallback) {
         /*** 1) check if city exists in database
         1.1) exists - onCityAlreadyExists()
         1.2) does not exist - api request()
@@ -131,7 +131,7 @@ open class CitiesRepository(private val localDataSource: LocalDataSource,
             .map { cityEntity: CityEntity -> cityEntity to weatherObject }
 
 
-    fun deleteCity(cityName: String, deleteCityCallback: LocalDataSource.DeleteCityCallback) {
+    open fun deleteCity(cityName: String, deleteCityCallback: LocalDataSource.DeleteCityCallback) {
         localDataSource.deleteCity(cityName)
             .doOnError { _ -> deleteCityCallback.onFail() }
             .map { delete -> deleteWeatherObjectFromCache(delete) }
@@ -141,7 +141,7 @@ open class CitiesRepository(private val localDataSource: LocalDataSource,
             )
     }
 
-    fun getWeatherObjectWithName(cityName: String): CurrentWeatherObject? {
+    open fun getWeatherObjectWithName(cityName: String): CurrentWeatherObject? {
         synchronized(weatherObjectsCache) {
             for (weatherObject in weatherObjectsCache) {
                 weatherObject.let {
@@ -164,7 +164,7 @@ open class CitiesRepository(private val localDataSource: LocalDataSource,
         return null
     }
 
-    fun refreshCities(cities: List<City>, getCityCallback: CityDataSource.GetCityCallback) {
+    open fun refreshCities(cities: List<City>, getCityCallback: CityDataSource.GetCityCallback) {
         /*** foreach city
          * load from DB
          * get name and load from API

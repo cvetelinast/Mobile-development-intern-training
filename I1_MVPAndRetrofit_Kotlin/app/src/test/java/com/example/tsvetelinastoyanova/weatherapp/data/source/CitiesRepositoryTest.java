@@ -34,7 +34,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(CitiesRemoteDataSource.class)
 public class CitiesRepositoryTest {
 
     private CitiesRepository citiesRepository;

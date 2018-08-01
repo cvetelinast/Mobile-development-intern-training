@@ -3,7 +3,6 @@ package com.example.tsvetelinastoyanova.weatherapp.citiesList
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.support.annotation.VisibleForTesting
 import android.support.design.widget.BaseTransientBottomBar
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputLayout

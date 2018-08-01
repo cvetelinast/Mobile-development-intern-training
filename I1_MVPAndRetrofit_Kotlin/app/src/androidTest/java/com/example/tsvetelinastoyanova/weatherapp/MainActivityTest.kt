@@ -9,8 +9,6 @@ import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.uiautomator.UiDevice
 import org.hamcrest.Matchers.*
 
-import org.junit.Rule
-import org.junit.Test
 import android.os.SystemClock
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
@@ -18,10 +16,12 @@ import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.matcher.ViewMatchers.*
 import com.example.tsvetelinastoyanova.weatherapp.citiesList.visualization.CitiesAdapter
 import android.support.test.InstrumentationRegistry.getInstrumentation
-import org.junit.Before
+import com.example.tsvetelinastoyanova.weatherapp.util.Utils
+import org.junit.*
 
 class MainActivityTest {
     private val VALID_CITY = "Varna"
+    private val NOT_ADDED_CITY = "Reconquista"
     private val degreeCelsiusSign: String = String.format(Constants.DEGREES_CELSIUS, "")
 
     @Rule
@@ -32,19 +32,29 @@ class MainActivityTest {
     fun init() {
         // todo: How to prepare recyclerView for testing?
         addCity(VALID_CITY)
+        val device: UiDevice = UiDevice.getInstance(getInstrumentation())
+        device.setOrientationNatural()
     }
 
+    /*@After
+    fun clear() {
+        Espresso.onView(withId(R.id.recyclerView))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<CitiesAdapter.MyViewHolder>(0, ViewActions.swipeLeft()))
+        SystemClock.sleep(3000)
+    }
+*/
     @Test
     fun testWrongInput() {
         addCity("Not valid city name")
         checkForErrorToastMessage()
     }
 
-    /* @Test
-     fun testValidInput() {
-         addCity(VALID_CITY)
-         checkForSuccessfullyAddedToastMessage()
-     }*/
+    @Test
+    fun testValidInput() {
+        addCity(NOT_ADDED_CITY)
+        checkForSuccessfullyAddedToastMessage()
+    }
+
 
     @Test
     fun testValidInputWithRepeatingCity() {
@@ -61,7 +71,9 @@ class MainActivityTest {
     @Test
     fun checkOnClickCityEvent() {
         clickOnFirstRowOfRecyclerView()
-        checkActivityStarted()
+        if (!Utils.isTablet(activityRule.activity)) {
+            checkActivityStarted()
+        }
         Espresso.onView(withId(R.id.cityAndCountry)).check(matches(isDisplayed()))
         Espresso.onView(withId(R.id.cityAndCountry))
             .perform(swipeLeft())
@@ -72,7 +84,9 @@ class MainActivityTest {
         val device: UiDevice = UiDevice.getInstance(getInstrumentation())
 
         clickOnFirstRowOfRecyclerView()
-        checkActivityStarted()
+        if (!Utils.isTablet(activityRule.activity)) {
+            checkActivityStarted()
+        }
         Espresso.onView(withId(R.id.cityAndCountry)).check(matches(isDisplayed()))
 
         Espresso.onView(withId(R.id.degrees)).check(matches(withText(endsWith(degreeCelsiusSign))))
@@ -88,21 +102,12 @@ class MainActivityTest {
         Espresso.onView(withId(R.id.degrees)).check(matches(withText(endsWith(degreeCelsiusSign))))
     }
 
-    private fun clickOnFirstRowOfRecyclerView() {
-        Espresso.onView(withId(R.id.recyclerView))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<CitiesAdapter.MyViewHolder>(0, click()))
-    }
-
     @Test
     fun deleteCityOnSwipe() {
         Espresso.onView(withId(R.id.recyclerView))
             .perform(RecyclerViewActions.actionOnItemAtPosition<CitiesAdapter.MyViewHolder>(0, ViewActions.swipeLeft()))
+        SystemClock.sleep(2000)
         checkForDeletedCityToastMessage()
-    }
-
-    @Test
-    fun deleteAllCities() {
-
     }
 
     @Test
@@ -153,6 +158,11 @@ class MainActivityTest {
         val speedOfWindPrefix: String = activityRule.activity.resources.getString(R.string.speed_of_wind, 0f)
             .substringBefore(":")
         Espresso.onView(withId(R.id.windSpeed)).check(matches(withText(startsWith(speedOfWindPrefix))))
+    }
+
+    private fun clickOnFirstRowOfRecyclerView() {
+        Espresso.onView(withId(R.id.recyclerView))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<CitiesAdapter.MyViewHolder>(0, click()))
     }
 
     private fun addCity(input: String) {
