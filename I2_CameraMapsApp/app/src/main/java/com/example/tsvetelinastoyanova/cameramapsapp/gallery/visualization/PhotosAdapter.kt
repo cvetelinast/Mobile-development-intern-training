@@ -5,15 +5,15 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.TextView
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateFormat
 import android.view.View
 import android.widget.ImageView
-/*import com.bumptech.glide.signature.ObjectKey*/
-/*import com.example.tsvetelinastoyanova.cameramapsapp.GlideApp*/
+import com.example.tsvetelinastoyanova.cameramapsapp.GlideApp
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 import java.io.File
 
 
-class PhotosAdapter(private val photosList: List<Photo>, private val context: Context) : RecyclerView.Adapter<PhotosAdapter.MyViewHolder>() {
+class PhotosAdapter(private val photosList: MutableList<Photo>, private val context: Context) : RecyclerView.Adapter<PhotosAdapter.MyViewHolder>() {
     private val IMAGE_WIDTH_PIXELS = 500
     private val IMAGE_HEIGHT_PIXELS = 500
 
@@ -44,18 +44,24 @@ class PhotosAdapter(private val photosList: List<Photo>, private val context: Co
 
         val file: File = photoWithDetails.file
 
-        /*    GlideApp.with(context)
-                .load(file)
-    //            .signature(ObjectKey(file.name + file.lastModified()))
-                .override(IMAGE_WIDTH_PIXELS, IMAGE_HEIGHT_PIXELS)
-                .into(holder.photo)*/
+        GlideApp.with(context)
+            .load(file)
+            //.signature(ObjectKey(file.name + file.lastModified()))
+            .override(IMAGE_WIDTH_PIXELS, IMAGE_HEIGHT_PIXELS)
+            .into(holder.photo)
 
         holder.name.text = photoWithDetails.name
-        holder.lastModified.text = photoWithDetails.lastModified
+        val dateString = DateFormat.format("yyyy.MM.dd", photoWithDetails.lastModified).toString()
+        holder.lastModified.text = dateString
         holder.location.text = photoWithDetails.location
     }
 
     override fun getItemCount(): Int {
         return photosList.size
+    }
+
+    fun addNewPhoto(photo: Photo) {
+        photosList.add(photo)
+        notifyItemChanged(photosList.size - 1)
     }
 }

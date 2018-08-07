@@ -1,6 +1,9 @@
 package com.example.tsvetelinastoyanova.cameramapsapp.data
 
+import android.content.Context
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.LocalRepository
+import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.Photo
+import io.reactivex.Observable
 
 class PhotosRepository(private val localRepository: LocalRepository) : Repository {
 
@@ -13,5 +16,9 @@ class PhotosRepository(private val localRepository: LocalRepository) : Repositor
                 INSTANCE ?: PhotosRepository(localRepository).also { INSTANCE = it }
             }
         }
+    }
+
+    override fun getListOfPhotosOneByOne(context: Context): Observable<Photo> {
+        return localRepository.getListOfPhotosOneByOne(context)
     }
 }

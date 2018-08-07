@@ -5,14 +5,17 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import android.support.v7.widget.*
+import android.util.Log
 import android.view.*
-import com.example.tsvetelinastoyanova.cameramapsapp.camera.CameraFragment
+import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.PhotosAdapter
 import kotlinx.android.synthetic.main.fragment_gallery.*
 
 
 class GalleryFragment : Fragment(), GalleryContract.View {
     private lateinit var presenter: GalleryContract.Presenter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var photosAdapter: PhotosAdapter
 
     /*** interface  ***/
 
@@ -35,22 +38,12 @@ class GalleryFragment : Fragment(), GalleryContract.View {
         }
     }
 
-   /* companion object {
-        @Volatile
-        private var INSTANCE: GalleryFragment? = null
-
-        fun newInstance(): GalleryFragment {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: GalleryFragment().also { INSTANCE = it }
-            }
-        }
-    }*/
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
         val toolbar = view.findViewById(R.id.toolbar_gallery) as Toolbar
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
+        setRecyclerView(view)
         return view
     }
 
@@ -82,5 +75,29 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     private fun setFloatingButtonListener() {
         camera.setOnClickListener { _ -> fragmentsLoader.onClickToOpenCamera() }
+    }
+
+    private fun setRecyclerView(view: View) {
+        this.recyclerView = view.findViewById(R.id.recyclerView)
+
+        context?.let {
+            presenter.getListOfPhotosOneByOne(it)
+                .subscribe(
+                    { photo ->
+                        photosAdapter.addNewPhoto(photo)
+                        Log.d("tag", "loaded photo: $photo")
+                    },
+                    { err -> Log.d("tag", "Error loading photos: $err") }
+                )
+        }
+        context?.let {
+            photosAdapter = PhotosAdapter(photosList = ArrayList(), context = it)
+        }
+
+        val mLayoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = mLayoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.layoutManager = GridLayoutManager(context, 3)
+        recyclerView.adapter = photosAdapter
     }
 }

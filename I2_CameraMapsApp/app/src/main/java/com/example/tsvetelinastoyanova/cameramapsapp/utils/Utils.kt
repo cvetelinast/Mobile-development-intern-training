@@ -13,22 +13,27 @@ import com.example.tsvetelinastoyanova.cameramapsapp.data.local.PhotosLocalRepos
 object Utils {
 
     fun addFragmentToActivity(fragmentManager: FragmentManager,
-                              fragment: Fragment, frameId: Int) {
+                              fragment: Fragment, frameId: Int, nameOfFragment: String) {
         checkNotNull(fragmentManager)
         checkNotNull(fragment)
         val transaction = fragmentManager.beginTransaction()
-        transaction.add(frameId, fragment)/*.addToBackStack("TAG")*/
+        fragmentManager.popBackStackImmediate()
+        transaction.add(frameId, fragment, nameOfFragment).addToBackStack(null)
         transaction.commit()
     }
 
     fun switchFragment(fragmentManager: FragmentManager,
-                       newFragment: Fragment, frameId: Int/*, oldFragment: Fragment*/) {
+                       newFragment: Fragment, frameId: Int, nameOfFragment: String) {
         checkNotNull(fragmentManager)
         checkNotNull(newFragment)
         val transaction = fragmentManager.beginTransaction()
-        //   transaction.remove(oldFragment)
-        transaction.replace(frameId, newFragment).addToBackStack("TAG")
+        transaction.replace(frameId, newFragment, nameOfFragment)
+        transaction.addToBackStack(null)
         transaction.commit()
+    }
+
+    fun popBackStack(fragmentManager: FragmentManager) {
+        fragmentManager.popBackStackImmediate()
     }
 
     fun providePhotosRepository(): PhotosRepository {
