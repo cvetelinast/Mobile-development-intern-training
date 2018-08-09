@@ -34,11 +34,13 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     companion object {
         fun newInstance(): GalleryFragment {
+            Log.d("tag1", "newInstance()")
             return GalleryFragment()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d("tag1", "onCreateView()")
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
         val toolbar = view.findViewById(R.id.toolbar_gallery) as Toolbar
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -54,6 +56,7 @@ class GalleryFragment : Fragment(), GalleryContract.View {
     }
 
     override fun onResume() {
+        Log.d("tag1", "onResume()")
         super.onResume()
         presenter.start()
         setFloatingButtonListener()
@@ -81,16 +84,6 @@ class GalleryFragment : Fragment(), GalleryContract.View {
         this.recyclerView = view.findViewById(R.id.recyclerView)
 
         context?.let {
-            presenter.getListOfPhotosOneByOne(it)
-                .subscribe(
-                    { photo ->
-                        photosAdapter.addNewPhoto(photo)
-                        Log.d("tag", "loaded photo: $photo")
-                    },
-                    { err -> Log.d("tag", "Error loading photos: $err") }
-                )
-        }
-        context?.let {
             photosAdapter = PhotosAdapter(photosList = ArrayList(), context = it)
         }
 
@@ -99,5 +92,22 @@ class GalleryFragment : Fragment(), GalleryContract.View {
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.layoutManager = GridLayoutManager(context, 3)
         recyclerView.adapter = photosAdapter
+
+        context?.let {
+            presenter.getListOfPhotosOneByOne(it)
+                .subscribe(
+                    { photo ->
+                        photosAdapter.addNewPhoto(photo)
+                        Log.d("tag", "loaded photo: $photo")
+                    },
+                    { err ->
+                        Log.d("tag", "Error loading photos: $err")
+                    },
+                    {
+                        photosAdapter.notifyDataSetChanged()
+                    }
+                )
+        }
     }
+
 }

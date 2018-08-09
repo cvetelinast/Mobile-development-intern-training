@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader/*, Cam
             val galleryPresenter: GalleryContract.Presenter = GalleryPresenter(it, photosRepository)
             it.setPresenter(galleryPresenter)
         }
-
     }
 
     private fun createMapFragment() {
