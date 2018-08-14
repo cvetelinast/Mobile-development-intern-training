@@ -1,6 +1,6 @@
 package com.example.tsvetelinastoyanova.cameramapsapp.camera
 
-import android.app.Activity
+import android.Manifest
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -10,23 +10,22 @@ import android.view.ViewGroup
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 import android.support.design.widget.FloatingActionButton
 import android.view.TextureView
-
+import android.widget.Toast
 
 class CameraFragment : Fragment(), CameraContract.View {
-    private lateinit var presenter: CameraContract.Presenter
+    private var presenter: CameraContract.Presenter? = null
+    private val CAMERA_REQUEST_CODE: Int = 1888
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1889
 
-    /*** interface  ***/
-    /*
-    private lateinit var previousFragmentLoader: PreviousFragmentLoader
-
-    interface PreviousFragmentLoader {
-        fun loadPreviousFragment()
-    }*/
 
     /*** Methods from Fragment  ***/
     override fun setPresenter(presenter: CameraContract.Presenter) {
         Log.d("tag", "Set Camera Presenter in CameraFragment")
         this.presenter = presenter
+    }
+
+    override fun showFileSavedMessage() {
+        Toast.makeText(activity, R.string.file_saved_successfully, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
@@ -40,36 +39,37 @@ class CameraFragment : Fragment(), CameraContract.View {
         createCameraView(view)
         val s = view.findViewById(R.id.fab_take_photo) as FloatingActionButton
         s.setOnClickListener { _ ->
-            context?.let {
-                presenter.onTakePhotoButtonClicked(it)
+            activity?.let {
+                presenter?.onTakePhotoButtonClicked(it)
             }
         }
         return view
     }
 
-    /* override fun onAttach(context: Context?) {
-         super.onAttach(context)
-         previousFragmentLoader = context as? PreviousFragmentLoader ?: throw ClassCastException(context?.toString()
-             + " must implement PreviousFragmentLoader")
-     }*/
-
     override fun onResume() {
         super.onResume()
-        presenter.start()
+        checkNotNull(presenter)
+        Log.d("tag", "onResume() in CameraPresenter")
+        presenter?.start()
         context?.let {
-            presenter.calledInOnResume(it)
+            presenter?.calledInOnResume(it)
         }
     }
 
     private fun createCameraView(view: View) {
         val textureView: TextureView = view.findViewById(R.id.texture_view)
-        presenter.initTextureView(textureView)
 
-        activity?.let {
-            presenter.requestPermissions(it)
-            presenter.initCameraManager(it)
-            presenter.setSurfaceTextureListener()
-            presenter.initStateCallback()
+        checkNotNull(presenter)
+        presenter!!.apply {
+            this.initTextureView(textureView)
+
+            activity?.let {
+                this.requestPermission(it, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
+                this.requestPermission(it,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS_REQUEST_CODE)
+                this.initCameraManager(it)
+                this.setSurfaceTextureListener()
+                this.initStateCallback()
+            }
         }
     }
 }

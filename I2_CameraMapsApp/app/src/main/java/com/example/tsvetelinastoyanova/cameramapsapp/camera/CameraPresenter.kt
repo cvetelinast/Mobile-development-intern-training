@@ -13,19 +13,21 @@ import android.view.Surface
 import android.hardware.camera2.CaptureRequest
 import io.reactivex.subjects.PublishSubject
 import android.graphics.SurfaceTexture
+import android.location.Location
 import android.os.Handler
 import android.os.HandlerThread
 import android.view.TextureView
 import android.util.Size
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import io.reactivex.Observable
 import java.util.*
 
 class CameraPresenter(private val view: CameraContract.View, private val repository: Repository) : CameraContract.Presenter {
 
-    private val CAMERA_REQUEST_CODE: Int = 1888
-
+    private val onSurfaceTextureAvailable = PublishSubject.create<SurfaceTexture>()
     lateinit var cameraManager: CameraManager
     lateinit var textureView: TextureView
-    private val onSurfaceTextureAvailable = PublishSubject.create<SurfaceTexture>()
     private lateinit var previewSize: Size
     private lateinit var stateCallback: CameraDevice.StateCallback
     private var cameraDevice: CameraDevice? = null
@@ -33,7 +35,6 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
     private var backgroundHandler: Handler? = null
     private var captureRequestBuilder: CaptureRequest.Builder? = null
     private var cameraId: String = ""
-
 
     override fun start() {
         Log.d("tag", "Camera Presenter started")
@@ -43,8 +44,8 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
         this.textureView = textureView
     }
 
-    override fun requestPermissions(activity: Activity) {
-        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
+    override fun requestPermission(activity: Activity, array: Array<String>, code: Int) {
+        ActivityCompat.requestPermissions(activity, array, code)
     }
 
     override fun initCameraManager(context: Context) {
@@ -90,13 +91,6 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
         }
     }
 
-    override fun onTakePhotoButtonClicked(context: Context) {
-        repository.savePhoto(context, textureView.bitmap)
-            .subscribe(
-                { success -> Log.d("tag", "File saved: $success") },
-                { error -> Log.d("tag", "Error: $error") }
-            )
-    }
 
     override fun calledInOnResume(context: Context) {
         openBackgroundThread()
@@ -106,6 +100,10 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
         } else {
             textureView.surfaceTextureListener = surfaceTextureListener
         }
+    }
+
+    override fun onTakePhotoButtonClicked(activity: Activity) {
+        initLocation(activity)
     }
 
     private fun openBackgroundThread() {
@@ -140,14 +138,38 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
         }
     }
 
+    private fun initLocation(activity: Activity) {
+        val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
+        //   val permissionState = ActivityCompat.requestPermission(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS_REQUEST_CODE)
+
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            var location = Location("No information")
+            fusedLocationProviderClient.lastLocation.addOnCompleteListener(activity) { task ->
+                if (task.isSuccessful && task.result != null) {
+                    Log.d("location", "Location get successfully: ${task.result}")
+                    location = task.result
+                } else {
+                    Log.d("location", "Location not get")
+                }
+                savePhoto(activity, location)
+            }
+        }
+
+    }
+
+    private fun savePhoto(activity: Activity, location: Location) {
+        repository.savePhoto(activity, textureView.bitmap, location)
+            .subscribe(
+                { _ -> view.showFileSavedMessage() },
+                { error -> Log.d("tag", "Error: $error") }
+            )
+    }
 
     private fun createPreviewSession() {
         try {
             val previewSurface = extractPreviewSurface()
             captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-
             captureRequestBuilder?.addTarget(previewSurface)
-
             cameraDevice?.createCaptureSession(Collections.singletonList(previewSurface),
                 object : CameraCaptureSession.StateCallback() {
 
@@ -156,7 +178,9 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
                             return
                         }
                         val captureRequest = captureRequestBuilder?.build()
-                        cameraCaptureSession.setRepeatingRequest(captureRequest, null, backgroundHandler)
+                        captureRequest?.let {
+                            cameraCaptureSession.setRepeatingRequest(it, null, backgroundHandler)
+                        }
                     }
 
                     override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {}

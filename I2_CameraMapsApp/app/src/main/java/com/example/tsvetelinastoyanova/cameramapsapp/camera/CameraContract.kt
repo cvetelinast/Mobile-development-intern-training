@@ -10,13 +10,14 @@ interface CameraContract {
 
     interface View : BaseView<Presenter> {
 
+        fun showFileSavedMessage()
     }
 
     interface Presenter : BasePresenter {
 
         fun initTextureView(textureView: TextureView)
 
-        fun requestPermissions(activity: Activity)
+        fun requestPermission(activity: Activity, array: Array<String>, code: Int)
 
         fun initCameraManager(context: Context)
 
@@ -26,6 +27,6 @@ interface CameraContract {
 
         fun calledInOnResume(context: Context)
 
-        fun onTakePhotoButtonClicked(context: Context)
+        fun onTakePhotoButtonClicked(activity: Activity)
     }
 }

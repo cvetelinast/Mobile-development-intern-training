@@ -2,9 +2,8 @@ package com.example.tsvetelinastoyanova.cameramapsapp.data.local
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.location.Location
 import android.media.ExifInterface
-import android.media.Image
-import android.support.annotation.NonNull
 import android.util.Log
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.Photo
@@ -14,7 +13,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,46 +26,38 @@ class PhotosLocalRepository : LocalRepository {
         }
     }
 
-    override fun getListOfPhotosOneByOne(context: Context): Observable<Photo> {
+    override fun getPhotos(context: Context): Observable<Photo> {
         createImageGallery(context)
         return Observable.fromIterable(traverseDirectoryAndGetFiles(context))
-            .map { file -> convertFileToPhoto(file) }
+            .map(::convertFileToPhoto)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun savePhoto(context: Context, bitmap: Bitmap): Single<String> {
+    override fun savePhoto(context: Context, bitmap: Bitmap, location: Location): Single<File> {
         createImageGallery(context)
-        var outputPhoto: FileOutputStream? = null
-        try {
+
+        return Single.fromCallable {
             val image = createImageFile()
-            var outputPhoto = FileOutputStream(image)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputPhoto)
-            return Single.just(image.name)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
+            var outputPhoto: FileOutputStream? = null
+
             try {
+                outputPhoto = FileOutputStream(image)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
+            } finally {
                 outputPhoto?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
             }
+            image
         }
-        val errorMessage = "Not successfull shot"
-        return Single.just(errorMessage)
+            .doAfterSuccess { s ->
+                val exifInterface = ExifInterface(s.path)
+                exifInterface.setAttribute(ExifInterface.TAG_GPS_LATITUDE, location.latitude.toString())
+                exifInterface.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, location.longitude.toString())
+                exifInterface.saveAttributes()
+                Log.d("fsd", "vgero")
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-
-        /* return Single.fromCallable {
-             image.use { image ->
-                 FileOutputStream(file).channel.use { output ->
-                     output.write(image.planes[0].buffer)
-                     return@fromCallable file
-                 }
-             }
-         }*/
     }
 
     private fun createImageGallery(context: Context) {
@@ -93,29 +83,22 @@ class PhotosLocalRepository : LocalRepository {
             list.addAll(it.listFiles())
         }
         return list
-
-        /* galleryFolder?.let {
-             list.a
-
-             for (image in it.listFiles()) {
-                 val exif = ExifInterface(image.path)
-                 val lat: String = ExifInterface.TAG_GPS_LATITUDE
-                 if (lat != null) {
-                     val lat_data: String = exif.getAttribute(lat)
-                     Log.d("tag", "Location of the file: lat: $lat, lat_data: $lat_data")
-                 }
-             }
-         }*/
     }
 
     private fun convertFileToPhoto(file: File): Photo {
-        val exif = ExifInterface(file.path)
-        val lat: String = ExifInterface.TAG_GPS_LATITUDE
-        var lat_data: String = "Fake data"//= exif.getAttribute(lat)
+        val exifInterface = ExifInterface(file.path)
+        val latTemp: String = ExifInterface.TAG_GPS_LATITUDE
+        val lat2 = exifInterface.getAttribute(latTemp)
+
+        val lat = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE) ?: ""
+        val lon = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) ?: ""
+        Log.d("location in repository", "lat: $lat, lon: $lon, latTemp: $latTemp, lat2: $lat2")
+
+        /*var lat_data: String = "Fake data"//= exif.getAttribute(lat)
         if (lat_data == null) {
             lat_data = "Some fake data"
-        }
-        return Photo(file.name, Date(file.lastModified()), lat_data, file)
+        }*/
+        return Photo(file.name, Date(file.lastModified()), lat, lon, file)
     }
 
     private fun createImageFile(): File {

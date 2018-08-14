@@ -3,4 +3,8 @@
     <string name="name_photo_example">Name: DCS2019889</string>
     <string name="last_modified_example">Last modified: 12.07.2018</string>
     <string name="location_example">Sofia, blvd. Beli Dunav 18</string>
+
+
+    <string name="file_saved_successfully">The file was saved successfully.</string>
+
 </resources>

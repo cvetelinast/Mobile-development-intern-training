@@ -1,5 +1,6 @@
 package com.example.tsvetelinastoyanova.cameramapsapp.gallery
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -10,12 +11,12 @@ import android.util.Log
 import android.view.*
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.PhotosAdapter
 import kotlinx.android.synthetic.main.fragment_gallery.*
-
+import android.graphics.Point
+import android.widget.Toast
 
 class GalleryFragment : Fragment(), GalleryContract.View {
-    private lateinit var presenter: GalleryContract.Presenter
+    private var presenter: GalleryContract.Presenter? = null
     private lateinit var recyclerView: RecyclerView
-    private lateinit var photosAdapter: PhotosAdapter
 
     /*** interface  ***/
 
@@ -34,18 +35,16 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     companion object {
         fun newInstance(): GalleryFragment {
-            Log.d("tag1", "newInstance()")
             return GalleryFragment()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d("tag1", "onCreateView()")
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
         val toolbar = view.findViewById(R.id.toolbar_gallery) as Toolbar
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
-        setRecyclerView(view)
+        createRecyclerView(view)?.let { loadPhotosInRecyclerView(it) }
         return view
     }
 
@@ -56,9 +55,8 @@ class GalleryFragment : Fragment(), GalleryContract.View {
     }
 
     override fun onResume() {
-        Log.d("tag1", "onResume()")
         super.onResume()
-        presenter.start()
+        presenter!!.start()
         setFloatingButtonListener()
     }
 
@@ -80,28 +78,42 @@ class GalleryFragment : Fragment(), GalleryContract.View {
         camera.setOnClickListener { _ -> fragmentsLoader.onClickToOpenCamera() }
     }
 
-    private fun setRecyclerView(view: View) {
+    private fun createRecyclerView(view: View): PhotosAdapter? {
         this.recyclerView = view.findViewById(R.id.recyclerView)
 
-        context?.let {
-            photosAdapter = PhotosAdapter(photosList = ArrayList(), context = it)
-        }
+        var photosAdapter: PhotosAdapter? = null
+        activity?.let { photosAdapter = createPhotosAdapter(it) }
+        photosAdapter?.let { setRecyclerViewAttributes(it) }
+        return photosAdapter
+    }
 
-        val mLayoutManager = LinearLayoutManager(context)
-        recyclerView.layoutManager = mLayoutManager
+    private fun createPhotosAdapter(activity: Activity): PhotosAdapter {
+        val display = activity.windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        val width = size.x
+        val height = size.y
+        return PhotosAdapter(photosList = mutableListOf(), context = activity, WIDTH = width / 3,
+            HEIGHT = height / 3)
+        { Toast.makeText(activity, "Clicked on ${it.name}", Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun setRecyclerViewAttributes(photosAdapter: PhotosAdapter) {
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.layoutManager = GridLayoutManager(context, 3)
         recyclerView.adapter = photosAdapter
+    }
 
+    private fun loadPhotosInRecyclerView(photosAdapter: PhotosAdapter) {
         context?.let {
-            presenter.getListOfPhotosOneByOne(it)
+            presenter!!.getListOfPhotosOneByOne(it)
                 .subscribe(
                     { photo ->
                         photosAdapter.addNewPhoto(photo)
-                        Log.d("tag", "loaded photo: $photo")
+                        Log.d("photo", "Loaded photo: ${photo.name}")
                     },
                     { err ->
-                        Log.d("tag", "Error loading photos: $err")
+                        Log.d("photo", "Error loading photos: $err")
                     },
                     {
                         photosAdapter.notifyDataSetChanged()
@@ -109,5 +121,4 @@ class GalleryFragment : Fragment(), GalleryContract.View {
                 )
         }
     }
-
 }

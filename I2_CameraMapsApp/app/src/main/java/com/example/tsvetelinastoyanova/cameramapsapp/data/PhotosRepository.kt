@@ -2,7 +2,7 @@ package com.example.tsvetelinastoyanova.cameramapsapp.data
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.media.Image
+import android.location.Location
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.LocalRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.Photo
 import io.reactivex.Observable
@@ -22,11 +22,11 @@ class PhotosRepository(private val localRepository: LocalRepository) : Repositor
 
     }
     override fun getListOfPhotosOneByOne(context: Context): Observable<Photo> {
-        return localRepository.getListOfPhotosOneByOne(context)
+        return localRepository.getPhotos(context)
     }
 
-    override fun savePhoto(context: Context, bitmap: Bitmap): Single<String> {
-       return localRepository.savePhoto(context, bitmap)
+    override fun savePhoto(context: Context, bitmap: Bitmap, location: Location): Single<File> {
+       return localRepository.savePhoto(context, bitmap, location)
     }
 
 }
