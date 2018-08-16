@@ -21,11 +21,11 @@ class PhotosRepository(private val localRepository: LocalRepository) : Repositor
         }
 
     }
-    override fun getListOfPhotosOneByOne(context: Context): Observable<Photo> {
+    override fun getPhotos(context: Context): Observable<Photo> {
         return localRepository.getPhotos(context)
     }
 
-    override fun savePhoto(context: Context, bitmap: Bitmap, location: Location): Single<File> {
+    override fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File> {
        return localRepository.savePhoto(context, bitmap, location)
     }
 

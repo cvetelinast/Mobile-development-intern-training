@@ -3,29 +3,29 @@ package com.example.tsvetelinastoyanova.cameramapsapp.camera
 import android.app.Activity
 import android.content.Context
 import android.view.TextureView
-import com.example.tsvetelinastoyanova.weatherapp.BasePresenter
-import com.example.tsvetelinastoyanova.weatherapp.BaseView
+import com.example.tsvetelinastoyanova.cameramapsapp.abstraction.BasePresenter
+import com.example.tsvetelinastoyanova.cameramapsapp.abstraction.BaseView
 
 interface CameraContract {
 
     interface View : BaseView<Presenter> {
 
-        fun showFileSavedMessage()
+        fun showErrorOpeningTheCamera()
+
+        fun showErrorMessageForSavingFile()
+
+        fun showProgressBar()
+
+        fun hideProgressBar()
     }
 
     interface Presenter : BasePresenter {
 
-        fun initTextureView(textureView: TextureView)
+        fun init(context: Context)
 
-        fun requestPermission(activity: Activity, array: Array<String>, code: Int)
+        fun setTextureView(textureView: TextureView)
 
-        fun initCameraManager(context: Context)
-
-        fun setSurfaceTextureListener()
-
-        fun initStateCallback()
-
-        fun calledInOnResume(context: Context)
+        fun startCameraIfPossible(activity: Activity)
 
         fun onTakePhotoButtonClicked(activity: Activity)
     }

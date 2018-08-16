@@ -10,7 +10,6 @@ import android.widget.ImageView
 import com.example.tsvetelinastoyanova.cameramapsapp.GlideApp
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 
-
 class PhotosAdapter(private val photosList: MutableList<Photo>, private val context: Context,
                     private val WIDTH: Int, private val HEIGHT: Int, private val listener: (Photo) -> Unit)
     : RecyclerView.Adapter<PhotosAdapter.MyViewHolder>() {
@@ -39,7 +38,7 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
             .asBitmap()
             .placeholder(R.drawable.ic_terrain_black_24dp)
             .load(fileUri)
-            .override(WIDTH, HEIGHT)
+            .override(WIDTH - 2, HEIGHT - 2)
             .fitCenter()
             .centerCrop()
             .into(holder.photo)

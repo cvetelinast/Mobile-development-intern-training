@@ -11,8 +11,8 @@ class GalleryPresenter(private val view: GalleryContract.View, private val repos
         Log.d("tag", "Gallery Presenter started")
     }
 
-    override fun getListOfPhotosOneByOne(context: Context): Observable<Photo> {
-        return repository.getListOfPhotosOneByOne(context)
+    override fun getPhotos(context: Context): Observable<Photo> {
+        return repository.getPhotos(context)
     }
 
 }

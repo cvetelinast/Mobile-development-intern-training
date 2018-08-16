@@ -11,7 +11,7 @@ import java.io.File
 
 interface Repository {
 
-    fun getListOfPhotosOneByOne(context: Context): Observable<Photo>
+    fun getPhotos(context: Context): Observable<Photo>
 
-    fun savePhoto(context: Context, bitmap: Bitmap, location: Location): Single<File>
+    fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File>
 }

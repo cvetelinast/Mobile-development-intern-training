@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.weatherapp
+package com.example.tsvetelinastoyanova.cameramapsapp.abstraction
 
 interface BaseView<T> {
 

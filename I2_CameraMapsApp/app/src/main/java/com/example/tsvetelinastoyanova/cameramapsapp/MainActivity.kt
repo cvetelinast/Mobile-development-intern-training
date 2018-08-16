@@ -2,6 +2,7 @@ package com.example.tsvetelinastoyanova.cameramapsapp
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
@@ -12,7 +13,13 @@ import com.example.tsvetelinastoyanova.cameramapsapp.data.PhotosRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.GalleryContract
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.GalleryFragment
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.GalleryPresenter
+import com.example.tsvetelinastoyanova.cameramapsapp.maps.MapsContract
+import com.example.tsvetelinastoyanova.cameramapsapp.maps.MapsFragment
+import com.example.tsvetelinastoyanova.cameramapsapp.maps.MapsPresenter
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.CAMERA_FRAGMENT_NAME
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.GALLERY_FRAGMENT_NAME
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.MAPS_FRAGMENT_NAME
 
 class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
@@ -22,11 +29,6 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        loadGalleryFragment()
-    }
-
-    private fun loadGalleryFragment() {
-        Utils.setTranslucent(this, false)
         createGalleryFragment(Utils::addFragmentToActivity)
     }
 
@@ -42,76 +44,51 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
         createCameraFragment()
     }
 
-    private fun createGalleryFragment(action: (sfm: FragmentManager, fragment: Fragment, id: Int, str: String) -> Unit) {
+    private fun createGalleryFragment(action: (fragmentManager: FragmentManager, fragment: Fragment, id: Int, str: String) -> Unit) {
+        Utils.setTranslucent(this, false)
         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
         val galleryFragment = GalleryFragment.newInstance()
         if (!galleryFragment.isAdded) {
-            //  showGalleryFragment(photosRepository)
-            action(supportFragmentManager, galleryFragment, R.id.contentFragment, "GALLERY")
+            action(supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
             galleryFragment.setGalleryPresenter(photosRepository)
         } else {
-            Utils.switchFragment(supportFragmentManager, galleryFragment, R.id.contentFragment, "GALLERY")
+            Utils.switchFragment(supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
         }
         isGalleryVisible = true
-
-        /*val tempGalleryFragment = supportFragmentManager.findFragmentByTag("GALLERY") as GalleryFragment?
-        val photosRepository: PhotosRepository = Utils.providePhotosRepository()
-        if (tempGalleryFragment == null) {
-            galleryFragment = GalleryFragment.newInstance()
-            showGalleryFragment(photosRepository)
-            setGalleryPresenter(photosRepository)
-        } else {
-            galleryFragment = tempGalleryFragment
-        }
-        isGalleryVisible = true*/
     }
 
-    fun GalleryFragment.setGalleryPresenter(photosRepository: PhotosRepository) {
+    private fun GalleryFragment.setGalleryPresenter(photosRepository: PhotosRepository) {
         val galleryPresenter: GalleryContract.Presenter = GalleryPresenter(this, photosRepository)
         this.setPresenter(galleryPresenter)
     }
 
-/*
-    private fun showGalleryFragment(photosRepository: PhotosRepository) {
-        if (supportFragmentManager.fragments.size == 0) {
-            Utils.addFragmentToActivity(supportFragmentManager, galleryFragment, R.id.contentFragment, "GALLERY")
-        } else {
-            Utils.switchFragment(supportFragmentManager, galleryFragment, R.id.contentFragment, "GALLERY")
-        }
-    }
-*/
-
     private fun createMapFragment() {
-        /* mapsFragment = supportFragmentManager.findFragmentById(R.id.contentFragment) as MapsFragment?
-         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
-         if (mapsFragment == null) {
-             mapsFragment = MapsFragment.newInstance()
-             mapsFragment?.let {
-                 Utils.switchFragment(supportFragmentManager, it, R.id.contentFragment, "MAPS")
-                 isGalleryVisible = false
-             }
-         }
-         mapsFragment?.let {
-             val mapsPresenter: MapsContract.Presenter = MapsPresenter(it, photosRepository)
-             it.setPresenter(mapsPresenter)
-         }*/
+        var mapsFragment = supportFragmentManager.findFragmentByTag(MAPS_FRAGMENT_NAME) as MapsFragment?
+        val photosRepository: PhotosRepository = Utils.providePhotosRepository()
+
+        if (mapsFragment == null) {
+            mapsFragment = MapsFragment.newInstance()
+
+            Utils.switchFragment(supportFragmentManager, mapsFragment, R.id.contentFragment, MAPS_FRAGMENT_NAME)
+            isGalleryVisible = false
+            val mapsPresenter: MapsContract.Presenter = MapsPresenter(mapsFragment, photosRepository)
+            mapsFragment.setPresenter(mapsPresenter)
+        }
     }
 
     private fun createCameraFragment() {
-        var cameraFragment = supportFragmentManager.findFragmentByTag("CAMERA") as CameraFragment?
-
+        var cameraFragment = supportFragmentManager.findFragmentByTag(CAMERA_FRAGMENT_NAME) as CameraFragment?
         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
 
         if (cameraFragment == null) {
             cameraFragment = CameraFragment.newInstance()
 
-            Utils.switchFragment(supportFragmentManager, cameraFragment, R.id.contentFragment, "CAMERA")
+            Utils.switchFragment(supportFragmentManager, cameraFragment, R.id.contentFragment, CAMERA_FRAGMENT_NAME)
             isGalleryVisible = false
             val cameraPresenter: CameraContract.Presenter = CameraPresenter(cameraFragment, photosRepository)
             cameraFragment.setPresenter(cameraPresenter)
         }
     }
-
 
     override fun onBackPressed() {
         if (isGalleryVisible) {

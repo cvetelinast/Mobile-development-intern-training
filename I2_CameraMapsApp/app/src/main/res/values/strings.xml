@@ -6,5 +6,8 @@
 
 
     <string name="file_saved_successfully">The file was saved successfully.</string>
+    <string name="error_opening_camera">A problem opening the camera occurred.</string>
+    <string name="error_saving_file">A problem saving the file occurred.</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>
