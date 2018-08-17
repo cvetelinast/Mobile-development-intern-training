@@ -2,7 +2,6 @@ package com.example.tsvetelinastoyanova.cameramapsapp.utils
 
 import android.app.Activity
 import android.os.Build
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.Window
@@ -15,11 +14,15 @@ object Utils {
 
     const val LOCATION_REQUEST_CODE = 1889
     const val CAMERA_AND_LOCATION_REQUEST_CODE = 1888
-    const val RESULT_GALLERY = 0
     const val CAMERA_BACKGROUND_THREAD_NAME = "CAMERA_BACKGROUND_THREAD"
     const val GALLERY_FRAGMENT_NAME = "GALLERY"
     const val CAMERA_FRAGMENT_NAME = "CAMERA"
     const val MAPS_FRAGMENT_NAME = "MAPS"
+
+    const val OPEN_GALLERY_FRAGMENT = "OPEN_GALLERY_FRAGMENT"
+    const val OPEN_MAPS_FRAGMENT = "OPEN_MAPS_FRAGMENT"
+    const val OPEN_CAMERA_FRAGMENT = "OPEN_CAMERA_FRAGMENT"
+    const val PATHS = "PATHS"
 
     fun addFragmentToActivity(fragmentManager: FragmentManager,
                               fragment: Fragment, frameId: Int, nameOfFragment: String) {

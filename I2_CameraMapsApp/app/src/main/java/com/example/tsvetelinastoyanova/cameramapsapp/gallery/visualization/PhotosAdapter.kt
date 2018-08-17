@@ -2,6 +2,9 @@ package com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization
 
 import android.view.LayoutInflater
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.ViewGroup
 import android.support.v7.widget.RecyclerView
@@ -50,5 +53,10 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
 
     fun addNewPhoto(photo: Photo) {
         photosList.add(photo)
+    }
+
+    fun getLastTwoPhotosToUpdateWidget(): ArrayList<String> {
+        val size = photosList.size
+        return arrayListOf(photosList[size - 2].file.absolutePath, photosList[size - 1].file.absolutePath)
     }
 }

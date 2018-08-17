@@ -18,10 +18,14 @@ import android.support.v4.app.ActivityCompat
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.CAMERA_AND_LOCATION_REQUEST_CODE
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.LOCATION_REQUEST_CODE
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.PATHS
 import android.content.Intent
 import android.net.Uri
 import android.support.v4.content.FileProvider
 import com.example.tsvetelinastoyanova.cameramapsapp.BuildConfig
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import com.example.tsvetelinastoyanova.cameramapsapp.CameraMapsAppWidget
 
 
 class GalleryFragment : Fragment(), GalleryContract.View {
@@ -179,10 +183,24 @@ class GalleryFragment : Fragment(), GalleryContract.View {
                         Log.d("photo1", "Error loading photos: $err")
                     },
                     {
+                        Log.d("photo1", "Finished loading photos")
                         photosAdapter.notifyDataSetChanged()
+                        updateWidget(photosAdapter)
                     }
                 )
         }
 
+    }
+
+    private fun updateWidget(photosAdapter: PhotosAdapter) {
+        val intent = Intent(requireContext(), CameraMapsAppWidget::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        val ids = AppWidgetManager.getInstance(requireActivity().application)
+            .getAppWidgetIds(ComponentName(requireActivity().application, CameraMapsAppWidget::class.java))
+
+        val bitmaps = photosAdapter.getLastTwoPhotosToUpdateWidget()
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        intent.putStringArrayListExtra(PATHS, bitmaps)
+        requireActivity().sendBroadcast(intent)
     }
 }

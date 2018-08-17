@@ -10,4 +10,7 @@
     <string name="error_saving_file">A problem saving the file occurred.</string>
     <string name="title_activity_maps">Map</string>
 
+    <string name="appwidget_text">Gallery</string>
+    <string name="add_widget">Add widget</string>
+
 </resources>

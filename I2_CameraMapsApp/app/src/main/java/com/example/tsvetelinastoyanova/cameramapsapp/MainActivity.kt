@@ -2,7 +2,6 @@ package com.example.tsvetelinastoyanova.cameramapsapp
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
@@ -20,6 +19,8 @@ import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.CAMERA_FRAGMENT_NAME
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.GALLERY_FRAGMENT_NAME
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.MAPS_FRAGMENT_NAME
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_CAMERA_FRAGMENT
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_MAPS_FRAGMENT
 
 class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
@@ -28,8 +29,7 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        createGalleryFragment(Utils::addFragmentToActivity)
+        loadParticularFragment()
     }
 
     /*** Methods from GalleryFragment.FragmentsLoader ***/
@@ -42,6 +42,20 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
     override fun onClickToOpenCamera() {
         Utils.setTranslucent(this, false)
         createCameraFragment()
+    }
+
+    private fun loadParticularFragment() {
+        when (intent.action) {
+            OPEN_MAPS_FRAGMENT -> {
+                onClickToLoadMap()
+            }
+            OPEN_CAMERA_FRAGMENT -> {
+                onClickToOpenCamera()
+            }
+            else -> {
+                createGalleryFragment(Utils::addFragmentToActivity)
+            }
+        }
     }
 
     private fun createGalleryFragment(action: (fragmentManager: FragmentManager, fragment: Fragment, id: Int, str: String) -> Unit) {
