@@ -12,6 +12,9 @@ import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_CAMERA_FRAGMENT
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_GALLERY_FRAGMENT
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_MAPS_FRAGMENT
+import android.support.v4.content.ContextCompat.startActivity
+import android.content.Intent.getIntent
+
 
 class CameraMapsAppWidget : AppWidgetProvider() {
 
@@ -69,6 +72,7 @@ class CameraMapsAppWidget : AppWidgetProvider() {
         private fun getPendingIntent(context: Context, value: Int, actionConstant: String)
             : PendingIntent {
             val intent = Intent(context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             intent.action = actionConstant
             return PendingIntent.getActivity(context, value, intent, 0)
         }

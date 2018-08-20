@@ -18,8 +18,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.widget.ImageView
 import android.graphics.drawable.Drawable
 import android.widget.TextView
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.onClickLoadPhotoInGallery
+import java.io.File
 
-class MapsFragment : Fragment(), MapsContract.View {
+class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickListener {
 
     private var presenter: MapsContract.Presenter? = null
     private lateinit var googleMap: GoogleMap
@@ -36,13 +38,13 @@ class MapsFragment : Fragment(), MapsContract.View {
         val location = photo.location
         location?.let {
             googleMap.setInfoWindowAdapter(infoWindowAdapter)
+            googleMap.setOnInfoWindowClickListener(this)
 
             val marker = googleMap.addMarker(MarkerOptions().position(location).title(photo.name)
                 .snippet(photo.lastModified.toString()))
             marker.tag = Pair<String, String>(photo.file.absolutePath, photo.lastModified.toString())
         }
     }
-
 
     override fun setPresenter(presenter: MapsContract.Presenter) {
         this.presenter = presenter
@@ -63,12 +65,18 @@ class MapsFragment : Fragment(), MapsContract.View {
         presenter!!.start()
     }
 
+    override fun onInfoWindowClick(marker: Marker?) {
+        val pair = marker?.tag as? Pair<String, String>
+        pair?.first?.apply {
+            onClickLoadPhotoInGallery(File(this), requireActivity())
+        }
+    }
+
     private fun handleMap() {
         mapView.getMapAsync { mMap ->
             googleMap = mMap
             requestPermissionIfNeeded()
 
-            checkNotNull(presenter)
             context?.let { presenter?.getPhotos(it) }
         }
     }
@@ -97,7 +105,6 @@ class MapsFragment : Fragment(), MapsContract.View {
                 val photoContainer = view.findViewById<ImageView>(R.id.photo)
                 val drawable = Drawable.createFromPath(pair?.first)
                 photoContainer.setImageDrawable(drawable)
-
                 val dateTime = view.findViewById<TextView>(R.id.dateTime)
                 dateTime.text = pair?.second
 
@@ -105,5 +112,4 @@ class MapsFragment : Fragment(), MapsContract.View {
             }
         }
     }
-
 }

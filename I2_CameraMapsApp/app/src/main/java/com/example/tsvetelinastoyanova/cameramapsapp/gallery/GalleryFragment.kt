@@ -20,13 +20,10 @@ import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.CAMERA_AND_LOCA
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.LOCATION_REQUEST_CODE
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.PATHS
 import android.content.Intent
-import android.net.Uri
-import android.support.v4.content.FileProvider
-import com.example.tsvetelinastoyanova.cameramapsapp.BuildConfig
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import com.example.tsvetelinastoyanova.cameramapsapp.CameraMapsAppWidget
-
+import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.onClickLoadPhotoInGallery
 
 class GalleryFragment : Fragment(), GalleryContract.View {
     private var presenter: GalleryContract.Presenter? = null
@@ -70,12 +67,13 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter!!.start()
+        presenter?.start()
         setFloatingButtonListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -156,12 +154,7 @@ class GalleryFragment : Fragment(), GalleryContract.View {
         return PhotosAdapter(photosList = mutableListOf(), context = activity, WIDTH = width / 3,
             HEIGHT = height / 3)
         {
-
-            val uri: Uri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".my.package.name.provider", it.file)
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setDataAndType(uri, "image/*")
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(intent)
+            onClickLoadPhotoInGallery(it.file, requireActivity())
         }
     }
 
@@ -189,7 +182,6 @@ class GalleryFragment : Fragment(), GalleryContract.View {
                     }
                 )
         }
-
     }
 
     private fun updateWidget(photosAdapter: PhotosAdapter) {

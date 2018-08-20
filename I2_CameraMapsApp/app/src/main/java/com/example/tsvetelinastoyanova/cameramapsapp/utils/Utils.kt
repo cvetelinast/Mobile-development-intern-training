@@ -1,14 +1,19 @@
 package com.example.tsvetelinastoyanova.cameramapsapp.utils
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.FileProvider
 import android.view.Window
 import android.view.WindowManager
+import com.example.tsvetelinastoyanova.cameramapsapp.BuildConfig
 import com.example.tsvetelinastoyanova.cameramapsapp.data.PhotosRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.LocalRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.PhotosLocalRepository
+import java.io.File
 
 object Utils {
 
@@ -60,5 +65,13 @@ object Utils {
 
     fun requestPermissions(fragment: Fragment, array: Array<String>, code: Int) {
         fragment.requestPermissions(array, code)
+    }
+
+    fun onClickLoadPhotoInGallery(file: File, activity: Activity) {
+        val uri: Uri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".my.package.name.provider", file)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, "image/*")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        activity.startActivity(intent)
     }
 }

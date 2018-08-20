@@ -8,7 +8,7 @@
         android:id="@+id/toolbar_gallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@color/menuColor"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
+        android:background="@color/menuColor"
         android:src="@drawable/ic_photo_camera_black_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>
