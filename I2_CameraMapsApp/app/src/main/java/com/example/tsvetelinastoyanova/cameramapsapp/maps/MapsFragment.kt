@@ -76,7 +76,6 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
         mapView.getMapAsync { mMap ->
             googleMap = mMap
             requestPermissionIfNeeded()
-
             context?.let { presenter?.getPhotos(it) }
         }
     }

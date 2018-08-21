@@ -12,9 +12,7 @@ import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_CAMERA_FRAGMENT
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_GALLERY_FRAGMENT
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_MAPS_FRAGMENT
-import android.support.v4.content.ContextCompat.startActivity
-import android.content.Intent.getIntent
-
+import android.os.Bundle
 
 class CameraMapsAppWidget : AppWidgetProvider() {
 
@@ -28,14 +26,11 @@ class CameraMapsAppWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
         val paths = intent?.extras?.getStringArrayList(Utils.PATHS)
         if (paths != null && paths.isNotEmpty()) {
-
-            val first = BitmapFactory.decodeFile(paths[0])
-            val second = BitmapFactory.decodeFile(paths[1])
-
-            firstBitmap = Bitmap.createScaledBitmap(
-                first, first.width / 8, first.height / 8, false)
-            secondBitmap = Bitmap.createScaledBitmap(
-                second, second.width / 8, second.height / 8, false)
+            isAppAlive = true
+            firstBitmap = createScaledBitmapFromPath(paths[0])
+            if (paths.size >= 2) {
+                secondBitmap = createScaledBitmapFromPath(paths[1])
+            }
         }
     }
 
@@ -47,17 +42,68 @@ class CameraMapsAppWidget : AppWidgetProvider() {
         // Enter relevant functionality for when the last widget is disabled
     }
 
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager,
+                                           appWidgetId: Int, newOptions: Bundle) {
+        if (isAppAlive) {
+            getWidgetOptionsAndUpdate(appWidgetManager, appWidgetId, context)
+        }
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+    }
+
+    private fun getWidgetOptionsAndUpdate(appWidgetManager: AppWidgetManager, appWidgetId: Int, context: Context) {
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+
+        val views = getRemoteViews(context, minWidth, minHeight)
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+        loadPhotos(views)
+        setOnClickListeners(views, context)
+    }
+
+    private fun getRemoteViews(context: Context, minWidth: Int, minHeight: Int): RemoteViews {
+        val rows = getCellsForSize(minHeight)
+        val columns = getCellsForSize(minWidth)
+
+        val layoutIdTemp = when (columns * rows) {
+            1 -> R.layout.widget_small
+            2 -> R.layout.widget_small
+            3 -> R.layout.widget_small
+            4 -> R.layout.widget_normal
+            5 -> R.layout.widget_normal
+            6 -> R.layout.widget_normal
+            else -> R.layout.widget_large
+        }
+        layoutId = layoutIdTemp
+        return RemoteViews(context.packageName, layoutIdTemp)
+    }
+
+    private fun getCellsForSize(size: Int): Int {
+        var n = 2
+        while (70 * n - 30 < size) {
+            ++n
+        }
+        return n - 1
+    }
+
     companion object {
+        var isAppAlive: Boolean = false
         var firstBitmap: Bitmap? = null
         var secondBitmap: Bitmap? = null
+        var layoutId: Int? = null
 
-        internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager,
-                                     appWidgetId: Int) {
-            val views = RemoteViews(context.packageName, R.layout.my_widget)
+        private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager,
+                                    appWidgetId: Int) {
+            val layoutIdTemp = if (layoutId == null) R.layout.widget_normal else layoutId ?: 0
+            val views = RemoteViews(context.packageName, layoutIdTemp)
             setOnClickListeners(views, context)
-            setImage(views, R.id.firstPhoto, firstBitmap)
-            setImage(views, R.id.secondPhoto, secondBitmap)
+            loadPhotos(views)
             appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+
+        private fun loadPhotos(views: RemoteViews) {
+            firstBitmap?.let { setImage(views, R.id.firstPhoto, it) }
+            secondBitmap?.let { setImage(views, R.id.secondPhoto, it) }
         }
 
         private fun setOnClickListeners(views: RemoteViews, context: Context) {
@@ -78,10 +124,14 @@ class CameraMapsAppWidget : AppWidgetProvider() {
         }
 
         private fun setImage(views: RemoteViews, id: Int, bitmap: Bitmap?) {
-            if (bitmap != null) {
-                views.setImageViewBitmap(id, bitmap)
-            }
+            bitmap?.let { views.setImageViewBitmap(id, it) }
         }
+    }
+
+    private fun createScaledBitmapFromPath(path: String): Bitmap {
+        val bitmap = BitmapFactory.decodeFile(path)
+        return Bitmap.createScaledBitmap(
+            bitmap, bitmap.width / 8, bitmap.height / 8, false)
     }
 }
 

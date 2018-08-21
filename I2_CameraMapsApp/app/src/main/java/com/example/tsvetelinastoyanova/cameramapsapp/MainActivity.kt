@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
         if (savedInstanceState != null) with(savedInstanceState) {
             currentFragmentAction = getString(CURRENT_FRAGMENT_ACTION) ?: ""
+            intent.action = currentFragmentAction
         } else {
             currentFragmentAction = intent.action ?: ""
         }
@@ -136,6 +137,4 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
         }
         super.onSaveInstanceState(outState)
     }
-
-
 }

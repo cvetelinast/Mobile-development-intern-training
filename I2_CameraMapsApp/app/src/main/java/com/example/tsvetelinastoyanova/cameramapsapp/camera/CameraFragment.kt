@@ -47,12 +47,12 @@ class CameraFragment : Fragment(), CameraContract.View {
 
     override fun onResume() {
         super.onResume()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        changeRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     }
 
     override fun onPause() {
         super.onPause()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+        changeRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -71,5 +71,9 @@ class CameraFragment : Fragment(), CameraContract.View {
             init(requireContext())
             startCameraIfPossible(requireActivity())
         }
+    }
+
+    private fun changeRequestedOrientation(orientation: Int) {
+        requireActivity().requestedOrientation = orientation
     }
 }

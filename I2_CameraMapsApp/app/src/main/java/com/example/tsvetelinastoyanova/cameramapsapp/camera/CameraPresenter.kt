@@ -182,5 +182,4 @@ class CameraPresenter(private val view: CameraContract.View, private val reposit
     private fun quitBackgroundHandler() {
         backgroundHandler?.looper?.quitSafely()
     }
-
 }

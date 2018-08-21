@@ -14,5 +14,4 @@ class GalleryPresenter(private val view: GalleryContract.View, private val repos
     override fun getPhotos(context: Context): Observable<Photo> {
         return repository.getPhotos(context)
     }
-
 }

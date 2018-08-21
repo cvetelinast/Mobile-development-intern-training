@@ -26,6 +26,7 @@ import com.example.tsvetelinastoyanova.cameramapsapp.CameraMapsAppWidget
 import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.onClickLoadPhotoInGallery
 
 class GalleryFragment : Fragment(), GalleryContract.View {
+
     private var presenter: GalleryContract.Presenter? = null
     private lateinit var recyclerView: RecyclerView
 
@@ -52,9 +53,7 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
-        val toolbar = view.findViewById(R.id.toolbar_gallery) as Toolbar
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        setHasOptionsMenu(true)
+        createToolbar(view)
         createRecyclerView(view)?.let { loadPhotosInRecyclerView(it) }
         return view
     }
@@ -67,7 +66,7 @@ class GalleryFragment : Fragment(), GalleryContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter?.start()
+        presenter!!.start()
         setFloatingButtonListener()
     }
 
@@ -102,6 +101,12 @@ class GalleryFragment : Fragment(), GalleryContract.View {
                 }
             }
         }
+    }
+
+    private fun createToolbar(view: View) {
+        val toolbar = view.findViewById(R.id.toolbar_gallery) as Toolbar
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        setHasOptionsMenu(true)
     }
 
     private fun setFloatingButtonListener() {
@@ -185,14 +190,18 @@ class GalleryFragment : Fragment(), GalleryContract.View {
     }
 
     private fun updateWidget(photosAdapter: PhotosAdapter) {
-        val intent = Intent(requireContext(), CameraMapsAppWidget::class.java)
-        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        val ids = AppWidgetManager.getInstance(requireActivity().application)
-            .getAppWidgetIds(ComponentName(requireActivity().application, CameraMapsAppWidget::class.java))
+        activity?.let {
+            val intent = Intent(requireContext(), CameraMapsAppWidget::class.java)
+            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            val ids = AppWidgetManager.getInstance(it.application)
+                .getAppWidgetIds(ComponentName(it.application, CameraMapsAppWidget::class.java))
 
-        val bitmaps = photosAdapter.getLastTwoPhotosToUpdateWidget()
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-        intent.putStringArrayListExtra(PATHS, bitmaps)
-        requireActivity().sendBroadcast(intent)
+            val paths = photosAdapter.getLastTwoPhotosToUpdateWidget()
+            paths?.apply {
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                intent.putStringArrayListExtra(PATHS, this)
+                it.sendBroadcast(intent)
+            }
+        }
     }
 }

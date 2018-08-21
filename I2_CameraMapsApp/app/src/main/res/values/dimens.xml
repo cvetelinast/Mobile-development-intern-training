@@ -2,4 +2,6 @@
 <resources>
     <dimen name="widget_margin">32dp</dimen>
     <dimen name="icon_margin">24dp</dimen>
+    <dimen name="icon_margin_normal">30dp</dimen>
+    <dimen name="icon_margin_large">48dp</dimen>
 </resources>

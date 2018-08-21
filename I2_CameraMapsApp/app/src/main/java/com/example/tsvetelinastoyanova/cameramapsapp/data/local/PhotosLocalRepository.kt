@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PhotosLocalRepository : LocalRepository {
+
     private var galleryFolder: File? = null
 
     companion object {

@@ -10,6 +10,7 @@ import io.reactivex.Single
 import java.io.File
 
 class PhotosRepository(private val localRepository: LocalRepository) : Repository {
+
     companion object {
 
         @Volatile
@@ -28,5 +29,4 @@ class PhotosRepository(private val localRepository: LocalRepository) : Repositor
     override fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File> {
        return localRepository.savePhoto(context, bitmap, location)
     }
-
 }

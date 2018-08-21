@@ -4,6 +4,7 @@ import android.graphics.SurfaceTexture
 import android.view.TextureView
 
 interface CustomSurfaceTextureListener : TextureView.SurfaceTextureListener {
+
     override fun onSurfaceTextureSizeChanged(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
     }
 

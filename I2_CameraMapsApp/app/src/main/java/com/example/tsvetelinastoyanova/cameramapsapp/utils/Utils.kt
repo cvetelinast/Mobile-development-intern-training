@@ -17,17 +17,20 @@ import java.io.File
 
 object Utils {
 
+    private const val PACKAGE_NAME_PROVIDER = ".my.package.name.provider"
+    private const val TYPE_IMAGE = "image/*"
     const val LOCATION_REQUEST_CODE = 1889
     const val CAMERA_AND_LOCATION_REQUEST_CODE = 1888
     const val CAMERA_BACKGROUND_THREAD_NAME = "CAMERA_BACKGROUND_THREAD"
     const val GALLERY_FRAGMENT_NAME = "GALLERY"
     const val CAMERA_FRAGMENT_NAME = "CAMERA"
-    const val MAPS_FRAGMENT_NAME = "MAPS"
 
+    const val MAPS_FRAGMENT_NAME = "MAPS"
     const val OPEN_GALLERY_FRAGMENT = "OPEN_GALLERY_FRAGMENT"
     const val OPEN_MAPS_FRAGMENT = "OPEN_MAPS_FRAGMENT"
     const val OPEN_CAMERA_FRAGMENT = "OPEN_CAMERA_FRAGMENT"
     const val PATHS = "PATHS"
+    const val END = "END"
 
     fun addFragmentToActivity(fragmentManager: FragmentManager,
                               fragment: Fragment, frameId: Int, nameOfFragment: String) {
@@ -68,9 +71,9 @@ object Utils {
     }
 
     fun onClickLoadPhotoInGallery(file: File, activity: Activity) {
-        val uri: Uri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".my.package.name.provider", file)
+        val uri: Uri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + PACKAGE_NAME_PROVIDER, file)
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, "image/*")
+        intent.setDataAndType(uri, TYPE_IMAGE)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activity.startActivity(intent)
     }

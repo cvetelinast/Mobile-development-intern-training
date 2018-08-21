@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_widget">
+
+    <ImageView
+        android:id="@+id/firstPhoto"
+        android:layout_width="70dp"
+        android:layout_height="105dp"
+        android:layout_alignBottom="@+id/secondPhoto"
+        android:layout_marginBottom="25dp"
+        android:layout_marginEnd="-35dp"
+        android:layout_toStartOf="@+id/secondPhoto" />
+
+    <ImageView
+        android:id="@+id/secondPhoto"
+        android:layout_width="70dp"
+        android:layout_height="105dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+    <ImageView
+        android:id="@+id/map"
+        android:layout_width="@dimen/icon_margin_normal"
+        android:layout_height="@dimen/icon_margin_normal"
+        android:layout_above="@+id/camera"
+        android:layout_alignStart="@id/more"
+        android:layout_toEndOf="@+id/secondPhoto"
+        android:background="@drawable/ic_location_on_white_24dp" />
+
+    <ImageView
+        android:id="@+id/camera"
+        android:layout_width="@dimen/icon_margin_normal"
+        android:layout_height="@dimen/icon_margin_normal"
+        android:layout_above="@+id/more"
+        android:layout_alignStart="@+id/more"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_camera_alt_white_24dp" />
+
+    <ImageView
+        android:id="@+id/more"
+        android:layout_width="@dimen/icon_margin_normal"
+        android:layout_height="@dimen/icon_margin_normal"
+        android:layout_alignBottom="@id/secondPhoto"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/secondPhoto"
+        android:background="@drawable/ic_more_horiz_white_24dp" />
+
+</RelativeLayout>

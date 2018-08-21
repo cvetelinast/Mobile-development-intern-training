@@ -2,10 +2,8 @@ package com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization
 
 import android.view.LayoutInflater
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.support.v4.widget.CircularProgressDrawable
 import android.view.ViewGroup
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -37,11 +35,16 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
         holder.bind(photoWithDetails, listener)
         val fileUri: Uri = Uri.fromFile(photoWithDetails.file)
 
+        val circularProgressDrawable = CircularProgressDrawable(context)
+        circularProgressDrawable.strokeWidth = 5f
+        circularProgressDrawable.centerRadius = 30f
+        circularProgressDrawable.start()
+
         GlideApp.with(context)
             .asBitmap()
-            .placeholder(R.drawable.ic_terrain_black_24dp)
+            .placeholder(circularProgressDrawable) // R.drawable.ic_terrain_black_24dp
             .load(fileUri)
-            .override(WIDTH - 2, HEIGHT - 2)
+            .override(WIDTH, HEIGHT)
             .fitCenter()
             .centerCrop()
             .into(holder.photo)
@@ -55,8 +58,13 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
         photosList.add(photo)
     }
 
-    fun getLastTwoPhotosToUpdateWidget(): ArrayList<String> {
+    fun getLastTwoPhotosToUpdateWidget(): ArrayList<String>? {
         val size = photosList.size
-        return arrayListOf(photosList[size - 2].file.absolutePath, photosList[size - 1].file.absolutePath)
+        if (size >= 2) {
+            return arrayListOf(photosList[size - 2].file.absolutePath, photosList[size - 1].file.absolutePath)
+        } else if (size == 1) {
+            return arrayListOf(photosList[0].file.absolutePath)
+        }
+        return null
     }
 }

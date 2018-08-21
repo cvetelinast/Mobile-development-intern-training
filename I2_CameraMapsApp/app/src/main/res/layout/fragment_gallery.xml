@@ -26,7 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:background="@color/menuColor"
         android:src="@drawable/ic_photo_camera_black_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

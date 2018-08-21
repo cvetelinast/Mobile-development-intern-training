@@ -8,9 +8,7 @@ import io.reactivex.Observable
 
 interface GalleryContract {
 
-    interface View : BaseView<Presenter> {
-
-    }
+    interface View : BaseView<Presenter>
 
     interface Presenter : BasePresenter {
 
