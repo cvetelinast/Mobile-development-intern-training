@@ -12,14 +12,16 @@ import com.example.tsvetelinastoyanova.cameramapsapp.GlideApp
 import com.example.tsvetelinastoyanova.cameramapsapp.R
 
 class PhotosAdapter(private val photosList: MutableList<Photo>, private val context: Context,
-                    private val WIDTH: Int, private val HEIGHT: Int, private val listener: (Photo) -> Unit)
+                    private val WIDTH: Int, private val HEIGHT: Int,
+                    private val listener: (Photo) -> Unit, private val longListener: (Photo) -> Boolean)
     : RecyclerView.Adapter<PhotosAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         var photo: ImageView = view.findViewById(R.id.photo)
 
-        fun bind(photo: Photo, listener: (Photo) -> Unit) {
+        fun bind(photo: Photo, listener: (Photo) -> Unit, longListener: (Photo) -> Boolean) {
             view.setOnClickListener { listener(photo) }
+            view.setOnLongClickListener { longListener(photo) }
         }
     }
 
@@ -32,17 +34,13 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val photoWithDetails = photosList[position]
-        holder.bind(photoWithDetails, listener)
+        holder.bind(photoWithDetails, listener, longListener)
         val fileUri: Uri = Uri.fromFile(photoWithDetails.file)
-
-        val circularProgressDrawable = CircularProgressDrawable(context)
-        circularProgressDrawable.strokeWidth = 5f
-        circularProgressDrawable.centerRadius = 30f
-        circularProgressDrawable.start()
+        val circularProgressDrawable = createProgressBarDrawable()
 
         GlideApp.with(context)
             .asBitmap()
-            .placeholder(circularProgressDrawable) // R.drawable.ic_terrain_black_24dp
+            .placeholder(circularProgressDrawable)
             .load(fileUri)
             .override(WIDTH, HEIGHT)
             .fitCenter()
@@ -58,13 +56,27 @@ class PhotosAdapter(private val photosList: MutableList<Photo>, private val cont
         photosList.add(photo)
     }
 
-    fun getLastTwoPhotosToUpdateWidget(): ArrayList<String>? {
+    fun deletePhotoFromRecyclerView(photoToDelete: Photo) {
+        if (photosList.remove(photoToDelete)) {
+            notifyDataSetChanged()
+        }
+    }
+
+    fun getLastTwoPhotosToUpdateWidget(): ArrayList<String?> {
         val size = photosList.size
         if (size >= 2) {
             return arrayListOf(photosList[size - 2].file.absolutePath, photosList[size - 1].file.absolutePath)
         } else if (size == 1) {
             return arrayListOf(photosList[0].file.absolutePath)
         }
-        return null
+        return arrayListOf()
+    }
+
+    private fun createProgressBarDrawable(): CircularProgressDrawable {
+        val circularProgressDrawable = CircularProgressDrawable(context)
+        circularProgressDrawable.strokeWidth = 5f
+        circularProgressDrawable.centerRadius = 30f
+        circularProgressDrawable.start()
+        return circularProgressDrawable
     }
 }

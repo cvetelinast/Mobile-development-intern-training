@@ -39,10 +39,7 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
         location?.let {
             googleMap.setInfoWindowAdapter(infoWindowAdapter)
             googleMap.setOnInfoWindowClickListener(this)
-
-            val marker = googleMap.addMarker(MarkerOptions().position(location).title(photo.name)
-                .snippet(photo.lastModified.toString()))
-            marker.tag = Pair<String, String>(photo.file.absolutePath, photo.lastModified.toString())
+            placeMarkerAndSetTag(location, photo)
         }
     }
 
@@ -50,7 +47,8 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
         this.presenter = presenter
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
@@ -86,7 +84,8 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
                 == PackageManager.PERMISSION_GRANTED) {
                 googleMap.isMyLocationEnabled = true
             } else {
-                Utils.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Utils.LOCATION_REQUEST_CODE)
+                Utils.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Utils.LOCATION_REQUEST_CODE)
             }
         }
     }
@@ -100,7 +99,8 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
             override fun getInfoContents(marker: Marker): View? {
                 val pair = marker.tag as? Pair<String, String>
 
-                val view = requireActivity().layoutInflater.inflate(R.layout.photo_in_geomarker, null)
+                val view = requireActivity()
+                    .layoutInflater.inflate(R.layout.photo_in_geomarker, null)
                 val photoContainer = view.findViewById<ImageView>(R.id.photo)
                 val drawable = Drawable.createFromPath(pair?.first)
                 photoContainer.setImageDrawable(drawable)
@@ -110,5 +110,11 @@ class MapsFragment : Fragment(), MapsContract.View, GoogleMap.OnInfoWindowClickL
                 return view
             }
         }
+    }
+
+    private fun placeMarkerAndSetTag(location: LatLng, photo: Photo) {
+        val marker = googleMap.addMarker(MarkerOptions().position(location).title(photo.name)
+            .snippet(photo.lastModified.toString()))
+        marker.tag = Pair<String, String>(photo.file.absolutePath, photo.lastModified.toString())
     }
 }

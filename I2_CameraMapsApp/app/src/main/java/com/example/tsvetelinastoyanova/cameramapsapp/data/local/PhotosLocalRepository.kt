@@ -59,6 +59,16 @@ class PhotosLocalRepository : LocalRepository {
             .observeOn(AndroidSchedulers.mainThread())
     }
 
+    override fun deletePhoto(photo: Photo): Observable<Boolean> {
+        return Observable.fromCallable {
+            val file = File(photo.file.absolutePath)
+            file.delete()
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
     private fun createImageGallery(context: Context) {
         val storageDirectory = context.filesDir.path
         galleryFolder = File(storageDirectory, context.resources.getString(R.string.app_name))
@@ -91,7 +101,6 @@ class PhotosLocalRepository : LocalRepository {
         val lon = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) ?: ""
         val eastOrWest = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF) ?: ""
 
-        Log.d("location", "lat: $lat, lon: $lon")
         var location: LatLng? = null
         if (lat != "" && lon != "") {
             location = LatLng(convertRationalToLocation(lat, northOrSouth), convertRationalToLocation(lon, eastOrWest))
@@ -108,15 +117,13 @@ class PhotosLocalRepository : LocalRepository {
     private fun setLocationTagsToCreatedFile(s: File, location: Location) {
         val exif = ExifInterface(s.path)
 
-        val lat = location.latitude
-        val latitudeStr = convertLocationToRational(lat)
+        val latitudeStr = convertLocationToRational(location.latitude)
         exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, latitudeStr)
-        exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, if (lat > 0) "N" else "S")
+        exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, if (location.latitude > 0) "N" else "S")
 
-        val lon = location.longitude
-        val longitudeStr = convertLocationToRational(lon)
+        val longitudeStr = convertLocationToRational(location.longitude)
         exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, longitudeStr)
-        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, if (lon > 0) "E" else "W")
+        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, if (location.longitude > 0) "E" else "W")
 
         exif.saveAttributes()
     }
@@ -124,13 +131,11 @@ class PhotosLocalRepository : LocalRepository {
     private fun convertLocationToRational(coordinate: Double): String {
         val absoluteValue = Math.abs(coordinate)
         val valueInSeconds = Location.convert(absoluteValue, Location.FORMAT_SECONDS)
-        val splits = valueInSeconds.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val secondPartSplit = splits[2].split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val seconds: String = if (secondPartSplit.isEmpty()) {
-            splits[2]
-        } else {
-            secondPartSplit[0]
-        }
+        val splits = valueInSeconds
+            .split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val secondPartSplit = splits[2]
+            .split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val seconds: String = if (secondPartSplit.isEmpty()) splits[2] else secondPartSplit[0]
         return splits[0] + "/1," + splits[1] + "/1," + seconds + "/1"
     }
 

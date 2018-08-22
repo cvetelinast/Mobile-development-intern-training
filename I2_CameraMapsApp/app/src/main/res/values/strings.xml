@@ -6,6 +6,9 @@
 
 
     <string name="file_saved_successfully">The file was saved successfully.</string>
+    <string name="file_deleted_successfully">The file was deleted successfully.</string>
+    <string name="error_deleting_photo">Problem deleting photo.</string>
+    <string name="error_loading_photos">Problem loading photos.</string>
     <string name="error_opening_camera">A problem opening the camera occurred.</string>
     <string name="error_saving_file">A problem saving the file occurred.</string>
     <string name="title_activity_maps">Map</string>

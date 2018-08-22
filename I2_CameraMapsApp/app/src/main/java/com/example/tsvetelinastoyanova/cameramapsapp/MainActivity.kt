@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.Button
 import com.example.tsvetelinastoyanova.cameramapsapp.camera.CameraContract
 import com.example.tsvetelinastoyanova.cameramapsapp.camera.CameraFragment
 import com.example.tsvetelinastoyanova.cameramapsapp.camera.CameraPresenter
@@ -26,6 +28,7 @@ import com.example.tsvetelinastoyanova.cameramapsapp.utils.Utils.OPEN_MAPS_FRAGM
 class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
     private var isGalleryVisible: Boolean = true
+    private var bucketButton: Button? = null
     private var currentFragmentAction: String = ""
 
     companion object {
@@ -55,6 +58,10 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
     override fun onClickToOpenCamera() {
         Utils.setTranslucent(this, false)
         createCameraFragment()
+    }
+
+    override fun onBucketButtonReady(button: Button) {
+        bucketButton = button
     }
 
     private fun loadParticularFragment() {
@@ -100,7 +107,6 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
         if (mapsFragment == null) {
             mapsFragment = MapsFragment.newInstance()
-
             Utils.switchFragment(supportFragmentManager, mapsFragment, R.id.contentFragment, MAPS_FRAGMENT_NAME)
         }
         isGalleryVisible = false
@@ -115,7 +121,6 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
         if (cameraFragment == null) {
             cameraFragment = CameraFragment.newInstance()
-
             Utils.switchFragment(supportFragmentManager, cameraFragment, R.id.contentFragment, CAMERA_FRAGMENT_NAME)
         }
         isGalleryVisible = false
@@ -124,7 +129,9 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
     }
 
     override fun onBackPressed() {
-        if (isGalleryVisible) {
+        if (bucketButton != null && bucketButton?.visibility == View.VISIBLE) {
+            bucketButton?.visibility = View.INVISIBLE
+        } else if (isGalleryVisible) {
             super.onBackPressed()
         } else {
             createGalleryFragment(Utils::switchFragment)

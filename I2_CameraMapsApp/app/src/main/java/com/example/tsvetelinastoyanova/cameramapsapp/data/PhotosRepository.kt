@@ -15,18 +15,23 @@ class PhotosRepository(private val localRepository: LocalRepository) : Repositor
 
         @Volatile
         private var INSTANCE: PhotosRepository? = null
+
         fun getInstance(localRepository: LocalRepository): PhotosRepository {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: PhotosRepository(localRepository).also { INSTANCE = it }
             }
         }
-
     }
+
     override fun getPhotos(context: Context): Observable<Photo> {
         return localRepository.getPhotos(context)
     }
 
     override fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File> {
-       return localRepository.savePhoto(context, bitmap, location)
+        return localRepository.savePhoto(context, bitmap, location)
+    }
+
+    override fun deletePhoto(photo: Photo): Observable<Boolean> {
+        return localRepository.deletePhoto(photo)
     }
 }

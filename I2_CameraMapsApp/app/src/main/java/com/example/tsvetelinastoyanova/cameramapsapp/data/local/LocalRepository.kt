@@ -13,4 +13,6 @@ interface LocalRepository {
     fun getPhotos(context: Context): Observable<Photo>
 
     fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File>
+
+    fun deletePhoto(photo: Photo): Observable<Boolean>
 }

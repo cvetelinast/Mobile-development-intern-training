@@ -3,7 +3,6 @@ package com.example.tsvetelinastoyanova.cameramapsapp.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
-import android.media.Image
 import com.example.tsvetelinastoyanova.cameramapsapp.gallery.visualization.Photo
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -14,4 +13,6 @@ interface Repository {
     fun getPhotos(context: Context): Observable<Photo>
 
     fun savePhoto(context: Context, bitmap: Bitmap, location: Location?): Single<File>
+
+    fun deletePhoto(photo: Photo): Observable<Boolean>
 }

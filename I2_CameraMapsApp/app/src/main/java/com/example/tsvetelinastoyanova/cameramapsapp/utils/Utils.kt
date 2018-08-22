@@ -1,6 +1,7 @@
 package com.example.tsvetelinastoyanova.cameramapsapp.utils
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -14,6 +15,9 @@ import com.example.tsvetelinastoyanova.cameramapsapp.data.PhotosRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.LocalRepository
 import com.example.tsvetelinastoyanova.cameramapsapp.data.local.PhotosLocalRepository
 import java.io.File
+import android.content.Context.VIBRATOR_SERVICE
+import android.os.Vibrator
+import android.os.VibrationEffect
 
 object Utils {
 
@@ -30,7 +34,6 @@ object Utils {
     const val OPEN_MAPS_FRAGMENT = "OPEN_MAPS_FRAGMENT"
     const val OPEN_CAMERA_FRAGMENT = "OPEN_CAMERA_FRAGMENT"
     const val PATHS = "PATHS"
-    const val END = "END"
 
     fun addFragmentToActivity(fragmentManager: FragmentManager,
                               fragment: Fragment, frameId: Int, nameOfFragment: String) {
@@ -76,5 +79,13 @@ object Utils {
         intent.setDataAndType(uri, TYPE_IMAGE)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activity.startActivity(intent)
+    }
+
+    fun vibrate(context: Context) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            (context.getSystemService(VIBRATOR_SERVICE) as Vibrator).vibrate(VibrationEffect.createOneShot(50, 10))
+        } else {
+            (context.getSystemService(VIBRATOR_SERVICE) as Vibrator).vibrate(50)
+        }
     }
 }
