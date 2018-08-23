@@ -78,17 +78,21 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
         }
     }
 
-    private fun createGalleryFragment(action: (fragmentManager: FragmentManager, fragment: Fragment, id: Int, str: String) -> Unit) {
+    private fun createGalleryFragment(action: (fragmentManager: FragmentManager,
+                                               fragment: Fragment, id: Int, str: String) -> Unit) {
         currentFragmentAction = OPEN_GALLERY_FRAGMENT
         Utils.setTranslucent(this, false)
         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
 
-        var galleryFragment = supportFragmentManager.findFragmentByTag(GALLERY_FRAGMENT_NAME) as GalleryFragment?
+        var galleryFragment =
+            supportFragmentManager.findFragmentByTag(GALLERY_FRAGMENT_NAME) as GalleryFragment?
         if (galleryFragment == null) {
             galleryFragment = GalleryFragment.newInstance()
-            action(supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
+            action(
+                supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
         } else {
-            Utils.switchFragment(supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
+            Utils.switchFragment(
+                supportFragmentManager, galleryFragment, R.id.contentFragment, GALLERY_FRAGMENT_NAME)
         }
 
         galleryFragment.setGalleryPresenter(photosRepository)
@@ -102,12 +106,14 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
     private fun createMapFragment() {
         currentFragmentAction = OPEN_MAPS_FRAGMENT
-        var mapsFragment = supportFragmentManager.findFragmentByTag(MAPS_FRAGMENT_NAME) as MapsFragment?
+        var mapsFragment =
+            supportFragmentManager.findFragmentByTag(MAPS_FRAGMENT_NAME) as MapsFragment?
         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
 
         if (mapsFragment == null) {
             mapsFragment = MapsFragment.newInstance()
-            Utils.switchFragment(supportFragmentManager, mapsFragment, R.id.contentFragment, MAPS_FRAGMENT_NAME)
+            Utils.switchFragment(
+                supportFragmentManager, mapsFragment, R.id.contentFragment, MAPS_FRAGMENT_NAME)
         }
         isGalleryVisible = false
         val mapsPresenter: MapsContract.Presenter = MapsPresenter(mapsFragment, photosRepository)
@@ -116,12 +122,14 @@ class MainActivity : AppCompatActivity(), GalleryFragment.FragmentsLoader {
 
     private fun createCameraFragment() {
         currentFragmentAction = OPEN_CAMERA_FRAGMENT
-        var cameraFragment = supportFragmentManager.findFragmentByTag(CAMERA_FRAGMENT_NAME) as CameraFragment?
+        var cameraFragment =
+            supportFragmentManager.findFragmentByTag(CAMERA_FRAGMENT_NAME) as CameraFragment?
         val photosRepository: PhotosRepository = Utils.providePhotosRepository()
 
         if (cameraFragment == null) {
             cameraFragment = CameraFragment.newInstance()
-            Utils.switchFragment(supportFragmentManager, cameraFragment, R.id.contentFragment, CAMERA_FRAGMENT_NAME)
+            Utils.switchFragment(
+                supportFragmentManager, cameraFragment, R.id.contentFragment, CAMERA_FRAGMENT_NAME)
         }
         isGalleryVisible = false
         val cameraPresenter: CameraContract.Presenter = CameraPresenter(cameraFragment, photosRepository)

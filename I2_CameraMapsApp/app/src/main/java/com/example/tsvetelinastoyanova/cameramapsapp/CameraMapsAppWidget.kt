@@ -128,6 +128,6 @@ class CameraMapsAppWidget : AppWidgetProvider() {
     private fun createScaledBitmapFromPath(path: String): Bitmap {
         val bitmap = BitmapFactory.decodeFile(path)
         return Bitmap.createScaledBitmap(
-            bitmap, bitmap.width / 8, bitmap.height / 8, false)
+            bitmap, bitmap.width / 4, bitmap.height / 4, false)
     }
 }

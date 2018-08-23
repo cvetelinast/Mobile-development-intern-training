@@ -243,13 +243,15 @@ class GalleryFragment : Fragment(), GalleryContract.View {
     }
 
     private fun updateWidget(photosAdapter: PhotosAdapter) {
-        val intent = createIntent()
-        val ids = getWidgetsIds(requireActivity())
-        val pathsToPhotos = photosAdapter.getLastTwoPhotosToUpdateWidget()
+        activity?.let {
+            val intent = createIntent(it)
+            val ids = getWidgetsIds(it)
+            val pathsToPhotos = photosAdapter.getLastTwoPhotosToUpdateWidget()
 
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-        intent.putStringArrayListExtra(PATHS, pathsToPhotos)
-        requireActivity().sendBroadcast(intent)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            intent.putStringArrayListExtra(PATHS, pathsToPhotos)
+            it.sendBroadcast(intent)
+        }
     }
 
     private fun getWidgetsIds(it: FragmentActivity): IntArray? {
@@ -257,8 +259,8 @@ class GalleryFragment : Fragment(), GalleryContract.View {
             .getAppWidgetIds(ComponentName(it.application, CameraMapsAppWidget::class.java))
     }
 
-    private fun createIntent(): Intent {
-        val intent = Intent(requireContext(), CameraMapsAppWidget::class.java)
+    private fun createIntent(context: Context): Intent {
+        val intent = Intent(context, CameraMapsAppWidget::class.java)
         intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
         return intent
     }
