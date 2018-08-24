@@ -8,8 +8,10 @@ class TopNewsPresenter(private val view: TopNewsContract.View, private val repos
     : TopNewsContract.Presenter {
 
     override fun start() {
-        Log.d("tag", "TopNewsPresenter started")
+        repository.getTopStories()
+            .subscribe(
+                { result -> Log.d("tag", "Result: $result") },
+                { error -> Log.d("tag", "Error: $error") }
+            )
     }
-
-
 }

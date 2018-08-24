@@ -7,8 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.tsvetelinastoyanova.hackernewsapp.R
 
-
-class NewsAdapter(private val newsList: MutableList<New>) : RecyclerView.Adapter<NewsAdapter.MyViewHolder>() {
+class NewsAdapter(private val newsList: MutableList<Story>) : RecyclerView.Adapter<NewsAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)

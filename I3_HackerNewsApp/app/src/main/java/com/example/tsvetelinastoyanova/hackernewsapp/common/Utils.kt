@@ -2,7 +2,9 @@ package com.example.tsvetelinastoyanova.hackernewsapp.common
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import com.example.tsvetelinastoyanova.hackernewsapp.data.NewsRepository
+import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRepository
+import com.example.tsvetelinastoyanova.hackernewsapp.data.local.StoriesLocalDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.StoriesRemoteDataSource
 
 object Utils {
 
@@ -15,10 +17,10 @@ object Utils {
         transaction.commit()
     }
 
-    fun provideRepository(): NewsRepository {
-        // todo
-       // val localRepository =
-        return NewsRepository()
+    fun provideRepository(): StoriesRepository {
+        val localDataSource = StoriesLocalDataSource.getInstance()
+        val remoteDataSource = StoriesRemoteDataSource.getInstance()
+        return StoriesRepository(localDataSource, remoteDataSource)
     }
 }
 
