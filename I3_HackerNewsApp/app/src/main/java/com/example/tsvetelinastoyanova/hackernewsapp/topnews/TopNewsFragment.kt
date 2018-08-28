@@ -11,14 +11,14 @@ import android.view.ViewGroup
 import com.example.tsvetelinastoyanova.hackernewsapp.R
 import com.example.tsvetelinastoyanova.hackernewsapp.recyclerview.NewsAdapter
 import android.support.v7.widget.DefaultItemAnimator
-import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils
-import com.example.tsvetelinastoyanova.hackernewsapp.data.NetworkState
+import android.widget.ProgressBar
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
 class TopNewsFragment : Fragment(), TopNewsContract.View {
 
     private var presenter: TopNewsContract.Presenter? = null
     private var adapter: NewsAdapter? = null
+    private var progressBar: ProgressBar? = null
 
     override fun setPresenter(newPresenter: TopNewsContract.Presenter) {
         presenter = newPresenter
@@ -27,18 +27,26 @@ class TopNewsFragment : Fragment(), TopNewsContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_top_news, container, false)
+        createRecyclerView(view)
+        progressBar = view.findViewById(R.id.progressBar)
+        return view
+    }
+
+    private fun createRecyclerView(view: View) {
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-        adapter = NewsAdapter()/*{ presenter.retry()}*/
+        adapter = NewsAdapter()
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = adapter
-
-        return view
     }
 
-    override fun showStoryInRecyclerView(story: Story) {
-       // adapter?.addStory(Utils.convertStoryToNew(story))
+    override fun showProgressBar() {
+        progressBar?.visibility = View.VISIBLE
+    }
+
+    override fun hideProgressBar() {
+        progressBar?.visibility = View.INVISIBLE
     }
 
     companion object {
@@ -53,9 +61,5 @@ class TopNewsFragment : Fragment(), TopNewsContract.View {
 
     override fun submitList(list: PagedList<Story>?) {
         adapter?.submitList(list)
-    }
-
-    override fun setNetworkStateToAdapter(networkState: NetworkState?) {
-        adapter?.setNetworkState(networkState)
     }
 }

@@ -8,14 +8,6 @@ import io.reactivex.Observable
 
 class StoriesRepository(private val localDataSource: StoriesLocalDataSource,
                         private val remoteDataSourceFactory: StoriesRemoteDataSourceFactory) : Repository {
-   /* override fun getTopStories(): Observable<Story> {
-        return remoteDataSource.getTopStories()
-    }
-
-    override fun getStoryById(id: String): Observable<Story> {
-        return remoteDataSource.getStoryById(id)
-    }*/
-
     companion object {
         @Volatile
         private var INSTANCE: StoriesRepository? = null

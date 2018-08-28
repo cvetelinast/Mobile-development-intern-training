@@ -8,7 +8,6 @@ import com.example.tsvetelinastoyanova.hackernewsapp.data.local.StoriesLocalData
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.StoriesRemoteDataSourceFactory
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import com.example.tsvetelinastoyanova.hackernewsapp.recyclerview.New
-import io.reactivex.disposables.CompositeDisposable
 import java.text.SimpleDateFormat
 
 object Utils {
@@ -26,8 +25,7 @@ object Utils {
 
     fun provideRepository(baseSchedulerProvider: BaseSchedulerProvider): StoriesRepository {
         val localDataSource = StoriesLocalDataSource.getInstance(baseSchedulerProvider)
-        val remoteDataSourceFactory = StoriesRemoteDataSourceFactory(baseSchedulerProvider)
-        // val remoteDataSource = StoriesRemoteDataSource.getInstance(baseSchedulerProvider, compositeDisposable)
+        val remoteDataSourceFactory = StoriesRemoteDataSourceFactory()
         return StoriesRepository(localDataSource, remoteDataSourceFactory)
     }
 

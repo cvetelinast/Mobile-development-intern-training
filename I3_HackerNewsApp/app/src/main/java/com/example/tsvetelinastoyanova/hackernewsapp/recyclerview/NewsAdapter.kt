@@ -12,9 +12,8 @@ import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils.convertStoryTo
 import com.example.tsvetelinastoyanova.hackernewsapp.data.NetworkState
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
-class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesComparator) {
+class NewsAdapter : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesComparator) {
 
-    //   private val newsList: MutableList<New> = mutableListOf()
     private var networkState: NetworkState? = null
 
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -26,7 +25,6 @@ class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.single_new, parent, false)
-
         return MyViewHolder(itemView)
     }
 
@@ -41,24 +39,8 @@ class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<
 
     override fun getItemCount(): Int {
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
-        // return newsList.size
     }
 
-    /*  fun addStory(story: New) {
-          synchronized(newsList) {
-              newsList.add(story)
-              notifyItemChanged(newsList.lastIndex)
-          }
-      }*/
-
-    /**
-     * Set the current network state to the adapter
-     * but this work only after the initial load
-     * and the adapter already have list to add new loading raw to it
-     * so the initial loading state the activity responsible for handle it
-     *
-     * @param newNetworkState the new network state
-     */
     fun setNetworkState(newNetworkState: NetworkState?) {
         if (currentList != null) {
             if (currentList!!.size != 0) {
@@ -80,9 +62,8 @@ class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<
     }
 
     private fun hasExtraRow(): Boolean {
-        return networkState != null && networkState != NetworkState.LOADED
+        return networkState != null  && networkState != NetworkState.LOADED
     }
-
 
     companion object {
         val StoriesComparator = object : DiffUtil.ItemCallback<Story>() {
@@ -93,7 +74,6 @@ class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<
             override fun areContentsTheSame(oldStory: Story, newStory: Story): Boolean {
                 return oldStory == newStory
             }
-
         }
     }
 }
