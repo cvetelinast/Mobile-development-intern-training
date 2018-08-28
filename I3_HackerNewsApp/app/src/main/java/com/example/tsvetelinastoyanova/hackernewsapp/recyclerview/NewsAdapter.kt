@@ -1,13 +1,21 @@
 package com.example.tsvetelinastoyanova.hackernewsapp.recyclerview
 
+import android.arch.paging.PagedListAdapter
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.tsvetelinastoyanova.hackernewsapp.R
+import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils.convertStoryToNew
+import com.example.tsvetelinastoyanova.hackernewsapp.data.NetworkState
+import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
-class NewsAdapter(private val newsList: MutableList<Story>) : RecyclerView.Adapter<NewsAdapter.MyViewHolder>() {
+class NewsAdapter(/*private val retryCallback: () -> Unit*/) : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesComparator) {
+
+    //   private val newsList: MutableList<New> = mutableListOf()
+    private var networkState: NetworkState? = null
 
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
@@ -23,13 +31,69 @@ class NewsAdapter(private val newsList: MutableList<Story>) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val new = newsList[position]
-        holder.title.text = new.title
-        holder.score.text = new.score
-        holder.datetime.text = new.datetime
+        getItem(position)?.let {
+            val new = convertStoryToNew(it)
+            holder.title.text = new.title
+            holder.score.text = new.score
+            holder.datetime.text = new.datetime
+        }
     }
 
     override fun getItemCount(): Int {
-        return newsList.size
+        return super.getItemCount() + if (hasExtraRow()) 1 else 0
+        // return newsList.size
+    }
+
+    /*  fun addStory(story: New) {
+          synchronized(newsList) {
+              newsList.add(story)
+              notifyItemChanged(newsList.lastIndex)
+          }
+      }*/
+
+    /**
+     * Set the current network state to the adapter
+     * but this work only after the initial load
+     * and the adapter already have list to add new loading raw to it
+     * so the initial loading state the activity responsible for handle it
+     *
+     * @param newNetworkState the new network state
+     */
+    fun setNetworkState(newNetworkState: NetworkState?) {
+        if (currentList != null) {
+            if (currentList!!.size != 0) {
+                val previousState = this.networkState
+                val hadExtraRow = hasExtraRow()
+                this.networkState = newNetworkState
+                val hasExtraRow = hasExtraRow()
+                if (hadExtraRow != hasExtraRow) {
+                    if (hadExtraRow) {
+                        notifyItemRemoved(super.getItemCount())
+                    } else {
+                        notifyItemInserted(super.getItemCount())
+                    }
+                } else if (hasExtraRow && previousState !== newNetworkState) {
+                    notifyItemChanged(itemCount - 1)
+                }
+            }
+        }
+    }
+
+    private fun hasExtraRow(): Boolean {
+        return networkState != null && networkState != NetworkState.LOADED
+    }
+
+
+    companion object {
+        val StoriesComparator = object : DiffUtil.ItemCallback<Story>() {
+            override fun areItemsTheSame(oldStory: Story, newStory: Story): Boolean {
+                return oldStory.id == newStory.id
+            }
+
+            override fun areContentsTheSame(oldStory: Story, newStory: Story): Boolean {
+                return oldStory == newStory
+            }
+
+        }
     }
 }

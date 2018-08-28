@@ -7,6 +7,8 @@ import com.google.gson.GsonBuilder
 
 object RetrofitClient {
 
+    private const val BASE_URL_HACKER_NEWS = "https://hacker-news.firebaseio.com/v0/"
+
     private val gson = GsonBuilder()
         .setLenient()
         .create()
@@ -18,6 +20,4 @@ object RetrofitClient {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
     }
-
-    private const val BASE_URL_HACKER_NEWS = "https://hacker-news.firebaseio.com/v0/"
 }
