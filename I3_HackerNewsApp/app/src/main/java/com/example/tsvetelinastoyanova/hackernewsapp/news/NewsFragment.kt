@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.topnews
+package com.example.tsvetelinastoyanova.hackernewsapp.news
 
 import android.arch.paging.PagedList
 import android.os.Bundle
@@ -14,22 +14,27 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.widget.ProgressBar
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
-class TopNewsFragment : Fragment(), TopNewsContract.View {
+class NewsFragment : Fragment(), NewsContract.View {
 
-    private var presenter: TopNewsContract.Presenter? = null
+    private var presenter: NewsContract.Presenter? = null
     private var adapter: NewsAdapter? = null
     private var progressBar: ProgressBar? = null
 
-    override fun setPresenter(newPresenter: TopNewsContract.Presenter) {
+    override fun setPresenter(newPresenter: NewsContract.Presenter) {
         presenter = newPresenter
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_top_news, container, false)
+        val view = inflater.inflate(R.layout.fragment_news, container, false)
         createRecyclerView(view)
         progressBar = view.findViewById(R.id.progressBar)
         return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter?.stopDisposables()
     }
 
     private fun createRecyclerView(view: View) {
@@ -50,7 +55,7 @@ class TopNewsFragment : Fragment(), TopNewsContract.View {
     }
 
     companion object {
-        fun newInstance() = TopNewsFragment()
+        fun newInstance() = NewsFragment()
     }
 
     override fun onResume() {

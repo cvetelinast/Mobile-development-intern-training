@@ -1,15 +1,14 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.topnews
+package com.example.tsvetelinastoyanova.hackernewsapp.news
 
 import android.arch.paging.PagedList
 import com.example.tsvetelinastoyanova.hackernewsapp.abstraction.BasePresenter
 import com.example.tsvetelinastoyanova.hackernewsapp.abstraction.BaseView
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
+import io.reactivex.Observable
 
-interface TopNewsContract {
+interface NewsContract {
 
     interface View : BaseView<Presenter> {
-
-    //    fun showStoryInRecyclerView(story: Story)
 
         fun showProgressBar()
 
@@ -17,12 +16,14 @@ interface TopNewsContract {
 
         fun submitList(list: PagedList<Story>?)
 
-     //   fun setNetworkStateToAdapter(networkState: NetworkState?)
     }
 
     interface Presenter : BasePresenter {
 
-     /*   fun retry()*/
+        fun loadTopNews(storiesListObservable: Observable<PagedList<Story>>)
 
+        fun loadLastNews(storiesListObservable: Observable<PagedList<Story>>)
+
+        fun stopDisposables()
     }
 }

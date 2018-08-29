@@ -1,8 +1,9 @@
 package com.example.tsvetelinastoyanova.hackernewsapp.data.local
 
 import com.example.tsvetelinastoyanova.hackernewsapp.common.schedulers.BaseSchedulerProvider
+import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRepository
 
-class StoriesLocalDataSource(schedulerProvider: BaseSchedulerProvider) {
+class StoriesLocalDataSource(schedulerProvider: BaseSchedulerProvider): StoriesRepository {
 
     companion object {
 

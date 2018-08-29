@@ -1,22 +1,25 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.data.remote
+package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.new
 
 import android.arch.paging.ItemKeyedDataSource
 import android.util.Log
+import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRepository
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import io.reactivex.Observable
 
-class StoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>() {
+class NewStoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>(), StoriesRepository {
 
     private val ids: MutableList<Int> = mutableListOf()
     private var lastReceivedIndex: Int = 13
 
     companion object {
-        private var INSTANCE: StoriesRemoteDataSource? = null
-        fun getInstance(): StoriesRemoteDataSource {
+        private var INSTANCE: NewStoriesRemoteDataSource? = null
+        fun getInstance(): NewStoriesRemoteDataSource {
             if (INSTANCE == null) {
-                synchronized(StoriesRemoteDataSource::class.java) {
+                synchronized(NewStoriesRemoteDataSource::class.java) {
                     if (INSTANCE == null) {
-                        INSTANCE = StoriesRemoteDataSource()
+                        INSTANCE = NewStoriesRemoteDataSource()
                     }
                 }
             }
@@ -25,7 +28,7 @@ class StoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>() {
     }
 
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Story>) {
-        getTopStoriesIds()
+        getNewStoriesIds()
             .flatMapIterable { ids -> this.ids.addAll(ids);ids }
             .take(13)
             .flatMap { id -> getStoryById(id.toString()) }
@@ -63,26 +66,12 @@ class StoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>() {
         return item.id.toLong()
     }
 
-    private fun getTopStoriesIds(): Observable<List<Int>> {
-        val retrofit = RetrofitClient.instance
-        val service = retrofit.create(GetDataService::class.java)
-        return service.getTopStories()
-    }
-
-    private fun getLastStoriesIds(): Observable<List<Int>> {
+    private fun getNewStoriesIds(): Observable<List<Int>> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getNewStories()
     }
 
-   /* private fun getTopStories(): Observable<Story> {
-        val retrofit = RetrofitClient.instance
-        val service = retrofit.create(GetDataService::class.java)
-        return service.getTopStories()
-            .flatMapIterable { ids -> ids }
-            .flatMap { id -> getStoryById(id.toString()) }
-    }
-*/
     private fun getStoryById(id: String): Observable<Story> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
