@@ -29,11 +29,13 @@ class NewsAdapter : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesCom
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        getItem(position)?.let {
-            val new = convertStoryToNew(it)
-            holder.title.text = new.title
-            holder.score.text = new.score
-            holder.datetime.text = new.datetime
+        synchronized(this) {
+            getItem(position)?.let {
+                val new = convertStoryToNew(it)
+                holder.title.text = new.title
+                holder.score.text = new.score
+                holder.datetime.text = new.datetime
+            }
         }
     }
 
@@ -41,7 +43,7 @@ class NewsAdapter : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesCom
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
     }
 
-    fun setNetworkState(newNetworkState: NetworkState?) {
+   /* fun setNetworkState(newNetworkState: NetworkState?) {
         if (currentList != null) {
             if (currentList!!.size != 0) {
                 val previousState = this.networkState
@@ -59,10 +61,10 @@ class NewsAdapter : PagedListAdapter<Story, NewsAdapter.MyViewHolder>(StoriesCom
                 }
             }
         }
-    }
+    }*/
 
     private fun hasExtraRow(): Boolean {
-        return networkState != null  && networkState != NetworkState.LOADED
+        return networkState != null && networkState != NetworkState.LOADED
     }
 
     companion object {

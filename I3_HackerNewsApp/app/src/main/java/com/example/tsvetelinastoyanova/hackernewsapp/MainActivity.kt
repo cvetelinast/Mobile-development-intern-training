@@ -9,6 +9,8 @@ import com.example.tsvetelinastoyanova.hackernewsapp.common.schedulers.Scheduler
 import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRemoteRepository
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.StoriesDataSourceFactory
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.TypeRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.new.NewStoriesRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.top.TopStoriesRemoteDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsContract
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsFragment
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsPresenter
@@ -60,7 +62,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAndReturnPresenter(topNewsFragment: NewsFragment): NewsContract.Presenter {
-        val repository = StoriesRemoteRepository.getInstance()
+        // val repository = StoriesRemoteRepository(TopStoriesRemoteDataSource.getInstance(), NewStoriesRemoteDataSource.getInstance())
+        val repository = StoriesRemoteRepository.getInstance(TopStoriesRemoteDataSource.getInstance(), NewStoriesRemoteDataSource.getInstance())
         val topNewsPresenter: NewsContract.Presenter = NewsPresenter(topNewsFragment, repository)
         topNewsFragment.setPresenter(topNewsPresenter)
         return topNewsPresenter

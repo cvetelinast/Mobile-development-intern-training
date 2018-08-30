@@ -15,7 +15,6 @@ interface NewsContract {
         fun hideProgressBar()
 
         fun submitList(list: PagedList<Story>?)
-
     }
 
     interface Presenter : BasePresenter {

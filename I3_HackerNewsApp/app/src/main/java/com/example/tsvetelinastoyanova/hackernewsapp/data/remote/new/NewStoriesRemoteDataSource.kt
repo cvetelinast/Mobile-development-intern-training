@@ -8,11 +8,11 @@ import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import io.reactivex.Observable
 
-class NewStoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>(), StoriesRepository {
-
+class NewStoriesRemoteDataSource : AbstractDataSource()/*ItemKeyedDataSource<Long, Story>()*/ {
     private val ids: MutableList<Int> = mutableListOf()
-    private var lastReceivedIndex: Int = 13
 
+  var lastReceivedIndex: Int = 0
+  private val storiesList: MutableList<Story> = mutableListOf()
     companion object {
         private var INSTANCE: NewStoriesRemoteDataSource? = null
         fun getInstance(): NewStoriesRemoteDataSource {
@@ -27,16 +27,41 @@ class NewStoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>(), StoriesRe
         }
     }
 
-    override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Story>) {
-        getNewStoriesIds()
-            .flatMapIterable { ids -> this.ids.addAll(ids);ids }
-            .take(13)
-            .flatMap { id -> getStoryById(id.toString()) }
-            .toList()
-            .subscribe(
-                { stories -> callback.onResult(stories) },
-                { error -> Log.d("tag", "Error in loadInitial(): $error") }
-            )
+    override fun addStoriesToList(storiesList: List<Story>) {
+        this.storiesList.addAll(storiesList)
+    }
+
+    override fun getStoriesList(): List<Story> {
+        return storiesList
+    }
+
+  /*  override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Story>) {
+        if(ids.isEmpty()) {
+            getNewStoriesIds()
+                .flatMapIterable { ids -> this.ids.addAll(ids);ids }
+                .take(13)
+                .flatMap { id -> getStoryById(id.toString()) }
+                .toList()
+                .subscribe(
+                    {                        stories -> callback.onResult(stories)
+                    },
+                    {
+                        error -> Log.d("tag", "Error in loadInitial(): $error")
+                    }
+                )
+        } else {
+            Observable.fromIterable(ids)
+                .flatMap { id -> getStoryById(id.toString()) }
+                .toList()
+                .subscribe(
+                    {
+                        stories -> callback.onResult(stories)
+                    },
+                    {
+                        error -> Log.d("tag", "Error in loadInitial(): $error")
+                    }
+                )
+        }
     }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Story>) {
@@ -65,16 +90,37 @@ class NewStoriesRemoteDataSource : ItemKeyedDataSource<Long, Story>(), StoriesRe
     override fun getKey(item: Story): Long {
         return item.id.toLong()
     }
-
-    private fun getNewStoriesIds(): Observable<List<Int>> {
+*/
+    override fun getStoriesIds(): Observable<List<Int>> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getNewStories()
     }
 
+    override fun getLastIndex(): Int {
+        return lastReceivedIndex
+    }
+
+    override fun increaseLastReceivedIndexWithValue(value: Int) {
+        lastReceivedIndex += value
+    }
+
+    override fun getIdsSize(): Int {
+        return ids.size
+    }
+
+    override fun addIdsFirstTime(listIds: List<Int>) {
+       ids.addAll(listIds)
+    }
+
+    override fun getSublistOfCachedStories(fromIndex: Int, toIndex: Int): MutableList<Int> {
+      return ids.subList(fromIndex, toIndex)
+    }
+
+/*
     private fun getStoryById(id: String): Observable<Story> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getStoryById(id)
-    }
+    }*/
 }
