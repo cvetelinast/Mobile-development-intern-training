@@ -13,9 +13,12 @@ class NewsPresenter(private val view: NewsContract.View,
 
     override fun loadLastNews(storiesListObservable: Observable<PagedList<Story>>) {
         view.showProgressBar()
-        //  stopDisposables()
         compositeDisposable.add(
-            repository.loadLastNews(storiesListObservable)
+            //repository.loadLastNews(storiesListObservable)
+            storiesListObservable
+                .doOnNext {
+                    view.showProgressBar()
+                }
                 .subscribe(
                     { storiesList ->
                         view.hideProgressBar()
@@ -30,11 +33,10 @@ class NewsPresenter(private val view: NewsContract.View,
 
     override fun loadTopNews(storiesListObservable: Observable<PagedList<Story>>) {
         view.showProgressBar()
-        //   stopDisposables()
-        //     compositeDisposable.add(
-        repository.loadTopNews(storiesListObservable)
+        // repository.loadTopNews(storiesListObservable)
+        storiesListObservable
             .doOnNext {
-                s -> Log.d("tag", "Length of list: ${s.size}")
+                view.showProgressBar()
             }
             .subscribe(
                 { storiesList ->
@@ -45,7 +47,6 @@ class NewsPresenter(private val view: NewsContract.View,
                     Log.d("tag", "Error loading top news occurred: $err")
                 }
             )
-        //   )
     }
 
     override fun stopDisposables() {

@@ -27,8 +27,8 @@ class NewsFragment : Fragment(), NewsContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_news, container, false)
-        createRecyclerView(view)
         progressBar = view.findViewById(R.id.progressBar)
+        createRecyclerView(view)
         return view
     }
 
