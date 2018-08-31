@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import com.example.tsvetelinastoyanova.hackernewsapp.R
 import com.example.tsvetelinastoyanova.hackernewsapp.recyclerview.NewsAdapter
 import android.support.v7.widget.DefaultItemAnimator
+import android.webkit.WebView
 import android.widget.ProgressBar
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
@@ -19,6 +20,7 @@ class NewsFragment : Fragment(), NewsContract.View {
     private var presenter: NewsContract.Presenter? = null
     private var adapter: NewsAdapter? = null
     private var progressBar: ProgressBar? = null
+    private var webView: WebView? = null
 
     override fun setPresenter(newPresenter: NewsContract.Presenter) {
         presenter = newPresenter
@@ -28,6 +30,7 @@ class NewsFragment : Fragment(), NewsContract.View {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_news, container, false)
         progressBar = view.findViewById(R.id.progressBar)
+        webView = view.findViewById(R.id.webView)
         createRecyclerView(view)
         return view
     }
@@ -39,7 +42,12 @@ class NewsFragment : Fragment(), NewsContract.View {
 
     private fun createRecyclerView(view: View) {
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-        adapter = NewsAdapter()
+        adapter = NewsAdapter(listener = {
+            it.url?.apply {
+                webView?.visibility = View.VISIBLE
+                webView?.loadUrl(this)
+            }
+        })
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()

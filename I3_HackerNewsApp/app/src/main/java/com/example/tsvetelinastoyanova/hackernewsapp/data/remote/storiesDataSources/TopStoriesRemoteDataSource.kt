@@ -1,16 +1,15 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.top
+package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources
 
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.new.AbstractDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import io.reactivex.Observable
 
 class TopStoriesRemoteDataSource : AbstractDataSource() {
 
+    private var lastReceivedIndex: Int = 0
     private val ids: MutableList<Int> = mutableListOf()
     private val storiesList: MutableList<Story> = mutableListOf()
-    private var lastReceivedIndex: Int = 0
 
     companion object {
         private var INSTANCE: TopStoriesRemoteDataSource? = null
@@ -50,7 +49,7 @@ class TopStoriesRemoteDataSource : AbstractDataSource() {
         ids.addAll(listIds)
     }
 
-    override fun getSublistOfCachedStories(fromIndex: Int, toIndex: Int): MutableList<Int> {
+    override fun getSublistOfCachedIds(fromIndex: Int, toIndex: Int): MutableList<Int> {
         return ids.subList(fromIndex, toIndex)
     }
 

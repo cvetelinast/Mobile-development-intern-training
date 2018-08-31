@@ -17,6 +17,7 @@ class NewsPresenter(private val view: NewsContract.View,
             //repository.loadLastNews(storiesListObservable)
             storiesListObservable
                 .doOnNext {
+                    Log.i("FOOOO", "on ${Thread.currentThread()}")
                     view.showProgressBar()
                 }
                 .subscribe(
@@ -36,6 +37,7 @@ class NewsPresenter(private val view: NewsContract.View,
         // repository.loadTopNews(storiesListObservable)
         storiesListObservable
             .doOnNext {
+                Log.i("BOOOO", "on ${Thread.currentThread()}")
                 view.showProgressBar()
             }
             .subscribe(

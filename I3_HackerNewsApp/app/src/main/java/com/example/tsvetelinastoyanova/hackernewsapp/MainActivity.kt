@@ -1,16 +1,16 @@
 package com.example.tsvetelinastoyanova.hackernewsapp
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import com.example.tsvetelinastoyanova.hackernewsapp.common.Constants
+import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.webkit.WebView
 import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils
 import com.example.tsvetelinastoyanova.hackernewsapp.common.schedulers.SchedulerProvider
 import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRemoteRepository
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.StoriesDataSourceFactory
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.TypeRemoteDataSource
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.new.NewStoriesRemoteDataSource
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.top.TopStoriesRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources.NewStoriesRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources.TopStoriesRemoteDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsContract
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsFragment
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsPresenter
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         var topNewsFragment = supportFragmentManager.findFragmentById(R.id.contentFragment) as? NewsFragment
         if (topNewsFragment == null) {
             topNewsFragment = NewsFragment.newInstance()
-            Utils.addFragment(supportFragmentManager, topNewsFragment, R.id.contentFragment, Constants.TOP_NEWS_FRAGMENT_NAME)
+            Utils.addFragment(supportFragmentManager, topNewsFragment, R.id.contentFragment, Utils.TOP_NEWS_FRAGMENT_NAME)
         }
         return topNewsFragment
     }
@@ -80,19 +80,40 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadTopNews(presenter: NewsContract.Presenter) {
         action = TOP_NEWS
+        hideWebView()
         val observable = Utils.provideStoriesObservable(TypeRemoteDataSource.TOP_STORIES, SchedulerProvider.getInstance())
         presenter.loadTopNews(observable)
     }
 
     private fun loadLastNews(presenter: NewsContract.Presenter) {
         action = LAST_NEWS
+        hideWebView()
         val observable = Utils.provideStoriesObservable(TypeRemoteDataSource.NEW_STORIES, SchedulerProvider.getInstance())
         presenter.loadLastNews(observable)
     }
 
     private fun loadFavouriteNews(presenter: NewsContract.Presenter) {
         action = FAVOURITE_NEWS
+        hideWebView()
         // presenter.loadFavouriteNews()
+    }
+
+    private fun hideWebView() {
+        val webView: WebView? = findViewById(R.id.webView)
+        webView?.let {
+            if (it.visibility == View.VISIBLE) {
+                it.visibility = View.INVISIBLE
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        val webView = findViewById<WebView>(R.id.webView)
+        if (webView.visibility == View.VISIBLE) {
+            webView.visibility = View.INVISIBLE
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object {

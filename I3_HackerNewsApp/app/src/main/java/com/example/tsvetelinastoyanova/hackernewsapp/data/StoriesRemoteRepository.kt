@@ -1,8 +1,8 @@
 package com.example.tsvetelinastoyanova.hackernewsapp.data
 
 import android.arch.paging.PagedList
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.new.NewStoriesRemoteDataSource
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.top.TopStoriesRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources.NewStoriesRemoteDataSource
+import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources.TopStoriesRemoteDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import io.reactivex.Observable
 

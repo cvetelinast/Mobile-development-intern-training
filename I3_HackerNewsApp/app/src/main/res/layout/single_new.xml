@@ -12,6 +12,7 @@
         card_view:cardCornerRadius="4dp">
 
         <RelativeLayout
+            android:padding="4dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -19,16 +20,22 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Title"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/title"
+                android:background="@drawable/ic_star_black_24dp" />
 
             <TextView
                 android:id="@+id/score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/title"
-                android:text="200 points"
+                android:layout_alignBottom="@+id/star"
+                android:layout_toRightOf="@+id/star"
                 android:textStyle="bold" />
 
             <TextView
@@ -37,7 +44,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/score"
                 android:layout_alignParentEnd="true"
-                android:text="23.08.2018"
                 android:textStyle="bold" />
 
         </RelativeLayout>

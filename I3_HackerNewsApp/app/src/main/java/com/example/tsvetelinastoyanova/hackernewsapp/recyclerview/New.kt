@@ -1,3 +1,3 @@
 package com.example.tsvetelinastoyanova.hackernewsapp.recyclerview
 
-data class New(val title: String, val score: String, val datetime: String)
+data class New(val title: String, val score: String, val datetime: String, val url: String?)

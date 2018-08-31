@@ -14,17 +14,9 @@ import java.text.SimpleDateFormat
 
 object Utils {
 
-    private val PATTERN_DATETIME_FORMAT = "MM dd, yyyy hh:mma"
-    private val pageSize = 15
-
-    /* fun switchFragment(fragmentManager: FragmentManager,
-                        newFragment: Fragment, frameId: Int, nameOfFragment: String) {
-         checkNotNull(fragmentManager)
-         checkNotNull(newFragment)
-         val transaction = fragmentManager.beginTransaction()
-         transaction.replace(frameId, newFragment, nameOfFragment)
-         transaction.commit()
-     }*/
+    const val TOP_NEWS_FRAGMENT_NAME = "TOP_NEWS_FRAGMENT"
+    private const val PATTERN_DATETIME_FORMAT = "dd.MM.yyyy, hh:mma"
+    private const val NUM_STORIES_FOR_PAGE = 15
 
     fun addFragment(fragmentManager: FragmentManager,
                     newFragment: Fragment, frameId: Int, nameOfFragment: String) {
@@ -35,63 +27,22 @@ object Utils {
         transaction.commit()
     }
 
-    /*  fun provideRepository(baseSchedulerProvider: BaseSchedulerProvider): StoriesRepository {
-          val localDataSource = StoriesLocalDataSource.getInstance(baseSchedulerProvider)
-          val remoteDataSourceFactory = TopStoriesRepositoryFactory()
-          return StoriesRepository(*//*localDataSource, remoteDataSourceFactory*//*)
-    }*/
-
-    /*  fun provideNewStoriesRepository(baseSchedulerProvider: BaseSchedulerProvider): StoriesRepository {
-          val localDataSource = StoriesLocalDataSource.getInstance(baseSchedulerProvider)
-          val remoteDataSourceFactory = TopStoriesRepositoryFactory()
-          return StoriesRepository(*//*localDataSource, remoteDataSourceFactory*//*)
-    }*/
-
     fun provideStoriesObservable(typeRemoteDataSource: TypeRemoteDataSource,
-                                    baseSchedulerProvider: BaseSchedulerProvider): Observable<PagedList<Story>> {
+                                 baseSchedulerProvider: BaseSchedulerProvider): Observable<PagedList<Story>> {
         val sourceFactory = StoriesDataSourceFactory(typeRemoteDataSource)
         val config = PagedList.Config.Builder()
-            .setPageSize(pageSize)
-            .setInitialLoadSizeHint(pageSize * 2)
+            .setPageSize(NUM_STORIES_FOR_PAGE)
+            .setInitialLoadSizeHint(NUM_STORIES_FOR_PAGE * 2)
             .setEnablePlaceholders(false)
             .build()
 
         return RxPagedListBuilder<Long, Story>(sourceFactory, config)
-            .setFetchScheduler(baseSchedulerProvider.io())
+            .setFetchScheduler(baseSchedulerProvider.ui())
             .setNotifyScheduler(baseSchedulerProvider.ui())
             .buildObservable()
     }
 
-
-   /* fun provideNewStoriesObservable(typeRemoteDataSource: TypeRemoteDataSource, baseSchedulerProvider: BaseSchedulerProvider): Observable<PagedList<Story>> {
-        val sourceFactory = StoriesDataSourceFactory(TypeRemoteDataSource.NEW_STORIES)
-        val config = PagedList.Config.Builder()
-            .setPageSize(pageSize)
-            .setInitialLoadSizeHint(pageSize * 2)
-            .setEnablePlaceholders(false)
-            .build()
-
-        return RxPagedListBuilder<Long, Story>(sourceFactory, config)
-            .setFetchScheduler(baseSchedulerProvider.io())
-            .setNotifyScheduler(baseSchedulerProvider.ui())
-            .buildObservable()
-    }
-
-    fun provideTopStoriesObservable(baseSchedulerProvider: BaseSchedulerProvider): Observable<PagedList<Story>> {
-        val sourceFactory = StoriesDataSourceFactory(TypeRemoteDataSource.TOP_STORIES)
-        val config = PagedList.Config.Builder()
-            .setPageSize(pageSize)
-            .setInitialLoadSizeHint(pageSize * 2)
-            .setEnablePlaceholders(false)
-            .build()
-
-        return RxPagedListBuilder<Long, Story>(sourceFactory, config)
-            .setFetchScheduler(baseSchedulerProvider.io())
-            .setNotifyScheduler(baseSchedulerProvider.ui())
-            .buildObservable()
-    }*/
-
-    fun convertStoryToNew(story: Story): New = New(story.title, story.score.toString(), convertUnixTimeToDatetime(story.time.toString()))
+    fun convertStoryToNew(story: Story): New = New(story.title, story.score.toString(), convertUnixTimeToDatetime(story.time.toString()), story.url)
 
     private fun convertUnixTimeToDatetime(time: String): String {
         val dv = java.lang.Long.valueOf(time) * 1000
