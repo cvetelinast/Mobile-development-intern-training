@@ -16,7 +16,7 @@ object Utils {
 
     const val TOP_NEWS_FRAGMENT_NAME = "TOP_NEWS_FRAGMENT"
     private const val PATTERN_DATETIME_FORMAT = "dd.MM.yyyy, hh:mma"
-    private const val NUM_STORIES_FOR_PAGE = 15
+    const val NUM_STORIES_FOR_PAGE = 8
 
     fun addFragment(fragmentManager: FragmentManager,
                     newFragment: Fragment, frameId: Int, nameOfFragment: String) {
@@ -28,13 +28,10 @@ object Utils {
     }
 
     fun provideStoriesObservable(typeRemoteDataSource: TypeRemoteDataSource,
-                                 baseSchedulerProvider: BaseSchedulerProvider): Observable<PagedList<Story>> {
-        val sourceFactory = StoriesDataSourceFactory(typeRemoteDataSource)
-        val config = PagedList.Config.Builder()
-            .setPageSize(NUM_STORIES_FOR_PAGE)
-            .setInitialLoadSizeHint(NUM_STORIES_FOR_PAGE * 2)
-            .setEnablePlaceholders(false)
-            .build()
+                                 baseSchedulerProvider: BaseSchedulerProvider,
+                                 query: String): Observable<PagedList<Story>> {
+        val sourceFactory = StoriesDataSourceFactory(typeRemoteDataSource, query)
+        val config = buildConfig()
 
         return RxPagedListBuilder<Long, Story>(sourceFactory, config)
             .setFetchScheduler(baseSchedulerProvider.ui())
@@ -42,11 +39,21 @@ object Utils {
             .buildObservable()
     }
 
-    fun convertStoryToNew(story: Story): New = New(story.title, story.score.toString(), convertUnixTimeToDatetime(story.time.toString()), story.url)
+    fun convertStoryToNew(story: Story): New {
+        val title = story.title ?: ""
+        return New(title, story.score.toString(),
+            convertUnixTimeToDatetime(story.time.toString()), story.url)
+    }
+
+    private fun buildConfig(): PagedList.Config = PagedList.Config.Builder()
+        .setPageSize(NUM_STORIES_FOR_PAGE)
+        .setInitialLoadSizeHint(NUM_STORIES_FOR_PAGE * 2)
+        .setEnablePlaceholders(false)
+        .build()
 
     private fun convertUnixTimeToDatetime(time: String): String {
-        val dv = java.lang.Long.valueOf(time) * 1000
-        val df = java.util.Date(dv)
-        return SimpleDateFormat(PATTERN_DATETIME_FORMAT).format(df)
+        val timeValue = java.lang.Long.valueOf(time) * 1000
+        val dateValue = java.util.Date(timeValue)
+        return SimpleDateFormat(PATTERN_DATETIME_FORMAT).format(dateValue)
     }
 }

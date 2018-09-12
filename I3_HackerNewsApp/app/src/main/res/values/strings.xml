@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Hacker News</string>
 
+    <string name="action_search">Search</string>
+    <string name="search_hint">Search…</string>
+
     <string name="top_news_label">Top</string>
     <string name="last_news_label">New</string>
     <string name="favorite_news_label">Favourite</string>
@@ -8,4 +11,7 @@
     <string name="top_news_fragment">Top news fragment</string>
     <string name="last_news_fragment">Last news fragment</string>
     <string name="favourite_news_fragment">Favourite news fragment</string>
+
+    <string name="number_of_stars">number of stars</string>
+    <string name="open_web_view">open web view</string>
 </resources>

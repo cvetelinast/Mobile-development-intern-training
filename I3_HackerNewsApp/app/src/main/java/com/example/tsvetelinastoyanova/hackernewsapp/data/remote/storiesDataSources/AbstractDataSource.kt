@@ -1,8 +1,8 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources
+package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasources
 
 import android.arch.paging.ItemKeyedDataSource
-import android.util.AndroidException
 import android.util.Log
+import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils.NUM_STORIES_FOR_PAGE
 import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRepository
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
@@ -12,10 +12,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesRepository {
-
-    companion object {
-        private const val STORIES_NUMBER_PER_PAGE: Int = 13
-    }
 
     abstract fun getStoriesIds(): Observable<List<Int>>
     abstract fun addStoriesToList(storiesList: List<Story>)
@@ -34,6 +30,24 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
         }
     }
 
+    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Story>) {
+        Log.d("filter", "loadAfter() called")
+        val lastIndex = getLastIndex()
+        val storiesNumberToBeLoaded = chooseBestNumberOfStoriesToLoad(lastIndex)
+        val sublist =
+            getSublistOfCachedIds(lastIndex, lastIndex + storiesNumberToBeLoaded)
+
+        loadStoriesFromCachedIds(sublist, callback)
+    }
+
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {
+        Log.d("tag", "loadBefore() called")
+    }
+
+    override fun getKey(item: Story): Long {
+        return item.id?.toLong() ?: 0
+    }
+
     private fun initLoadingCachedStories(callback: LoadInitialCallback<Story>) {
         Observable.just(getStoriesList())
             .subscribe(
@@ -46,7 +60,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
         getStoriesIds()
             .doOnNext { idList -> addIdsFirstTime(idList) }
             .flatMapIterable { it }
-            .take(STORIES_NUMBER_PER_PAGE.toLong())
+            .take(NUM_STORIES_FOR_PAGE.toLong())
             .flatMap { id -> getStoryById(id.toString()) }
             .toList()
             .subscribeOn(Schedulers.io())
@@ -59,16 +73,6 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
                 },
                 { error -> Log.d("tag", "Error in loadInitial(): $error") }
             )
-    }
-
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        val storiesNumberToBeLoaded: Int
-        val lastIndex = getLastIndex()
-
-        storiesNumberToBeLoaded = chooseBestNumberOfStoriesToLoad(lastIndex)
-        val sublist = getSublistOfCachedIds(lastIndex, lastIndex + storiesNumberToBeLoaded)
-
-        loadStoriesFromCachedIds(sublist, callback)
     }
 
     private fun loadStoriesFromCachedIds(sublist: MutableList<Int>, callback: LoadCallback<Story>) {
@@ -86,20 +90,12 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
     }
 
     private fun chooseBestNumberOfStoriesToLoad(lastIndex: Int): Int {
-        return if (lastIndex + STORIES_NUMBER_PER_PAGE < getIdsSize()) {
-            increaseLastReceivedIndexWithValue(STORIES_NUMBER_PER_PAGE)
-            STORIES_NUMBER_PER_PAGE
+        return if (lastIndex + NUM_STORIES_FOR_PAGE < getIdsSize()) {
+            increaseLastReceivedIndexWithValue(NUM_STORIES_FOR_PAGE)
+            NUM_STORIES_FOR_PAGE
         } else {
             getIdsSize() - lastIndex
         }
-    }
-
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        Log.d("tag", "loadBefore() called")
-    }
-
-    override fun getKey(item: Story): Long {
-        return item.id.toLong()
     }
 
     private fun isFirstTimeLoadingStories() = getLastIndex() == 0
@@ -107,6 +103,9 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
     private fun getStoryById(id: String): Observable<Story> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
-        return service.getStoryById(id).subscribeOn(Schedulers.io())
+        return service.getStoryById(id)
+            .subscribeOn(Schedulers.io())
+            .filter{story: Story? -> story != null}
+            .ofType(Story::class.java)
     }
 }

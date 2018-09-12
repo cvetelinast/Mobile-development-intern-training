@@ -19,9 +19,7 @@ interface NewsContract {
 
     interface Presenter : BasePresenter {
 
-        fun loadTopNews(storiesListObservable: Observable<PagedList<Story>>)
-
-        fun loadLastNews(storiesListObservable: Observable<PagedList<Story>>)
+        fun loadProperNews(storiesListObservable: Observable<PagedList<Story>>)
 
         fun stopDisposables()
     }

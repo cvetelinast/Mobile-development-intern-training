@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources
+package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasources
 
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient

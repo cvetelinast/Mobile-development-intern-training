@@ -22,6 +22,10 @@ class NewsFragment : Fragment(), NewsContract.View {
     private var progressBar: ProgressBar? = null
     private var webView: WebView? = null
 
+    companion object {
+        fun newInstance() = NewsFragment()
+    }
+
     override fun setPresenter(newPresenter: NewsContract.Presenter) {
         presenter = newPresenter
     }
@@ -40,6 +44,24 @@ class NewsFragment : Fragment(), NewsContract.View {
         presenter?.stopDisposables()
     }
 
+    override fun showProgressBar() {
+        progressBar?.visibility = View.VISIBLE
+    }
+
+    override fun hideProgressBar() {
+        progressBar?.visibility = View.INVISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkNotNull(presenter)
+        presenter?.start()
+    }
+
+    override fun submitList(list: PagedList<Story>?) {
+        adapter?.submitList(list)
+    }
+
     private fun createRecyclerView(view: View) {
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         adapter = NewsAdapter(listener = {
@@ -52,27 +74,5 @@ class NewsFragment : Fragment(), NewsContract.View {
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = adapter
-    }
-
-    override fun showProgressBar() {
-        progressBar?.visibility = View.VISIBLE
-    }
-
-    override fun hideProgressBar() {
-        progressBar?.visibility = View.INVISIBLE
-    }
-
-    companion object {
-        fun newInstance() = NewsFragment()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        checkNotNull(presenter)
-        presenter?.start()
-    }
-
-    override fun submitList(list: PagedList<Story>?) {
-        adapter?.submitList(list)
     }
 }

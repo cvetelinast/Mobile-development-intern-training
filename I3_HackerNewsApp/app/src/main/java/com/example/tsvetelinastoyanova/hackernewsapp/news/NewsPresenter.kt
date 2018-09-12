@@ -9,47 +9,29 @@ import io.reactivex.disposables.CompositeDisposable
 
 class NewsPresenter(private val view: NewsContract.View,
                     private val repository: StoriesRemoteRepository) : NewsContract.Presenter {
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    override fun loadLastNews(storiesListObservable: Observable<PagedList<Story>>) {
+    override fun loadProperNews(storiesListObservable: Observable<PagedList<Story>>) {
         view.showProgressBar()
         compositeDisposable.add(
-            //repository.loadLastNews(storiesListObservable)
             storiesListObservable
                 .doOnNext {
-                    Log.i("FOOOO", "on ${Thread.currentThread()}")
+                    Log.i("thread", "on ${Thread.currentThread()}")
                     view.showProgressBar()
                 }
                 .subscribe(
                     { storiesList ->
-                        view.hideProgressBar()
+                        Log.d("thread", "${storiesList.size}")
                         view.submitList(storiesList)
+                        view.hideProgressBar()
                     },
                     { err ->
-                        Log.d("tag", "Error loading last news occurred: $err")
+                        Log.d("thread", "Error loading last news occurred: $err")
                     }
                 )
         )
     }
 
-    override fun loadTopNews(storiesListObservable: Observable<PagedList<Story>>) {
-        view.showProgressBar()
-        // repository.loadTopNews(storiesListObservable)
-        storiesListObservable
-            .doOnNext {
-                Log.i("BOOOO", "on ${Thread.currentThread()}")
-                view.showProgressBar()
-            }
-            .subscribe(
-                { storiesList ->
-                    view.hideProgressBar()
-                    view.submitList(storiesList)
-                },
-                { err ->
-                    Log.d("tag", "Error loading top news occurred: $err")
-                }
-            )
-    }
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun stopDisposables() {
         compositeDisposable.dispose()

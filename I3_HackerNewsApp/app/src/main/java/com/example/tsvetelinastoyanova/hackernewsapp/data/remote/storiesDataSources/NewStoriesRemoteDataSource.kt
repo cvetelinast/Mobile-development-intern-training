@@ -1,4 +1,4 @@
-package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesDataSources
+package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasources
 
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
@@ -6,6 +6,7 @@ import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 import io.reactivex.Observable
 
 class NewStoriesRemoteDataSource : AbstractDataSource() {
+
     private var lastReceivedIndex: Int = 0
     private val ids: MutableList<Int> = mutableListOf()
     private val storiesList: MutableList<Story> = mutableListOf()
