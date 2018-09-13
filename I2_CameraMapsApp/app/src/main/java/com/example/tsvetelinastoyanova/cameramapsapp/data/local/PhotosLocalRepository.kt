@@ -17,7 +17,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PhotosLocalRepository : LocalRepository {
+class PhotosLocalRepository() : LocalRepository {
 
     private var galleryFolder: File? = null
 
