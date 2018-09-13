@@ -14,9 +14,9 @@
         android:title="@string/last_news_label"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_favourite"
+        android:id="@+id/action_search"
         android:enabled="true"
-        android:icon="@drawable/ic_favorite_white_24dp"
-        android:title="@string/favorite_news_label"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/search_news_label"
         app:showAsAction="ifRoom" />
 </menu>

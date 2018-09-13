@@ -75,7 +75,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
             )
     }
 
-    private fun loadStoriesFromCachedIds(sublist: MutableList<Int>, callback: LoadCallback<Story>) {
+    open fun loadStoriesFromCachedIds(sublist: MutableList<Int>, callback: LoadCallback<Story>) {
         Observable.fromIterable(sublist)
             .flatMap { id -> getStoryById(id.toString()) }
             .observeOn(AndroidSchedulers.mainThread())
@@ -100,7 +100,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
 
     private fun isFirstTimeLoadingStories() = getLastIndex() == 0
 
-    private fun getStoryById(id: String): Observable<Story> {
+    fun getStoryById(id: String): Observable<Story> {
         val retrofit = RetrofitClient.instance
         val service = retrofit.create(GetDataService::class.java)
         return service.getStoryById(id)

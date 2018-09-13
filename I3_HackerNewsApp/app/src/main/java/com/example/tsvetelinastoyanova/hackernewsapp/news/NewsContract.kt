@@ -22,5 +22,7 @@ interface NewsContract {
         fun loadProperNews(storiesListObservable: Observable<PagedList<Story>>)
 
         fun stopDisposables()
+
+        fun stopSearching()
     }
 }

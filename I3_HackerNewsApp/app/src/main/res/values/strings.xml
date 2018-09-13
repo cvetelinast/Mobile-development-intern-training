@@ -6,7 +6,7 @@
 
     <string name="top_news_label">Top</string>
     <string name="last_news_label">New</string>
-    <string name="favorite_news_label">Favourite</string>
+    <string name="search_news_label">Search</string>
 
     <string name="top_news_fragment">Top news fragment</string>
     <string name="last_news_fragment">Last news fragment</string>

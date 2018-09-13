@@ -66,8 +66,8 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
                 .subscribe(
                     { stories ->
                         addStoriesToList(stories)
-                        callback.onResult(stories)
                         decrementIndexToAvoidRepetition()
+                        callback.onResult(stories)
                     },
                     { error ->
                         Log.d("filter", "Error in loadInitial(): $error, ${error.stackTrace}")
@@ -81,7 +81,7 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
             .flatMap({ id ->
                 getStoryById((maxIndex - id).toString())
                     .subscribeOn(Schedulers.io())
-            }, 25)
+            }, 15)
             .doOnNext {
                 Log.d("filter", "Before - Id: ${it?.id}, Title: ${it?.title}; The current thread is: ${Thread.currentThread()}")
             }

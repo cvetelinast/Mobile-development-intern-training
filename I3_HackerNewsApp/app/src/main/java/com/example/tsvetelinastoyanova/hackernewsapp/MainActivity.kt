@@ -15,12 +15,11 @@ import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasour
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsContract
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsFragment
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsPresenter
-import android.app.SearchManager
-import android.content.Context
 import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         initToolbar()
-
         val fragment = getFragment()
         presenter = setAndReturnPresenter(fragment)
 
@@ -61,23 +59,10 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
-        setSearchViewDetails(searchView, searchManager)
-        this.searchView = searchView
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean =
-        if (item.itemId == R.id.action_search) true else super.onOptionsItemSelected(item)
-
     override fun onBackPressed() {
         val webView = findViewById<WebView>(R.id.webView)
         when {
             webView.visibility == View.VISIBLE -> webView.visibility = View.INVISIBLE
-            searchView?.isIconified != true -> searchView?.isIconified = true
             else -> super.onBackPressed()
         }
     }
@@ -86,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
+            setDisplayHomeAsUpEnabled(false)
             setTitle(R.string.app_name)
         }
         setSupportActionBar(toolbar)
@@ -99,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.action_top -> loadTopNews(presenter)
                 R.id.action_new -> loadLastNews(presenter)
-                R.id.action_favourite -> loadFavouriteNews(presenter)
+                R.id.action_search -> loadFilteredNews(presenter)
             }
             true
         }
@@ -129,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNews(action: String, presenter: NewsContract.Presenter) {
         when {
-            action.contains(FAVOURITE_NEWS) -> loadFavouriteNews(presenter)
+            action.contains(FAVOURITE_NEWS) -> loadFilteredNews(presenter)
             action.contains(LAST_NEWS) -> loadLastNews(presenter)
             action.contains(SEARCH) -> Log.d("OOO", "search")
             else -> loadTopNews(presenter)
@@ -137,52 +122,67 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadTopNews(presenter: NewsContract.Presenter) {
-        intent.action = TOP_NEWS
-        hideWebView()
+        prepareForLoadingNews(presenter, TOP_NEWS, View.GONE)
+
         val observable = Utils.provideStoriesObservable(
             TypeRemoteDataSource.TOP_STORIES, SchedulerProvider.getInstance(), "")
         presenter.loadProperNews(observable)
     }
 
     private fun loadLastNews(presenter: NewsContract.Presenter) {
-        intent.action = LAST_NEWS
-        hideWebView()
+        prepareForLoadingNews(presenter, LAST_NEWS, View.GONE)
+
         val observable = Utils.provideStoriesObservable(
             TypeRemoteDataSource.NEW_STORIES, SchedulerProvider.getInstance(), "")
         presenter.loadProperNews(observable)
     }
 
-    private fun loadFavouriteNews(presenter: NewsContract.Presenter) {
-        intent.action = FAVOURITE_NEWS
+    private fun loadFilteredNews(presenter: NewsContract.Presenter) {
+        prepareForLoadingNews(presenter, SEARCH, View.VISIBLE)
+
+        val buttonSearch: Button = findViewById(R.id.buttonSearch)
+        buttonSearch.setOnClickListener {
+            val editText = findViewById<EditText>(R.id.input)
+            val observable = Utils.provideStoriesObservable(
+                TypeRemoteDataSource.FILTERED_STORIES, SchedulerProvider.getInstance(), editText.text.toString())
+            presenter.loadProperNews(observable)
+        }
+    }
+
+    private fun prepareForLoadingNews(presenter: NewsContract.Presenter, action: String, visibility: Int) {
+        intent.action = action
         hideWebView()
+        changeVisibilityOfSearchTools(visibility)
+        presenter.stopSearching()
+        //  presenter.stopDisposables()
     }
 
-    private fun setSearchViewDetails(searchView: SearchView, searchManager: SearchManager) {
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView.maxWidth = Integer.MAX_VALUE
-        setSearchListener(searchView)
-    }
+    /* private fun setSearchViewDetails(searchView: SearchView, searchManager: SearchManager) {
+         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+         searchView.maxWidth = Integer.MAX_VALUE
+         setSearchListener(searchView)
+     }
 
-    private fun setSearchListener(searchView: SearchView) {
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                intent.action = SEARCH
-                searchView.setQuery(query, false)
-                loadFilteredNews(query)
-                return false
-            }
+     private fun setSearchListener(searchView: SearchView) {
+         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+             override fun onQueryTextSubmit(query: String): Boolean {
+                 intent.action = SEARCH
+                 searchView.setQuery(query, false)
+                 loadFilteredNews(query)
+                 return false
+             }
 
-            override fun onQueryTextChange(query: String): Boolean {
-                return false
-            }
-        })
-    }
+             override fun onQueryTextChange(query: String): Boolean {
+                 return false
+             }
+         })
+     }*/
 
-    private fun loadFilteredNews(searchedString: String) {
-        val storiesObservable = Utils.provideStoriesObservable(
-            TypeRemoteDataSource.FILTERED_STORIES, SchedulerProvider.getInstance(), searchedString)
-        presenter!!.loadProperNews(storiesObservable)
-    }
+    /* private fun loadFilteredNews(searchedString: String) {
+         val storiesObservable = Utils.provideStoriesObservable(
+             TypeRemoteDataSource.FILTERED_STORIES, SchedulerProvider.getInstance(), searchedString)
+         presenter!!.loadProperNews(storiesObservable)
+     }*/
 
     private fun hideWebView() {
         val webView: WebView? = findViewById(R.id.webView)
@@ -191,5 +191,10 @@ class MainActivity : AppCompatActivity() {
                 it.visibility = View.INVISIBLE
             }
         }
+    }
+
+    private fun changeVisibilityOfSearchTools(visibility: Int) {
+        val searchView = findViewById<LinearLayout>(R.id.searchTools)
+        searchView?.visibility = visibility
     }
 }
