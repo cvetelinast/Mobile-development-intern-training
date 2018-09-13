@@ -2,7 +2,7 @@ package com.example.tsvetelinastoyanova.hackernewsapp.data.remote.filtereddataso
 
 import android.arch.paging.ItemKeyedDataSource
 import android.util.Log
-import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils.NUM_STORIES_FOR_PAGE
+import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils.NUM_STORIES_FOR_SEARCH
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.GetDataService
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.RetrofitClient
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
@@ -16,22 +16,7 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
     @Volatile
     private var lastReceivedIndex: Int = 0
 
-    companion object {
-        private var INSTANCE: FilteredDataSource? = null
-        fun getInstance(query: String): FilteredDataSource {
-            if (INSTANCE == null) {
-                synchronized(FilteredDataSource::class.java) {
-                    if (INSTANCE == null) {
-                        INSTANCE = FilteredDataSource(query)
-                    }
-                }
-            }
-            return INSTANCE!!
-        }
-    }
-
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Story>) {
-        Log.d("filter", "loadInitial() called")
         getMaxStoryId()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -47,13 +32,10 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
     }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        Log.d("filter", "loadAfter() called")
         getStories(callback, lastReceivedIndex)
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        Log.d("filter", "loadBefore() called")
-    }
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {}
 
     override fun getKey(item: Story): Long {
         return item.id?.toLong() ?: 0
@@ -70,7 +52,7 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
                         callback.onResult(stories)
                     },
                     { error ->
-                        Log.d("filter", "Error in loadInitial(): $error, ${error.stackTrace}")
+                        Log.d("filter", "Error in getStories(): $error, ${error.stackTrace}")
                     }
                 )
         }
@@ -81,7 +63,7 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
             .flatMap({ id ->
                 getStoryById((maxIndex - id).toString())
                     .subscribeOn(Schedulers.io())
-            }, 15)
+            }, true, 400)
             .doOnNext {
                 Log.d("filter", "Before - Id: ${it?.id}, Title: ${it?.title}; The current thread is: ${Thread.currentThread()}")
             }
@@ -93,7 +75,7 @@ class FilteredDataSource(private val searchedString: String) : ItemKeyedDataSour
                 Log.d("filter", "After - Id: ${it.id}, Title: ${it.title}; The current thread is: ${Thread.currentThread()}")
                 it.id?.apply { if (this < lastReceivedIndex) lastReceivedIndex = this }
             }
-            .take(NUM_STORIES_FOR_PAGE.toLong())
+            .take(NUM_STORIES_FOR_SEARCH.toLong())
             .toList()
     }
 

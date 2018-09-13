@@ -8,14 +8,10 @@ import android.view.View
 import android.webkit.WebView
 import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils
 import com.example.tsvetelinastoyanova.hackernewsapp.common.schedulers.SchedulerProvider
-import com.example.tsvetelinastoyanova.hackernewsapp.data.StoriesRemoteRepository
 import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.TypeRemoteDataSource
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasources.NewStoriesRemoteDataSource
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.storiesdatasources.TopStoriesRemoteDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsContract
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsFragment
 import com.example.tsvetelinastoyanova.hackernewsapp.news.NewsPresenter
-import android.support.v7.widget.SearchView
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -23,7 +19,6 @@ import android.widget.LinearLayout
 
 class MainActivity : AppCompatActivity() {
 
-    private var searchView: SearchView? = null
     private var presenter: NewsContract.Presenter? = null
 
     companion object {
@@ -105,9 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAndReturnPresenter(topNewsFragment: NewsFragment): NewsContract.Presenter {
-        val repository = StoriesRemoteRepository
-            .getInstance(TopStoriesRemoteDataSource.getInstance(), NewStoriesRemoteDataSource.getInstance())
-        val topNewsPresenter: NewsContract.Presenter = NewsPresenter(topNewsFragment, repository)
+        val topNewsPresenter: NewsContract.Presenter = NewsPresenter(topNewsFragment)
         topNewsFragment.setPresenter(topNewsPresenter)
         return topNewsPresenter
     }
@@ -154,35 +147,7 @@ class MainActivity : AppCompatActivity() {
         hideWebView()
         changeVisibilityOfSearchTools(visibility)
         presenter.stopSearching()
-        //  presenter.stopDisposables()
     }
-
-    /* private fun setSearchViewDetails(searchView: SearchView, searchManager: SearchManager) {
-         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-         searchView.maxWidth = Integer.MAX_VALUE
-         setSearchListener(searchView)
-     }
-
-     private fun setSearchListener(searchView: SearchView) {
-         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-             override fun onQueryTextSubmit(query: String): Boolean {
-                 intent.action = SEARCH
-                 searchView.setQuery(query, false)
-                 loadFilteredNews(query)
-                 return false
-             }
-
-             override fun onQueryTextChange(query: String): Boolean {
-                 return false
-             }
-         })
-     }*/
-
-    /* private fun loadFilteredNews(searchedString: String) {
-         val storiesObservable = Utils.provideStoriesObservable(
-             TypeRemoteDataSource.FILTERED_STORIES, SchedulerProvider.getInstance(), searchedString)
-         presenter!!.loadProperNews(storiesObservable)
-     }*/
 
     private fun hideWebView() {
         val webView: WebView? = findViewById(R.id.webView)

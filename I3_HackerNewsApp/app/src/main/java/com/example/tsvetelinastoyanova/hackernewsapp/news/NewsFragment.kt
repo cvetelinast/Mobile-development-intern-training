@@ -13,9 +13,6 @@ import com.example.tsvetelinastoyanova.hackernewsapp.recyclerview.NewsAdapter
 import android.support.v7.widget.DefaultItemAnimator
 import android.webkit.WebView
 import android.widget.*
-import com.example.tsvetelinastoyanova.hackernewsapp.common.Utils
-import com.example.tsvetelinastoyanova.hackernewsapp.common.schedulers.SchedulerProvider
-import com.example.tsvetelinastoyanova.hackernewsapp.data.remote.TypeRemoteDataSource
 import com.example.tsvetelinastoyanova.hackernewsapp.model.Story
 
 class NewsFragment : Fragment(), NewsContract.View {

@@ -17,6 +17,7 @@ object Utils {
     const val TOP_NEWS_FRAGMENT_NAME = "TOP_NEWS_FRAGMENT"
     private const val PATTERN_DATETIME_FORMAT = "dd.MM.yyyy, hh:mma"
     const val NUM_STORIES_FOR_PAGE = 8
+    const val NUM_STORIES_FOR_SEARCH = 1
 
     fun addFragment(fragmentManager: FragmentManager,
                     newFragment: Fragment, frameId: Int, nameOfFragment: String) {

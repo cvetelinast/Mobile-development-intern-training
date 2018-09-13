@@ -31,7 +31,6 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
     }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        Log.d("filter", "loadAfter() called")
         val lastIndex = getLastIndex()
         val storiesNumberToBeLoaded = chooseBestNumberOfStoriesToLoad(lastIndex)
         val sublist =
@@ -40,9 +39,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
         loadStoriesFromCachedIds(sublist, callback)
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {
-        Log.d("tag", "loadBefore() called")
-    }
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Story>) {}
 
     override fun getKey(item: Story): Long {
         return item.id?.toLong() ?: 0
@@ -52,7 +49,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
         Observable.just(getStoriesList())
             .subscribe(
                 { stories -> callback.onResult(stories) },
-                { error -> Log.d("tag", "Error in loadInitial(): $error") }
+                { error -> Log.d("tag", "Error in initLoadingCachedStories(): $error") }
             )
     }
 
@@ -71,7 +68,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
                     increaseLastReceivedIndexWithValue(stories.size)
                     callback.onResult(stories)
                 },
-                { error -> Log.d("tag", "Error in loadInitial(): $error") }
+                { error -> Log.d("tag", "Error in initGettingIdsAndLoadingStories(): $error") }
             )
     }
 
@@ -85,7 +82,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
                     addStoriesToList(stories)
                     callback.onResult(stories)
                 },
-                { error -> Log.d("tag", "Error in loadAfter(): $error") }
+                { error -> Log.d("tag", "Error in loadStoriesFromCachedIds(): $error") }
             )
     }
 
@@ -105,7 +102,7 @@ abstract class AbstractDataSource : ItemKeyedDataSource<Long, Story>(), StoriesR
         val service = retrofit.create(GetDataService::class.java)
         return service.getStoryById(id)
             .subscribeOn(Schedulers.io())
-            .filter{story: Story? -> story != null}
+            .filter { story: Story? -> story != null }
             .ofType(Story::class.java)
     }
 }
